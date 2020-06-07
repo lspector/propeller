@@ -1,22 +1,25 @@
 # propeller
 
-A Clojure library designed to ... well, that part is up to you.
+Yet another Push-based genetic programming system in Clojure.
 
 ## Usage
 
-FIXME
+To run PushGP on the default genetic programming problem 
+from a REPL, load propel.core into your REPL (i.e. `lein repl`), 
+and run `(-main)`.
 
-## License
+To run PushGP on the default genetic programming problem from 
+command line, execute `lein run`. Command-line arguments may 
+be provided to override the defaults specified in `-main`, for 
+example, `lein run :population-size 100`. You can use something 
+like `lein run | tee outfile` to send output both to the terminal 
+and to `outfile`.
 
-Copyright © 2020 FIXME
+## Description
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
+Propel is an implementation of the Push programming 
+language and the PushGP genetic programming system in Clojure.
 
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+For more information on Push and PushGP see 
+[http://pushlanguage.org](http://pushlanguage.org).
+
