@@ -487,7 +487,7 @@
 (defn -main
   "Runs propel-gp, giving it a map of arguments."
   [& args]
-  (binding [*ns* (the-ns 'propel.core)]
+  (binding [*ns* (the-ns 'propeller.core)]
     (propel-gp (update-in (merge {:instructions default-instructions
                                   :error-function regression-error-function
                                   :max-generations 500
