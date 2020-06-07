@@ -7,7 +7,7 @@
   (let [popped-state (pop-stack state :exec)
         first-raw (first (:exec state))
         first-instruction (if (symbol? first-raw)
-                            (eval first-raw)
+                            (var-get (resolve first-raw))
                             first-raw)]
     (cond
       (fn? first-instruction)
