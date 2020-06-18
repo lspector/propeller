@@ -13,7 +13,9 @@
                            :max-initial-plushy-size 50
                            :step-limit              100
                            :parent-selection        :tournament
-                           :tournament-size         5}
+                           :tournament-size         5
+                           :UMADRate 0.2
+                           :variation {:UMAD 0.5 :crossover 0.5}}
                           (apply hash-map
                                  (map read-string args)))
                    [:error-function]
