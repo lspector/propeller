@@ -22,21 +22,39 @@
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
            max-initial-plushy-size]
-    :as argmap}]
+    :as   argmap}]
   (println "Starting GP with args:" argmap)
-  (loop [generation 0
-         population (repeatedly
-                      population-size
-                      #(hash-map :plushy
-                                 (make-random-plushy instructions
-                                                     max-initial-plushy-size)))]
-    (let [evaluated-pop (sort-by :total-error
-                                 (map (partial error-function argmap)
-                                      population))]
-      (report evaluated-pop generation)
-      (cond
-        (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
-        (>= generation max-generations) nil
-        :else (recur (inc generation)
-                     (repeatedly population-size
-                                 #(new-individual evaluated-pop argmap)))))))
+  (if
+    (:elitism argmap)
+    (loop [generation 0
+           population (repeatedly
+                        population-size
+                        #(hash-map :plushy
+                                   (make-random-plushy instructions
+                                                       max-initial-plushy-size)))]
+      (let [evaluated-pop (sort-by :total-error
+                                   (map (partial error-function argmap)
+                                        population))]
+        (report evaluated-pop generation)
+        (cond
+          (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
+          (>= generation max-generations) nil
+          :else (recur (inc generation)
+                       (conj (repeatedly (- population-size 1)
+                                         #(new-individual evaluated-pop argmap)) (first evaluated-pop))))))
+    (loop [generation 0
+           population (repeatedly
+                        population-size
+                        #(hash-map :plushy
+                                   (make-random-plushy instructions
+                                                       max-initial-plushy-size)))]
+      (let [evaluated-pop (sort-by :total-error
+                                   (map (partial error-function argmap)
+                                        population))]
+        (report evaluated-pop generation)
+        (cond
+          (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
+          (>= generation max-generations) nil
+          :else (recur (inc generation)
+                       (repeatedly population-size
+                                   #(new-individual evaluated-pop argmap))))))))

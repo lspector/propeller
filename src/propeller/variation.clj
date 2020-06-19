@@ -31,7 +31,8 @@
 (defn uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
   [plushy UMADRate]
-  (remove (fn [x] (< (rand) (/ 1(+ 1 (/ 1 UMADRate)))))
+  (remove (fn [x] (< (rand)
+                     (/ 1 (+ 1 (/ 1 UMADRate)))))
           plushy))
 
 (defn new-individual
@@ -41,10 +42,14 @@
   {:plushy
    (let [prob (rand)]
      (cond
-       (< prob (:crossover (:variation argmap))) (crossover (:plushy (select-parent pop argmap))
-                                                            (:plushy (select-parent pop argmap)))
-       (< prob (+ (:crossover (:variation argmap)) (/ (:UMAD (:variation argmap)) 2))) (uniform-addition (:plushy (select-parent pop argmap))
-                                                                                                         (:instructions argmap)
-                                                                                                         (:UMADRate argmap))
-       :else (uniform-deletion (:plushy (select-parent pop argmap))
-                               (:UMADRate argmap))))})
+       (< prob (:crossover (:variation argmap)))
+       (crossover (:plushy (select-parent pop argmap))
+                  (:plushy (select-parent pop argmap)))
+       (< prob (+ (:crossover (:variation argmap))
+                  (/ (:UMAD (:variation argmap)) 2)))
+       (do (uniform-addition (:plushy (select-parent pop argmap))
+                             (:instructions argmap)
+                             (:UMADRate argmap))
+           (uniform-deletion (:plushy (select-parent pop argmap))
+                             (:UMADRate argmap)))
+       :else (:plushy (select-parent pop argmap))))})
