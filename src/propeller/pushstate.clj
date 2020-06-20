@@ -2,17 +2,17 @@
   (:use [propeller util]))
 
 (def example-push-state
-  {:exec '()
+  {:exec    '()
    :integer '(1 2 3 4 5 6 7)
-   :string '("abc")
-   :input {:in1 4}})
+   :string  '("abc")
+   :input   {:in1 4}})
 
 (def empty-push-state
-  {:exec '()
+  {:exec    '()
    :integer '()
-   :string '()
+   :string  '()
    :boolean '()
-   :input {}})
+   :input   {}})
 
 (defn push-to-stack
   "Pushes item onto stack in state"

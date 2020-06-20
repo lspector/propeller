@@ -22,7 +22,7 @@
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
            max-initial-plushy-size]
-    :as argmap}]
+    :as   argmap}]
   (println "Starting GP with args:" argmap)
   (loop [generation 0
          population (repeatedly
@@ -38,5 +38,9 @@
         (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
         (>= generation max-generations) nil
         :else (recur (inc generation)
-                     (repeatedly population-size
-                                 #(new-individual evaluated-pop argmap)))))))
+                     (if (:elitism argmap)
+                       (conj (repeatedly (dec population-size)
+                                         #(new-individual evaluated-pop argmap))
+                             (first evaluated-pop))
+                       (repeatedly population-size
+                                   #(new-individual evaluated-pop argmap))))))))

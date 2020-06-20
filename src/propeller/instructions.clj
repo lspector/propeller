@@ -38,9 +38,9 @@
     "G"
     "T"))
 
-(def opens ; number of blocks opened by instructions (default = 0)
+(def opens                                                  ; number of blocks opened by instructions (default = 0)
   {'exec_dup 1
-   'exec_if 2})
+   'exec_if  2})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; actual instructions
