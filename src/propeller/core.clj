@@ -13,8 +13,8 @@
                            :max-initial-plushy-size 50
                            :step-limit              100
                            :parent-selection        :lexicase
-                           :tournament-size         20
-                           :UMADRate                0.2
+                           :tournament-size         5
+                           :UMADRate                0.1
                            :variation               {:UMAD 0.5 :crossover 0.5}
                            :elitism                 false}
                           (apply hash-map

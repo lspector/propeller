@@ -16,22 +16,18 @@
                  longer))))
 
 (defn uniform-addition
-  "Randomly adds new instructions before every instruction (and at the end of
-  the plushy) with some probability."
+  "Returns plushy with new instructions possibly added before or after each existing instruction."
   [plushy instructions UMADRate]
-  (let [rand-code (repeatedly (inc (count plushy))
-                              (fn []
-                                (if (< (rand) UMADRate)
-                                  (rand-nth instructions)
-                                  :mutation-padding)))]
-    (remove #(= % :mutation-padding)
-            (interleave (conj plushy :mutation-padding)
-                        rand-code))))
+  (apply concat
+         (map #(if (< (rand) UMADRate)
+                 (shuffle [% (rand-nth instructions)])
+                 [%])
+              plushy)))
 
 (defn uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
   [plushy UMADRate]
-  (remove (fn [x] (< (rand)
+  (remove (fn [_] (< (rand)
                      (/ 1 (+ 1 (/ 1 UMADRate)))))
           plushy))
 
@@ -46,10 +42,9 @@
        (crossover (:plushy (select-parent pop argmap))
                   (:plushy (select-parent pop argmap)))
        (< prob (+ (:crossover (:variation argmap))
-                  (/ (:UMAD (:variation argmap)) 2)))
-       (do (uniform-addition (:plushy (select-parent pop argmap))
-                             (:instructions argmap)
-                             (:UMADRate argmap))
-           (uniform-deletion (:plushy (select-parent pop argmap))
-                             (:UMADRate argmap)))
+                  (:UMAD (:variation argmap)) 2))
+       (uniform-deletion (uniform-addition (:plushy (select-parent pop argmap))
+                                           (:instructions argmap)
+                                           (:UMADRate argmap))
+                         (:UMADRate argmap))
        :else (:plushy (select-parent pop argmap))))})
