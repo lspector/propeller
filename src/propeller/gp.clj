@@ -1,7 +1,6 @@
 (ns propeller.gp
   (:use [propeller genome variation]))
 
-
 (defn report
   "Reports information each generation."
   [pop generation]
@@ -14,8 +13,10 @@
     (println "Best total error:" (:total-error best))
     (println "Best errors:" (:errors best))
     (println "Best behaviors:" (:behaviors best))
-    (println "Genotypic diversity:" (float (/ (count (distinct (map :plushy pop))) (count pop))))
-    (println "Average genome length:" (float (/ (reduce + (map count (map :plushy pop))) (count pop))))
+    (println "Genotypic diversity:"
+             (float (/ (count (distinct (map :plushy pop))) (count pop))))
+    (println "Average genome length:"
+             (float (/ (reduce + (map count (map :plushy pop))) (count pop))))
     (println)))
 
 (defn gp

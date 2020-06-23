@@ -1,6 +1,7 @@
 (ns propeller.session
-  (:use [propeller core problems gp variation selection genome interpreter instructions pushstate util]))
-
+  (:use [propeller core gp variation selection genome]
+        [propeller.push interpreter instructions state]
+        [propeller.problems simple-regression string-classification]))
 
 #_(interpret-program '(1 2 integer_+) empty-push-state 1000)
 

@@ -1,5 +1,5 @@
 (ns propeller.genome
-  (:use [propeller instructions]))
+  (:use propeller.push.instructions))
 
 (defn push-from-plushy
   "Returns the Push program expressed by the given plushy representation."

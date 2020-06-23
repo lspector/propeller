@@ -1,5 +1,5 @@
-(ns propeller.interpreter
-  (:use [propeller util pushstate instructions]))
+(ns propeller.push.interpreter
+  (:use [propeller.push state instructions]))
 
 (defn interpret-one-step
   "Takes a Push state and executes the next instruction on the exec stack."
@@ -37,5 +37,3 @@
             (> (:step state) step-limit))
       state
       (recur (update (interpret-one-step state) :step inc)))))
-
-

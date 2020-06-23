@@ -1,6 +1,8 @@
 (ns propeller.core
   (:gen-class)
-  (:use [propeller instructions gp problems]))
+  (:use propeller.gp
+        propeller.push.instructions
+        [propeller.problems simple-regression string-classification]))
 
 (defn -main
   "Runs propel-gp, giving it a map of arguments."
@@ -14,8 +16,8 @@
                            :step-limit              100
                            :parent-selection        :lexicase
                            :tournament-size         5
-                           :UMADRate                0.1
-                           :variation               {:UMAD 0.5 :crossover 0.5}
+                           :umad-rate                0.1
+                           :variation               {:umad 0.5 :crossover 0.5}
                            :elitism                 false}
                           (apply hash-map
                                  (map read-string args)))
