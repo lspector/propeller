@@ -1,14 +1,15 @@
 (ns propeller.push.interpreter
-  (:use [propeller.push state instructions]))
+  (:require [propeller.push.instructions :refer [instruction-table]])
+  (:require [propeller.push.state :refer :all]))
 
 (defn interpret-one-step
   "Takes a Push state and executes the next instruction on the exec stack."
   [state]
   (let [popped-state (pop-stack state :exec)
-        first-raw (first (:exec state))
-        first-instruction (if (symbol? first-raw)
-                            (var-get (resolve first-raw))
-                            first-raw)]
+        first-instruction-raw (first (:exec state))
+        first-instruction (if (keyword? first-instruction-raw)
+                            (first-instruction-raw @instruction-table)
+                            first-instruction-raw)]
     (cond
       (fn? first-instruction)
       (first-instruction popped-state)
@@ -27,7 +28,7 @@
       ;
       :else
       (throw (Exception. (str "Unrecognized Push instruction in program: "
-                              first-instruction))))))
+                              (name first-instruction-raw)))))))
 
 (defn interpret-program
   "Runs the given problem starting with the stacks in start-state."
