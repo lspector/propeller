@@ -21,9 +21,9 @@
                      (assoc empty-push-state :input {:in1 "I can hear you."})
                      1000)
 
-#_(push-from-plushy (make-random-plushy default-instructions 20))
+#_(plushy->push (make-random-plushy default-instructions 20))
 
-#_(interpret-program (push-from-plushy (make-random-plushy default-instructions 20))
+#_(interpret-program (plushy->push (make-random-plushy default-instructions 20))
                      (assoc empty-push-state :input {:in1 "I can hear you."})
                      1000)
 

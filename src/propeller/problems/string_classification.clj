@@ -12,7 +12,7 @@
   behavior is produced. The behavior is here defined as the final top item on
   the BOOLEAN stack."
   [argmap individual]
-  (let [program (push-from-plushy (:plushy individual))
+  (let [program (plushy->push (:plushy individual))
         inputs ["GCG" "GACAG" "AGAAG" "CCCA" "GATTACA" "TAGG" "GACT"]
         correct-outputs [false false false false true true true]
         outputs (map (fn [input]

@@ -1,7 +1,7 @@
 (ns propeller.genome
   (:use propeller.push.instructions))
 
-(defn push-from-plushy
+(defn plushy->push
   "Returns the Push program expressed by the given plushy representation."
   [plushy]
   (let [opener? #(and (vector? %) (= (first %) 'open))]     ;; [open <n>] marks opens

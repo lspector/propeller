@@ -1,30 +1,30 @@
 (ns propeller.push.state)
 
 ;; Set of all stacks used by the Push interpreter
-(defonce ^:private stack-types #{:auxiliary
-                                 :boolean
-                                 :char
-                                 :code
-                                 :environment
-                                 :exec
-                                 :float
-                                 :genome
-                                 :gtm
-                                 :input
-                                 :integer
-                                 :output
-                                 :return
-                                 :string
-                                 :tag
-                                 :vector_boolean
-                                 :vector_float
-                                 :vector_integer
-                                 :vector_string
-                                 :zip})
+(defonce stacks #{:auxiliary
+                  :boolean
+                  :char
+                  :code
+                  :environment
+                  :exec
+                  :float
+                  :genome
+                  :gtm
+                  :input
+                  :integer
+                  :output
+                  :return
+                  :string
+                  :tag
+                  :vector_boolean
+                  :vector_float
+                  :vector_integer
+                  :vector_string
+                  :zip})
 
 ;; Record-based states for performance
 (defmacro define-push-state []
-  `(defrecord ~'State [~@(map #(symbol (name %)) stack-types)]))
+  `(defrecord ~'State [~@(map #(symbol (name %)) stacks)]))
 
 (define-push-state)
 
@@ -32,18 +32,10 @@
 (defonce empty-state (map->State {}))
 
 (def example-push-state
-  {:exec '()
+  {:exec    '()
    :integer '(1 2 3 4 5 6 7)
-   :string '("abc")
-   :input {:in1 4}})
-
-(defn print-state
-  "Pretty-prints a Push state, for logging or debugging purposes."
-  [state]
-  (doseq [stack stack-types]
-    (printf "%-15s = " stack)
-    (prn (if (get state stack) (get state stack) '()))
-    (flush)))
+   :string  '("abc")
+   :input   {:in1 4}})
 
 (defn empty-stack?
   "Returns true if the stack is empty."

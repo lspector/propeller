@@ -1,6 +1,6 @@
 (ns propeller.push.instructions.char
-  (:require [propeller.push.instructions :refer [make-instruction
-                                                 def-instruction]]
+  (:require [propeller.push.instructions :refer [def-instruction]]
+            [propeller.push.utils :refer [make-instruction]]
             [tools.character :as char]))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the popped character is a letter

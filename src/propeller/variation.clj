@@ -1,5 +1,5 @@
 (ns propeller.variation
-  (:use [propeller selection]))
+  (:require [propeller.selection :refer :all]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
