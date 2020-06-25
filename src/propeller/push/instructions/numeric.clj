@@ -10,67 +10,57 @@
 
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is greater than the top
 ;; item, and FALSE otherwise
-(defn- _>
+(defn- _gt
   [stack state]
   (make-instruction state > [stack stack] :boolean))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is greater than or
 ;; equal to the top item, and FALSE otherwise
-(defn- _>=
+(defn- _gte
   [stack state]
   (make-instruction state >= [stack stack] :boolean))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is less than the top
 ;; item, and FALSE otherwise
-(defn- _<
+(defn- _lt
   [stack state]
   (make-instruction state < [stack stack] :boolean))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is less than or equal
 ;; to the top item, and FALSE otherwise
-(defn- _<=
+(defn- _lte
   [stack state]
   (make-instruction state <= [stack stack] :boolean))
 
 ;; Pushes the sum of the top two items onto the same stack
-(defn- _+
+(defn- _add
   [stack state]
   (make-instruction state +' [stack stack] stack))
 
 ;; Pushes the difference of the top two items (i.e. the second item minus the
 ;; top item) onto the same stack
-(defn- _-
+(defn- _subtract
   [stack state]
   (make-instruction state -' [stack stack] stack))
 
 ;; Pushes the product of the top two items onto the same stack
-(defn- _*
+(defn- _mult
   [stack state]
   (make-instruction state *' [stack stack] stack))
 
 ;; Pushes the quotient of the top two items (i.e. the second item divided by the
-;; top item) onto the same stack. If the top item is zero, acts as a NOOP
+;; top item) onto the same stack. If the top item is zero, pushes 1
 (defn- _quot
   [stack state]
-  (make-instruction state
-                    #(if (zero? %2)
-                       (list %1 %2) ; push both items back (NOOP)
-                       (quot %1 %2))
-                    [stack stack]
-                    stack))
+  (make-instruction state #(if (zero? %2) 1 (quot %1 %2)) [stack stack] stack))
 
 ;; Pushes the second item modulo the top item onto the same stack. If the top
-;; item is zero, acts as a NOOP. The modulus is computed as the remainder of the
+;; item is zero, pushes 1. The modulus is computed as the remainder of the
 ;; quotient, where the quotient has first been truncated towards negative
 ;; infinity.
-(defn- _%
+(defn- _mod
   [stack state]
-  (make-instruction state
-                    #(if (zero? %2)
-                       (list %1 %2) ; push both items back (NOOP)
-                       (mod %1 %2))
-                    [stack stack]
-                    stack))
+  (make-instruction state #(if (zero? %2) 1 (mod %1 %2)) [stack stack] stack))
 
 ;; Pushes the maximum of the top two items
 (defn- _max
@@ -118,7 +108,7 @@
 ;; 2 types x 16 functions = 32 instructions
 (generate-functions
   [:float :integer]
-  [_> _>= _< _<= _+ _- _* _quot _% _max _min _inc _dec
+  [_gt _gte _lt _lte _add _subtract _mult _quot _mod _max _min _inc _dec
    _fromboolean _fromchar _fromstring])
 
 ;; =============================================================================

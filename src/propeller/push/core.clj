@@ -16,18 +16,18 @@
 ;; Set of original propel instructions
 (def default-instructions
   (list :in1
-        :integer_+
-        :integer_-
-        :integer_*
-        :integer_%
-        :integer_=
+        :integer_add
+        :integer_subtract
+        :integer_mult
+        :integer_quot
+        :integer_eq
         :exec_dup
         :exec_if
         :boolean_and
         :boolean_or
         :boolean_not
-        :boolean_=
-        :string_=
+        :boolean_eq
+        :string_eq
         :string_take
         :string_drop
         :string_reverse

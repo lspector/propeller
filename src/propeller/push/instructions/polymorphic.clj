@@ -16,7 +16,7 @@
 
 ;; Pushes TRUE onto the BOOLEAN stack if the top two items are equal.
 ;; Otherwise FALSE
-(defn- _=
+(defn- _eq
   [stack state]
   (make-instruction state = [stack stack] :boolean))
 
@@ -101,7 +101,7 @@
   ())
 
 ;; 5 types x 1 function = 5 instructions
-(generate-functions [:boolean :char :float :integer :string] [_=])
+(generate-functions [:boolean :char :float :integer :string] [_eq])
 
 ;; 8 types x 12 function = 96 instructions
 (generate-functions
