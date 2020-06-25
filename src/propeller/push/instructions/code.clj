@@ -1,7 +1,7 @@
 (ns propeller.push.instructions.code
   (:require [propeller.push.state :as state]
             [propeller.push.utils :refer [def-instruction
-                                           make-instruction]]))
+                                          make-instruction]]))
 
 ;; =============================================================================
 ;; CODE and EXEC Instructions
