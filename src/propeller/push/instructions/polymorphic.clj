@@ -102,6 +102,6 @@
 
 ;; 8 types x 12 function = 96 instructions
 (generate-functions
-  [:boolean :char :code :exec :float :integer :string :zip]
+  [:boolean :char :code :exec :float :integer :string]
   [_dup _duptimes _dupitems _empty _flush _pop _rot _shove _stackdepth
    _swap _yank _yankdup])
