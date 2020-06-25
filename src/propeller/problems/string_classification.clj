@@ -1,7 +1,7 @@
 (ns propeller.problems.string-classification
-  (:require [propeller.genome :refer :all]
-            (propeller.push [state :refer :all]
-                            [interpreter :refer :all])))
+  (:require [propeller.genome :as genome]
+            (propeller.push [state :as state]
+                            [interpreter :as interpreter])))
 
 ;; =============================================================================
 ;; String classification
@@ -13,14 +13,14 @@
   behavior is produced. The behavior is here defined as the final top item on
   the BOOLEAN stack."
   [argmap individual]
-  (let [program (plushy->push (:plushy individual))
+  (let [program (genome/plushy->push (:plushy individual))
         inputs ["GCG" "GACAG" "AGAAG" "CCCA" "GATTACA" "TAGG" "GACT"]
         correct-outputs [false false false false true true true]
         outputs (map (fn [input]
-                       (peek-stack
-                         (interpret-program
+                       (state/peek-stack
+                         (interpreter/interpret-program
                            program
-                           (assoc empty-state :input {:in1 input})
+                           (assoc state/empty-state :input {:in1 input})
                            (:step-limit argmap))
                          :boolean))
                      inputs)

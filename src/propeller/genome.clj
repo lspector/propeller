@@ -1,12 +1,12 @@
 (ns propeller.genome
-  (:require [propeller.push.core :refer :all]))
+  (:require [propeller.push.core :as push]))
 
 (defn plushy->push
   "Returns the Push program expressed by the given plushy representation."
   [plushy]
   (let [opener? #(and (vector? %) (= (first %) 'open))]     ;; [open <n>] marks opens
     (loop [push ()                                          ;; iteratively build the Push program from the plushy
-           plushy (mapcat #(if-let [n (get opens %)] [% ['open n]] [%]) plushy)]
+           plushy (mapcat #(if-let [n (get push/opens %)] [% ['open n]] [%]) plushy)]
       (if (empty? plushy)                                   ;; maybe we're done?
         (if (some opener? push)                             ;; done with plushy, but unclosed open
           (recur push '(close))                             ;; recur with one more close
