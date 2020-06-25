@@ -1,7 +1,14 @@
 (ns propeller.gp
   (:require [propeller.genome :as genome]
             [propeller.variation :as variation]
-            [propeller.push.core :as push]))
+            [propeller.push.core :as push]
+            [propeller.push.instructions.boolean]
+            [propeller.push.instructions.char]
+            [propeller.push.instructions.code]
+            [propeller.push.instructions.input-output]
+            [propeller.push.instructions.numeric]
+            [propeller.push.instructions.polymorphic]
+            [propeller.push.instructions.string]))
 
 (defn report
   "Reports information each generation."
@@ -29,10 +36,7 @@
   ;;
   (println "Starting GP with args: " argmap)
   ;;
-  (do (print "Registering instructions... ")
-      (require '[propeller.push.instructions boolean char code input-output
-                 numeric polymorphic string])
-      (println "Done. Registered instructions:")
+  (do (println "Registered instructions:")
       (println (sort (keys @push/instruction-table))))
   ;;
   (loop [generation 0
