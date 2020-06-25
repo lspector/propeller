@@ -3,11 +3,11 @@
             [propeller.gp :as gp]
             [propeller.selection :as selection]
             [propeller.variation :as variation]
-            [propeller.push.core :as push]
-            [propeller.interpreter :as interpreter]
-            [propeller.state :as state]
             [propeller.problems.simple-regression :as regression]
-            [propeller.problems.string-classification :as string-classif]))
+            [propeller.problems.string-classification :as string-classif]
+            [propeller.push.core :as push]
+            [propeller.push.interpreter :as interpreter]
+            [propeller.push.state :as state]))
 
 #_(interpreter/interpret-program
     '(1 2 integer_add) state/empty-state 1000)

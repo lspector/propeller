@@ -59,7 +59,7 @@
   "Pushes item(s) onto stack."
   [state stack items]
   (let [items-list (if (coll? items) items (list items))
-        items-list-no-nil (filter #(not (nil? %)) items-list)]               ; do not push nil items
+        items-list-no-nil (filter #(not (nil? %)) items-list)]
     (update state stack into items-list-no-nil)))
 
 (defn get-args-from-stacks
