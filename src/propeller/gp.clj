@@ -1,7 +1,7 @@
 (ns propeller.gp
   (:require [propeller.push.core :refer [instruction-table]]
-            (propeller [genome :refer :all]
-                       [variation :refer :all])))
+            (propeller [genome :as genome]
+                       [variation :as variation])))
 
 (defn report
   "Reports information each generation."
@@ -11,7 +11,7 @@
     (println "               Report for Generation" generation)
     (println "-------------------------------------------------------")
     (print "Best plushy: ") (prn (:plushy best))
-    (print "Best program: ") (prn (plushy->push (:plushy best)))
+    (print "Best program: ") (prn (genome/plushy->push (:plushy best)))
     (println "Best total error:" (:total-error best))
     (println "Best errors:" (:errors best))
     (println "Best behaviors:" (:behaviors best))
@@ -39,7 +39,7 @@
          population (repeatedly
                       population-size
                       #(hash-map :plushy
-                                 (make-random-plushy instructions
+                                 (genome/make-random-plushy instructions
                                                      max-initial-plushy-size)))]
     (let [evaluated-pop (sort-by :total-error
                                  (map (partial error-function argmap)
@@ -51,7 +51,7 @@
         :else (recur (inc generation)
                      (if (:elitism argmap)
                        (conj (repeatedly (dec population-size)
-                                         #(new-individual evaluated-pop argmap))
+                                         #(variation/new-individual evaluated-pop argmap))
                              (first evaluated-pop))
                        (repeatedly population-size
-                                   #(new-individual evaluated-pop argmap))))))))
+                                   #(variation/new-individual evaluated-pop argmap))))))))

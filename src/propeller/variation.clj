@@ -1,5 +1,5 @@
 (ns propeller.variation
-  (:require [propeller.selection :refer :all]))
+  (:require [propeller.selection :as selection]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
@@ -40,12 +40,12 @@
    (let [prob (rand)]
      (cond
        (< prob (:crossover (:variation argmap)))
-       (crossover (:plushy (select-parent pop argmap))
-                  (:plushy (select-parent pop argmap)))
+       (crossover (:plushy (selection/select-parent pop argmap))
+                  (:plushy (selection/select-parent pop argmap)))
        (< prob (+ (:crossover (:variation argmap))
                   (:umad (:variation argmap)) 2))
-       (uniform-deletion (uniform-addition (:plushy (select-parent pop argmap))
+       (uniform-deletion (uniform-addition (:plushy (selection/select-parent pop argmap))
                                            (:instructions argmap)
                                            (:umad-rate argmap))
                          (:umad-rate argmap))
-       :else (:plushy (select-parent pop argmap))))})
+       :else (:plushy (selection/select-parent pop argmap))))})
