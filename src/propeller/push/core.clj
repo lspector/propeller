@@ -1,4 +1,4 @@
-(ns propeller.push.instructions
+(ns propeller.push.core
   (:require [propeller.push.state :refer [get-args-from-stacks
                                           push-to-stack]]))
 

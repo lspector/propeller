@@ -1,6 +1,7 @@
 (ns propeller.problems.string-classification
-  (:use propeller.genome
-        [propeller.push state interpreter]))
+  (:require [propeller.genome :refer :all]
+            (propeller.push [state :refer :all]
+                            [interpreter :refer :all])))
 
 ;; =============================================================================
 ;; String classification

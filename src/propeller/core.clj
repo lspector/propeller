@@ -1,9 +1,9 @@
 (ns propeller.core
   (:gen-class)
-  (:require [propeller.push.instructions boolean char code input-output numeric random string])
-  (:use propeller.gp
-        propeller.push.instructions
-        [propeller.problems simple-regression string-classification]))
+  (:require [propeller.gp :refer :all]
+            [propeller.push.core :refer :all]
+            (propeller.problems [simple-regression :refer :all]
+                                [string-classification :refer :all])))
 
 (defn -main
   "Runs propel-gp, giving it a map of arguments."

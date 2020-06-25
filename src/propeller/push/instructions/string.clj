@@ -1,6 +1,10 @@
 (ns propeller.push.instructions.string
-  (:require [propeller.push.instructions :refer [def-instruction]]
+  (:require [propeller.push.core :refer [def-instruction]]
             [propeller.push.utils :refer [make-instruction]]))
+
+;; =============================================================================
+;; STRING Instructions
+;; =============================================================================
 
 (def-instruction
   :string_=

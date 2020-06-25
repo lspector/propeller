@@ -58,7 +58,9 @@
 (defn push-to-stack
   "Pushes item(s) onto stack."
   [state stack items]
-  (update state stack (if (seq? items) into conj) items))
+  (let [items-list (if (coll? items) items (list items))
+        items-list-no-nil (filter #(not (nil? %)) items-list)]               ; do not push nil items
+    (update state stack into items-list-no-nil)))
 
 (defn get-args-from-stacks
   "Takes a state and a collection of stacks to take args from. If there are

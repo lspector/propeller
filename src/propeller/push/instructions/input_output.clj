@@ -1,6 +1,10 @@
 (ns propeller.push.instructions.input-output
   (:require [propeller.push.state :as state]
-            [propeller.push.instructions :refer [def-instruction]]))
+            [propeller.push.core :refer [def-instruction]]))
+
+;; =============================================================================
+;; INPUT and OUTPUT Instructions
+;; =============================================================================
 
 ;; Pushes the input labeled :in1 on the inputs map onto the :exec stack
 (def-instruction

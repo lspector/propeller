@@ -1,5 +1,5 @@
 (ns propeller.push.interpreter
-  (:require [propeller.push.instructions :refer [instruction-table]])
+  (:require [propeller.push.core :refer [instruction-table]])
   (:require [propeller.push.state :refer :all]))
 
 (defn interpret-one-step

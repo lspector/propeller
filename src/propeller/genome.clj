@@ -1,5 +1,5 @@
 (ns propeller.genome
-  (:use propeller.push.instructions))
+  (:require [propeller.push.core :refer :all]))
 
 (defn plushy->push
   "Returns the Push program expressed by the given plushy representation."

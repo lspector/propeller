@@ -1,12 +1,10 @@
 (ns propeller.push.instructions.boolean
-  (:require [propeller.push.instructions :refer [def-instruction]]
+  (:require [propeller.push.core :refer [def-instruction]]
             [propeller.push.utils :refer [make-instruction]]))
 
-;; Pushes TRUE if the top two BOOLEANs are equal, and FALSE otherwise
-(def-instruction
-  :boolean_=
-  (fn [state]
-    (make-instruction state = [:boolean :boolean] :boolean)))
+;; =============================================================================
+;; BOOLEAN Instructions
+;; =============================================================================
 
 ;; Pushes the logical AND of the top two BOOLEANs
 (def-instruction

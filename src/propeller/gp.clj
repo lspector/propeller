@@ -1,5 +1,7 @@
 (ns propeller.gp
-  (:use [propeller genome variation]))
+  (:require [propeller.push.core :refer [instruction-table]]
+            (propeller [genome :refer :all]
+                       [variation :refer :all])))
 
 (defn report
   "Reports information each generation."
@@ -24,7 +26,15 @@
   [{:keys [population-size max-generations error-function instructions
            max-initial-plushy-size]
     :as   argmap}]
-  (println "Starting GP with args:" argmap)
+  ;;
+  (println "Starting GP with args: " argmap)
+  ;;
+  (do (print "Registering instructions... ")
+      (require '[propeller.push.instructions boolean char code input-output
+                 numeric polymorphic string])
+      (println "Done. Registered instructions:")
+      (println (sort (keys @instruction-table))))
+  ;;
   (loop [generation 0
          population (repeatedly
                       population-size

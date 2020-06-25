@@ -1,18 +1,12 @@
 (ns propeller.push.instructions.numeric
-  (:require [propeller.push.instructions :refer [def-instruction]]
+  (:require [propeller.push.core :refer [def-instruction]]
             [propeller.push.utils :refer [generate-functions
                                           make-instruction]]
             [tools.math :as math]))
 
 ;; =============================================================================
-;; FLOAT and INTEGER (polymorphic)
+;; FLOAT and INTEGER Instructions (polymorphic)
 ;; =============================================================================
-
-;; Pushes TRUE onto the BOOLEAN stack if the top two items are equal, and
-;; FALSE otherwise
-(defn- _=
-  [stack state]
-  (make-instruction state = [stack stack] :boolean))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is greater than the top
 ;; item, and FALSE otherwise
@@ -20,11 +14,23 @@
   [stack state]
   (make-instruction state > [stack stack] :boolean))
 
+;; Pushes TRUE onto the BOOLEAN stack if the second item is greater than or
+;; equal to the top item, and FALSE otherwise
+(defn- _>=
+  [stack state]
+  (make-instruction state >= [stack stack] :boolean))
+
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is less than the top
 ;; item, and FALSE otherwise
 (defn- _<
   [stack state]
   (make-instruction state < [stack stack] :boolean))
+
+;; Pushes TRUE onto the BOOLEAN stack if the second item is less than or equal
+;; to the top item, and FALSE otherwise
+(defn- _<=
+  [stack state]
+  (make-instruction state <= [stack stack] :boolean))
 
 ;; Pushes the sum of the top two items onto the same stack
 (defn- _+
@@ -48,7 +54,7 @@
   [stack state]
   (make-instruction state
                     #(if (zero? %2)
-                       (list %1 %2) ; push both items back
+                       (list %1 %2) ; push both items back (NOOP)
                        (quot %1 %2))
                     [stack stack]
                     stack))
@@ -61,7 +67,7 @@
   [stack state]
   (make-instruction state
                     #(if (zero? %2)
-                       (list %1 %2) ; push both items back
+                       (list %1 %2) ; push both items back (NOOP)
                        (mod %1 %2))
                     [stack stack]
                     stack))
@@ -80,21 +86,43 @@
 (defn- _fromboolean
   [stack state]
   (make-instruction state
-                    #((if (= stack :float) float int) (if % 1 0))
+                    #((if (= stack :integer) int float) (if % 1 0))
                     [:boolean]
                     stack))
 
-;; Automate type-specific function generation. All resulting functions take a
-;; Push state as their only argument. For FLOAT and INTEGER, create one of each
-;; of the 11 following type-specific functions: =, >, <, +, -, *, QUOT, %, MAX,
-;; MIN, and FROMBOOLEAN. (22 functions total, with syntax e.g. integer_=,
-;; float_min etc.)
+;; Pushes the ASCII value of the top CHAR
+(defn- _fromchar
+  [stack state]
+  (make-instruction state (if (= stack :integer) int float) [:char] stack))
+
+;; Pushes the value of the top STRING, if it can be parsed as a number.
+;; Otherwise, acts as a NOOP
+(defn- _fromstring
+  [stack state]
+  (make-instruction state
+                    #(try ((if (= stack :integer) int float) (read-string %))
+                          (catch Exception e))
+                    [:string]
+                    stack))
+
+;; Pushes the increment (i.e. +1) of the top item of the stack
+(defn- _inc
+  [stack state]
+  (make-instruction state inc [stack] stack))
+
+;; Pushes the decrement (i.e. -1) of the top item of the stack
+(defn- _dec
+  [stack state]
+  (make-instruction state dec [stack] stack))
+
+;; 2 types x 16 functions = 32 instructions
 (generate-functions
   [:float :integer]
-  [_=, _>, _<, _+, _-, _*, _quot, _%, _max, _min, _fromboolean])
+  [_> _>= _< _<= _+ _- _* _quot _% _max _min _inc _dec
+   _fromboolean _fromchar _fromstring])
 
 ;; =============================================================================
-;; FLOAT only
+;; FLOAT Instructions only
 ;; =============================================================================
 
 ;; Pushes the cosine of the top FLOAT
@@ -115,20 +143,14 @@
   (fn [state]
     (make-instruction state math/tan [:float] :float)))
 
-;; Pushes the tangent of the top FLOAT
-(def-instruction
-  :float_tan
-  (fn [state]
-    (make-instruction state math/tan [:float] :float)))
-
-;; Pushes a floating point version of the top INTEGER
+;; Pushes the floating point version of the top INTEGER
 (def-instruction
   :float_frominteger
   (fn [state]
-    (make-instruction state math/tan [:float] :float)))
+    (make-instruction state float [:integer] :float)))
 
 ;; =============================================================================
-;; INTEGER only
+;; INTEGER Instructions only
 ;; =============================================================================
 
 ;; Pushes the result of truncating the top FLOAT towards negative infinity
