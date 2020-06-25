@@ -1,13 +1,13 @@
 (ns propeller.session
-  (:require (propeller [genome :as genome]
-                       [gp :as gp]
-                       [selection :as selection]
-                       [variation :as variation])
-            (propeller.push [core :as push]
-                            [interpreter :as interpreter]
-                            [state :as state])
-            (propeller.problems [simple-regression :as regression]
-                                [string-classification :as string-classif])))
+  (:require [propeller.genome :as genome]
+            [propeller.gp :as gp]
+            [propeller.selection :as selection]
+            [propeller.variation :as variation]
+            [propeller.push.core :as push]
+            [propeller.interpreter :as interpreter]
+            [propeller.state :as state]
+            [propeller.problems.simple-regression :as regression]
+            [propeller.problems.string-classification :as string-classif]))
 
 #_(interpreter/interpret-program
     '(1 2 integer_add) state/empty-state 1000)

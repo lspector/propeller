@@ -1,6 +1,6 @@
 (ns propeller.push.instructions.input-output
-  (:require (propeller.push [state :as state]
-                            [utils :refer [def-instruction]])))
+  (:require [propeller.push.state :as state]
+            [propeller.push.utils :refer [def-instruction]]))
 
 ;; =============================================================================
 ;; INPUT and OUTPUT Instructions

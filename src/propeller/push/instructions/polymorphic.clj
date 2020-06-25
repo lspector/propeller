@@ -1,8 +1,8 @@
 (ns propeller.push.instructions.polymorphic
-  (:require (propeller.push [state :as state]
-                            [utils :refer [def-instruction
+  (:require  [propeller.push.state :as state]
+             [propeller.push.utils :refer [def-instruction
                                            generate-functions
-                                           make-instruction]])))
+                                           make-instruction]]))
 
 ;; =============================================================================
 ;; Polymorphic Instructions

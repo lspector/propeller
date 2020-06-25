@@ -1,6 +1,6 @@
 (ns propeller.gp
-  (:require (propeller [genome :as genome]
-                       [variation :as variation])
+  (:require [propeller.genome :as genome]
+            [propeller.variation :as variation]
             [propeller.push.core :as push]))
 
 (defn report
