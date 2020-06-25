@@ -1,4 +1,4 @@
-(ns tools.character)
+(ns propeller.tools.character)
 
 (defn is-letter
   "Returns true if the given character is a letter, A-Z or a-z."

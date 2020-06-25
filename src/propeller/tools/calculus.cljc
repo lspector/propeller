@@ -1,4 +1,4 @@
-(ns tools.calculus)
+(ns propeller.tools.calculus)
 
 (defonce ^:const dx 0.0001)
 

@@ -1,4 +1,4 @@
-(ns tools.math)
+(ns propeller.tools.math)
 
 (defonce PI #?(:clj  Math/PI
                :cljs js/Math.PI))

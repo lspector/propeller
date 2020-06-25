@@ -2,24 +2,27 @@
   (:gen-class)
   (:require [propeller.gp :as gp]
             [propeller.push.core :as push]
-            (propeller.problems [simple-regression :refer [regression-error-function]]
-                                [string-classification :refer [string-classification-error-function]])))
+            (propeller.problems [simple-regression :as regression]
+                                [string-classification :as string-classif])))
 
 (defn -main
   "Runs propel-gp, giving it a map of arguments."
   [& args]
-  (gp/gp (update-in (merge {:instructions            push/default-instructions
-                            :error-function          regression-error-function
-                            :max-generations         500
-                            :population-size         500
-                            :max-initial-plushy-size 50
-                            :step-limit              100
-                            :parent-selection        :lexicase
-                            :tournament-size         5
-                            :umad-rate               0.1
-                            :variation               {:umad 0.5 :crossover 0.5}
-                            :elitism                 false}
-                           (apply hash-map
-                                  (map read-string args)))
-                    [:error-function]
-                    #(if (fn? %) % (eval %)))))
+  (gp/gp
+    (update-in
+      (merge
+        {:instructions            push/default-instructions
+         :error-function          regression/error-function
+         :max-generations         500
+         :population-size         500
+         :max-initial-plushy-size 50
+         :step-limit              100
+         :parent-selection        :lexicase
+         :tournament-size         5
+         :umad-rate               0.1
+         :variation               {:umad 0.5 :crossover 0.5}
+         :elitism                 false}
+        (apply hash-map
+               (map read-string args)))
+      [:error-function]
+      #(if (fn? %) % (eval %)))))

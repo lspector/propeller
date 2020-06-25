@@ -1,11 +1,8 @@
 (ns propeller.push.instructions.polymorphic
-  (:require [propeller.push.core :refer [def-instruction]]
-            [propeller.push.state :refer [empty-stack?
-                                          peek-stack
-                                          pop-stack
-                                          push-to-stack]]
-            [propeller.push.utils :refer [generate-functions
-                                          make-instruction]]))
+  (:require (propeller.push [state :as state]
+                            [utils :refer [def-instruction
+                                           generate-functions
+                                           make-instruction]])))
 
 ;; =============================================================================
 ;; Polymorphic Instructions
@@ -24,10 +21,10 @@
 ;; would negate the effect of the duplication)
 (defn- _dup
   [stack state]
-  (let [top-item (peek-stack state stack)]
-    (if (empty-stack? state stack)
+  (let [top-item (state/peek-stack state stack)]
+    (if (state/empty-stack? state stack)
       state
-      (push-to-stack state stack top-item))))
+      (state/push-to-stack state stack top-item))))
 
 ;; Duplicates n copies of the top item (i.e leaves n copies there). Does not pop
 ;; its argument (since that would negate the effect of the duplication). The
@@ -39,10 +36,10 @@
   (if (or (and (= stack :integer)
                (>= (count (:integer state)) 2))
           (and (not= stack :integer)
-               (not (empty-stack? state :integer))
-               (not (empty-stack? state stack))))
-    (let [n (peek-stack state :integer)
-          item-to-duplicate (peek-stack state stack)]
+               (not (state/empty-stack? state :integer))
+               (not (state/empty-stack? state stack))))
+    (let [n (state/peek-stack state :integer)
+          item-to-duplicate (state/peek-stack state stack)]
       nil)
     state))
 
@@ -54,7 +51,7 @@
 ;; Pushes TRUE onto the BOOLEAN stack if the stack is empty. Otherwise FALSE
 (defn- _empty
   [stack state]
-  (push-to-stack state :boolean (empty-stack? state stack)))
+  (state/push-to-stack state :boolean (state/empty-stack? state stack)))
 
 ;; Empties the given stack
 (defn- _flush
@@ -64,7 +61,7 @@
 ;; Pops the given stack
 (defn- _pop
   [stack state]
-  (pop-stack state stack))
+  (state/pop-stack state stack))
 
 ;; Rotates the top three items on the stack (i.e. pulls the third item out and
 ;; pushes it on top). Equivalent to (yank state stack-type 2)

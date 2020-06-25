@@ -1,6 +1,10 @@
 (ns propeller.push.utils
-  (:require [propeller.push.core :refer [def-instruction]]
-            [propeller.push.state :as state]))
+  (:require (propeller.push [core :as push]
+                            [state :as state])))
+
+(defmacro def-instruction
+  [instruction definition]
+  `(swap! push/instruction-table assoc '~instruction ~definition))
 
 ;; A utility function for making Push instructions. Takes a state, a function
 ;; to apply to the args, the stacks to take the args from, and the stack to

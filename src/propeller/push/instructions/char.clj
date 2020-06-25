@@ -1,7 +1,7 @@
 (ns propeller.push.instructions.char
-  (:require [propeller.push.core :refer [def-instruction]]
-            [propeller.push.utils :refer [make-instruction]]
-            [tools.character :as char]))
+  (:require [propeller.push.utils :refer [def-instruction
+                                          make-instruction]]
+            [propeller.tools.character :as char]))
 
 ;; =============================================================================
 ;; CHAR Instructions

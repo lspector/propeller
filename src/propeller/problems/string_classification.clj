@@ -1,13 +1,13 @@
 (ns propeller.problems.string-classification
   (:require [propeller.genome :as genome]
-            (propeller.push [state :as state]
-                            [interpreter :as interpreter])))
+            (propeller.push [interpreter :as interpreter]
+                            [state :as state])))
 
 ;; =============================================================================
 ;; String classification
 ;; =============================================================================
 
-(defn string-classification-error-function
+(defn error-function
   "Finds the behaviors and errors of an individual: Error is 0 if the value and
   the program's selected behavior match, or 1 if they differ, or 1000000 if no
   behavior is produced. The behavior is here defined as the final top item on

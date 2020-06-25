@@ -1,6 +1,6 @@
 (ns propeller.push.interpreter
-  (:require [propeller.push.core :refer [instruction-table]]
-            [propeller.push.state :as state]))
+  (:require (propeller.push [core :as push]
+                            [state :as state])))
 
 (defn interpret-one-step
   "Takes a Push state and executes the next instruction on the exec stack."
@@ -8,7 +8,7 @@
   (let [popped-state (state/pop-stack state :exec)
         first-instruction-raw (first (:exec state))
         first-instruction (if (keyword? first-instruction-raw)
-                            (first-instruction-raw @instruction-table)
+                            (first-instruction-raw @push/instruction-table)
                             first-instruction-raw)]
     (cond
       (fn? first-instruction)

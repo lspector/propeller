@@ -1,5 +1,5 @@
-(ns tools.metrics
-  (:require [tools.math :as math]))
+(ns propeller.tools.metrics
+  (:require [propeller.tools.math :as math]))
 
 (defn mean
   "Returns the mean of a collection."

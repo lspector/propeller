@@ -1,6 +1,4 @@
-(ns propeller.push.core
-  (:require [propeller.push.state :refer [get-args-from-stacks
-                                          push-to-stack]]))
+(ns propeller.push.core)
 
 ;; =============================================================================
 ;; PushGP Instructions
@@ -12,6 +10,8 @@
 ;;
 ;; TMH: ERCs?
 ;; =============================================================================
+
+(def instruction-table (atom (hash-map)))
 
 ;; Set of original propel instructions
 (def default-instructions
@@ -45,12 +45,6 @@
         "C"
         "G"
         "T"))
-
-(def instruction-table (atom (hash-map)))
-
-(defmacro def-instruction
-  [instruction definition]
-  `(swap! instruction-table assoc '~instruction ~definition))
 
 ;; Number of blocks opened by instructions (default = 0)
 (def opens {:exec_dup 1

@@ -1,6 +1,6 @@
 (ns propeller.push.instructions.boolean
-  (:require [propeller.push.core :refer [def-instruction]]
-            [propeller.push.utils :refer [make-instruction]]))
+  (:require [propeller.push.utils :refer [def-instruction
+                                          make-instruction]]))
 
 ;; =============================================================================
 ;; BOOLEAN Instructions

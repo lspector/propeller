@@ -1,10 +1,10 @@
-(ns tools.distributions
-  (:require [tools.math :as math])
-  (:require [tools.calculus :as calculus]))
+(ns propeller.tools.distributions
+  (:require (propeller.tools [calculus :as calculus]
+                             [math :as math])))
 
-;; -----------------------------------------------------------------------------
+;; =============================================================================
 ;; NORMAL
-;; -----------------------------------------------------------------------------
+;; =============================================================================
 
 (defn- box-muller
   "Given two uniformly distributed random variables (from 0 to 1), returns a
