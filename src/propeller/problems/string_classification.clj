@@ -1,7 +1,7 @@
 (ns propeller.problems.string-classification
   (:require [propeller.genome :as genome]
-            (propeller.push [interpreter :as interpreter]
-                            [state :as state])))
+            [propeller.push.interpreter :as interpreter]
+            [propeller.push.state :as state]))
 
 ;; =============================================================================
 ;; String classification

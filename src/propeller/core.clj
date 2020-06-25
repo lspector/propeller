@@ -2,8 +2,8 @@
   (:gen-class)
   (:require [propeller.gp :as gp]
             [propeller.push.core :as push]
-            (propeller.problems [simple-regression :as regression]
-                                [string-classification :as string-classif])))
+            [propeller.problems.simple-regression :as regression]
+            [propeller.problems.string-classification :as string-classif]))
 
 (defn -main
   "Runs propel-gp, giving it a map of arguments."

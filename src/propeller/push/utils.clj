@@ -1,6 +1,6 @@
 (ns propeller.push.utils
-  (:require (propeller.push [core :as push]
-                            [state :as state])))
+  (:require [propeller.push.core :as push]
+            [propeller.push.state :as state]))
 
 (defmacro def-instruction
   [instruction definition]

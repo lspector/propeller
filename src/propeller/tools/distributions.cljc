@@ -1,6 +1,6 @@
 (ns propeller.tools.distributions
-  (:require (propeller.tools [calculus :as calculus]
-                             [math :as math])))
+  (:require [propeller.tools.calculus :as calculus]
+            [propeller.tools.math :as math]))
 
 ;; =============================================================================
 ;; NORMAL
