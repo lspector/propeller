@@ -32,7 +32,7 @@
 ;; Pretty-prints a Push state, for logging or debugging purposes
 (defn print-state
   [state]
-  (doseq [stack state/stacks]
+  (doseq [stack (keys state/empty-state)]
     (printf "%-15s = " stack)
     (prn (if (get state stack) (get state stack) '()))
     (flush)))

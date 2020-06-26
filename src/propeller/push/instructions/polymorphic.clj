@@ -100,7 +100,7 @@
 ;; 5 types x 1 function = 5 instructions
 (generate-functions [:boolean :char :float :integer :string] [_eq])
 
-;; 8 types x 12 function = 96 instructions
+;; 7 types x 12 function = 84 instructions
 (generate-functions
   [:boolean :char :code :exec :float :integer :string]
   [_dup _duptimes _dupitems _empty _flush _pop _rot _shove _stackdepth

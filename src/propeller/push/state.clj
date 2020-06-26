@@ -1,35 +1,23 @@
 (ns propeller.push.state)
 
-;; Set of all stacks used by the Push interpreter
-(defonce stacks #{:auxiliary
-                  :boolean
-                  :char
-                  :code
-                  :environment
-                  :exec
-                  :float
-                  :genome
-                  :gtm
-                  :input
-                  :integer
-                  :output
-                  :return
-                  :string
-                  :tag
-                  :vector_boolean
-                  :vector_float
-                  :vector_integer
-                  :vector_string
-                  :zip})
-
-;; Record-based states for performance
-(defmacro define-push-state []
-  `(defrecord ~'State [~@(map #(symbol (name %)) stacks)]))
-
-(define-push-state)
-
-;; Empty push state - each stack type is nil
-(defonce empty-state (map->State {}))
+;; Empty push state - all available stacks are empty
+(defonce empty-state {:auxiliary      '()
+                      :boolean        '()
+                      :char           '()
+                      :code           '()
+                      :environment    '()
+                      :exec           '()
+                      :float          '()
+                      :genome         '()
+                      :input          {}
+                      :integer        '()
+                      :return         '()
+                      :string         '()
+                      :tag            '()
+                      :vector_boolean '()
+                      :vector_float   '()
+                      :vector_integer '()
+                      :vector_string  '()})
 
 (def example-push-state
   {:exec    '()
