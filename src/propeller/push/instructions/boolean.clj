@@ -9,24 +9,28 @@
 ;; Pushes the logical AND of the top two BOOLEANs
 (def-instruction
   :boolean_and
+  ^{:stacks #{:boolean}}
   (fn [state]
     (make-instruction state #(and %1 %2) [:boolean :boolean] :boolean)))
 
 ;; Pushes the logical OR of the top two BOOLEANs
 (def-instruction
   :boolean_or
+  ^{:stacks #{:boolean}}
   (fn [state]
     (make-instruction state #(or %1 %2) [:boolean :boolean] :boolean)))
 
 ;; Pushes the logical NOT of the top BOOLEAN
 (def-instruction
   :boolean_not
+  ^{:stacks #{:boolean}}
   (fn [state]
     (make-instruction state not [:boolean] :boolean)))
 
 ;; Pushes the logical XOR of the top two BOOLEAN
 (def-instruction
   :boolean_xor
+  ^{:stacks #{:boolean}}
   (fn [state]
     (make-instruction state #(or (and %1 (not %2))
                                  (and (not %1) %2))
@@ -37,6 +41,7 @@
 ;; first one
 (def-instruction
   :boolean_invert_first_then_and
+  ^{:stacks #{:boolean}}
   (fn [state]
     (make-instruction state #(and %1 (not %2)) [:boolean :boolean] :boolean)))
 
@@ -44,17 +49,20 @@
 ;; second one
 (def-instruction
   :boolean_invert_second_then_and
+  ^{:stacks #{:boolean}}
   (fn [state]
     (make-instruction state #(and (not %1) %2) [:boolean :boolean] :boolean)))
 
 ;; Pushes FALSE if the top FLOAT is 0.0, and TRUE otherwise
 (def-instruction
   :boolean_fromfloat
+  ^{:stacks #{:boolean :float}}
   (fn [state]
     (make-instruction state #(not (zero? %)) [:float] :boolean)))
 
 ;; Pushes FALSE if the top INTEGER is 0, and TRUE otherwise
 (def-instruction
   :boolean_frominteger
+  ^{:stacks #{:boolean :integer}}
   (fn [state]
     (make-instruction state #(not (zero? %)) [:integer] :boolean)))

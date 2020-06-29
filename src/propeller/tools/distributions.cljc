@@ -28,7 +28,7 @@
   Accepts an argument map with optional keys :n, :mu, and :sigma."
   [{:keys [n mu sigma]
     :or   {n 1, mu 0, sigma 1}}]
-  (repeatedly n #(box-muller (rand 1) (rand 1))))
+  (repeatedly n #(box-muller (rand) (rand))))
 
 (defn pdf-norm
   "Returns the value of the Normal Probability Distribution Function at a

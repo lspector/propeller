@@ -5,15 +5,12 @@
                       :boolean        '()
                       :char           '()
                       :code           '()
-                      :environment    '()
                       :exec           '()
                       :float          '()
-                      :genome         '()
                       :input          {}
                       :integer        '()
-                      :return         '()
+                      :output         '()
                       :string         '()
-                      :tag            '()
                       :vector_boolean '()
                       :vector_float   '()
                       :vector_integer '()
@@ -31,24 +28,41 @@
   (empty? (get state stack)))
 
 (defn peek-stack
-  "Returns top item on a stack."
+  "Returns the top item on a stack."
   [state stack]
   (let [working-stack (get state stack)]
     (if (empty? working-stack)
       :no-stack-item
       (first working-stack))))
 
+(defn peek-stack-multiple
+  "Returns the top n items on a stack. If there are less than n items on the
+  stack, returns the entire stack."
+  [state stack n]
+  (take n (get state stack)))
+
 (defn pop-stack
-  "Removes top item of stack."
+  "Removes the top item of stack."
   [state stack]
   (update state stack rest))
 
+(defn pop-stack-multiple
+  "Removes the top n items of a stack. If there are less than n items on the
+  stack, pops the entire stack."
+  [state stack n]
+  (update state stack #(drop n %)))
+
 (defn push-to-stack
-  "Pushes item(s) onto stack."
+  "Pushes an item onto a stack."
+  [state stack item]
+  (update state stack conj item))
+
+(defn push-to-stack-multiple
+  "Pushes a list of items onto a stack, leaving them in the order they are in."
   [state stack items]
   (let [items-list (if (coll? items) items (list items))
         items-list-no-nil (filter #(not (nil? %)) items-list)]
-    (update state stack into items-list-no-nil)))
+    (update state stack into (reverse items-list-no-nil))))
 
 (defn get-args-from-stacks
   "Takes a state and a collection of stacks to take args from. If there are

@@ -7,8 +7,10 @@
             [propeller.push.instructions.code]
             [propeller.push.instructions.input-output]
             [propeller.push.instructions.numeric]
+            [propeller.push.instructions.random]
             [propeller.push.instructions.polymorphic]
-            [propeller.push.instructions.string]))
+            [propeller.push.instructions.string]
+            [propeller.push.instructions.vector]))
 
 (defn report
   "Reports information each generation."
@@ -36,15 +38,12 @@
   ;;
   (println "Starting GP with args: " argmap)
   ;;
-  (do (println "Registered instructions:")
-      (println (sort (keys @push/instruction-table))))
-  ;;
   (loop [generation 0
          population (repeatedly
                       population-size
-                      #(hash-map :plushy
-                                 (genome/make-random-plushy instructions
-                                                            max-initial-plushy-size)))]
+                      #(hash-map :plushy (genome/make-random-plushy
+                                           instructions
+                                           max-initial-plushy-size)))]
     (let [evaluated-pop (sort-by :total-error
                                  (map (partial error-function argmap)
                                       population))]

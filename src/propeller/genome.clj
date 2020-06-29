@@ -1,5 +1,13 @@
 (ns propeller.genome
-  (:require [propeller.push.core :as push]))
+  (:require [propeller.push.core :as push]
+            [propeller.utils :as utils]))
+
+(defn make-random-plushy
+  "Creates and returns a new plushy."
+  [instructions max-initial-plushy-size]
+  (repeatedly
+    (rand-int max-initial-plushy-size)
+    #(utils/random-instruction instructions)))
 
 (defn plushy->push
   "Returns the Push program expressed by the given plushy representation."
@@ -25,9 +33,3 @@
                      (rest plushy))
               (recur push (rest plushy)))                   ;; unmatched close, ignore
             (recur (concat push [i]) (rest plushy))))))))   ;; anything else
-
-(defn make-random-plushy
-  "Creates and returns a new plushy."
-  [instructions max-initial-plushy-size]
-  (repeatedly (rand-int max-initial-plushy-size)
-              #(rand-nth instructions)))

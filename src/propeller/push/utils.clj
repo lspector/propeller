@@ -1,5 +1,6 @@
 (ns propeller.push.utils
-  (:require [propeller.push.core :as push]
+  (:require [clojure.set]
+            [propeller.push.core :as push]
             [propeller.push.state :as state]))
 
 (defmacro def-instruction
@@ -20,14 +21,44 @@
         (state/push-to-stack new-state return-stack result)))))
 
 ;; Given a sequence of stacks, e.g. [:float :integer], and a sequence of suffix
-;; function strings, e.g. [_+, _*, _=], automates the generation of all possible
-;; combination instructions, which here would be :float_+, :float_*, :float_=,
-;; :integer_+, :integer_*, and :integer_=
-(defmacro generate-functions [stacks functions]
+;; function strings, e.g. [_add, _mult, _eq], automates the generation of all
+;; possible combination instructions, which here would be :float_add, :float_mult,
+;; :float_eq, :integer_add, :integer_mult, and :integer_eq, also transferring
+;; and updating the generic function's stack-type metadata
+(defmacro generate-instructions [stacks functions]
   `(do ~@(for [stack stacks
-               function functions
-               :let [instruction-name (keyword (str (name stack) function))]]
-           `(def-instruction ~instruction-name (partial ~function ~stack)))))
+               func functions
+               :let [instruction-name (keyword (str (name stack) func))
+                     metadata `(update-in (meta ~func) [:stacks] #(conj % ~stack))
+                     new-func `(with-meta (partial ~func ~stack) ~metadata)]]
+           `(def-instruction ~instruction-name ~new-func))))
+
+;; Given a set of stacks, returns all instructions that operate on those stacks
+;; only. This won't include random or parenthesis-altering instructions unless
+;; :random or :parentheses respectively are in the stacks set
+(defn get-stack-instructions
+  [stacks]
+  (doseq [[instruction-name function] @push/instruction-table]
+    (assert
+      (:stacks (meta function))
+      (format "ERROR: Instruction %s does not have :stacks defined in metadata."
+              (name instruction-name))))
+  (for [[instruction-name function] @push/instruction-table
+        :when (clojure.set/subset? (:stacks (meta function)) stacks)]
+    instruction-name))
+
+;; If a piece of data is a literal, return its corresponding stack name, e.g.
+;; :integer. Otherwise, return nil"
+(defn get-literal-type
+  [data]
+  (let [literals {:boolean (fn [thing] (or (true? thing) (false? thing)))
+                  :char    char?
+                  :float   float?
+                  :integer integer?
+                  :string  string?}]
+    (first (for [[stack function] literals
+                 :when (function data)]
+             stack))))
 
 ;; Pretty-prints a Push state, for logging or debugging purposes
 (defn print-state

@@ -1,5 +1,6 @@
 (ns propeller.variation
-  (:require [propeller.selection :as selection]))
+  (:require [propeller.selection :as selection]
+            [propeller.utils :as utils]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
@@ -21,7 +22,7 @@
   [plushy instructions umad-rate]
   (apply concat
          (map #(if (< (rand) umad-rate)
-                 (shuffle [% (rand-nth instructions)])
+                 (shuffle [% (utils/random-instruction instructions)])
                  [%])
               plushy)))
 

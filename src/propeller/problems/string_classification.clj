@@ -7,6 +7,39 @@
 ;; String classification
 ;; =============================================================================
 
+;; Set of original propel instructions
+(def instructions
+  (list :in1
+        :integer_add
+        :integer_subtract
+        :integer_mult
+        :integer_quot
+        :integer_eq
+        :exec_dup
+        :exec_if
+        :boolean_and
+        :boolean_or
+        :boolean_not
+        :boolean_eq
+        :string_eq
+        :string_take
+        :string_drop
+        :string_reverse
+        :string_concat
+        :string_length
+        :string_includes?
+        'close
+        0
+        1
+        true
+        false
+        ""
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "A"
+        "C"
+        "G"
+        "T"))
+
 (defn error-function
   "Finds the behaviors and errors of an individual: Error is 0 if the value and
   the program's selected behavior match, or 1 if they differ, or 1000000 if no

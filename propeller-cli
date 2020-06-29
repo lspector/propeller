@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Bash script utility for running propeller for people unfamiliar with Clojure
+
+
