@@ -28,28 +28,9 @@
         :integer_eq
         :exec_dup
         :exec_if
-        :boolean_and
-        :boolean_or
-        :boolean_not
-        :boolean_eq
-        :string_eq
-        :string_take
-        :string_drop
-        :string_reverse
-        :string_concat
-        :string_length
-        :string_includes?
         'close
         0
-        1
-        true
-        false
-        ""
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "A"
-        "C"
-        "G"
-        "T"))
+        1))
 
 (defn error-function
   "Finds the behaviors and errors of an individual. The error is the absolute

@@ -1,34 +1,38 @@
 (ns propeller.push.interpreter
   (:require [propeller.push.core :as push]
-            [propeller.push.state :as state]))
+            [propeller.push.state :as state]
+            [propeller.push.utils :refer [get-literal-type]]
+            [propeller.push.instructions.input-output :as io]))
 
 (defn interpret-one-step
   "Takes a Push state and executes the next instruction on the exec stack."
   [state]
   (let [popped-state (state/pop-stack state :exec)
-        first-instruction-raw (first (:exec state))
-        first-instruction (if (keyword? first-instruction-raw)
-                            (first-instruction-raw @push/instruction-table)
-                            first-instruction-raw)]
+        instruction (first (:exec state))
+        literal-type (get-literal-type instruction)] ; nil for non-literals
     (cond
-      (fn? first-instruction)
-      (first-instruction popped-state)
-      ;
-      (integer? first-instruction)
-      (state/push-to-stack popped-state :integer first-instruction)
-      ;
-      (string? first-instruction)
-      (state/push-to-stack popped-state :string first-instruction)
-      ;
-      (seq? first-instruction)
-      (update popped-state :exec #(concat %2 %1) first-instruction)
-      ;
-      (or (= first-instruction true) (= first-instruction false))
-      (state/push-to-stack popped-state :boolean first-instruction)
-      ;
+      ;;
+      ;; Recognize functional instruction or input instruction
+      (keyword? instruction)
+      (if-let [function (instruction @push/instruction-table)]
+        (function popped-state)
+        (io/handle-input-instruction popped-state instruction))
+      ;;
+      ;; Recognize constant literal instruction
+      literal-type
+      (if (= :generic-vector literal-type)
+        ;; Empty vector gets pushed on all vector stacks
+        (reduce #(update-in % [%2] conj []) popped-state
+                [:vector_boolean :vector_float :vector_integer :vector_string])
+        (state/push-to-stack popped-state literal-type instruction))
+      ;;
+      ;; Recognize parenthesized group of instructions
+      (seq? instruction)
+      (update popped-state :exec #(concat %2 %1) instruction)
+      ;;
       :else
       (throw (Exception. (str "Unrecognized Push instruction in program: "
-                              (name first-instruction-raw)))))))
+                              (name instruction)))))))
 
 (defn interpret-program
   "Runs the given problem starting with the stacks in start-state."

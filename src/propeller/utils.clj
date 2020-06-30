@@ -1,5 +1,10 @@
 (ns propeller.utils)
 
+(defn get-vector-literal-type
+  "Returns the literal stack corresponding to some vector stack."
+  [vector-stack]
+  (keyword (clojure.string/replace (str vector-stack) ":vector_" "")))
+
 (defn indexof
   "Returns the first index of an element in a collection. If the element is not
   present in the collection, returns -1."
@@ -26,9 +31,6 @@
   ERC-producing functions to a constant literal."
   [instructions]
   (let [instruction (rand-nth instructions)]
-    (if (fn? instruction) (instruction) instruction)))
-
-(defn get-vector-literal-type
-  "Returns the literal stack corresponding to some vector stack."
-  [vector-stack]
-  (keyword (clojure.string/replace (str vector-stack) ":vector_" "")))
+    (if (fn? instruction)
+      (instruction)
+      instruction)))
