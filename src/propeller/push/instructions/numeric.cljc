@@ -1,8 +1,11 @@
 (ns propeller.push.instructions.numeric
-  (:require [propeller.push.utils :refer [def-instruction
-                                          generate-instructions
-                                          make-instruction]]
-            [propeller.tools.math :as math]))
+  #?(:cljs (:require-macros [propeller.push.utils :refer [def-instruction
+                                                          generate-instructions
+                                                          make-instruction]]))
+  (:require [propeller.tools.math :as math]
+            #?(:clj [propeller.push.utils :refer [def-instruction
+                                                  generate-instructions
+                                                  make-instruction]])))
 
 ;; =============================================================================
 ;; FLOAT and INTEGER Instructions (polymorphic)

@@ -1,8 +1,10 @@
-(ns propeller.push.instructions.char
+(ns propeller.push.instructions.chara
+  #?(:cljs (:require-macros [propeller.push.utils :refer [def-instruction
+                                                          make-instruction]]))
   (:require [propeller.push.state :as state]
-            [propeller.push.utils :refer [def-instruction
-                                          make-instruction]]
-            [propeller.tools.character :as char]))
+            [propeller.tools.character :as char]
+            #?(:clj [propeller.push.utils :refer [def-instruction
+                                                  make-instruction]])))
 
 ;; =============================================================================
 ;; CHAR Instructions

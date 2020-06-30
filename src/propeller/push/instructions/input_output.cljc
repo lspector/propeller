@@ -1,7 +1,9 @@
 (ns propeller.push.instructions.input-output
+  #?(:cljs (:require-macros [propeller.push.utils :refer
+                             [def-instruction generate-instructions]]))
   (:require [propeller.push.state :as state]
-            [propeller.push.utils :refer [def-instruction
-                                          generate-instructions]]))
+            #?(:clj [propeller.push.utils :refer [def-instruction
+                                                  generate-instructions]])))
 
 ;; =============================================================================
 ;; INPUT Instructions

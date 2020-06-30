@@ -1,7 +1,8 @@
-(ns propeller.push.instructions.boolean
-  (:require [propeller.push.utils :refer [def-instruction
-                                          make-instruction]]))
-
+(ns propeller.push.instructions.bool
+  #?(:cljs (:require-macros [propeller.push.utils :refer [def-instruction
+                                                          make-instruction]]))
+  (:require #?(:clj [propeller.push.utils :refer [def-instruction
+                                                  make-instruction]])))
 ;; =============================================================================
 ;; BOOLEAN Instructions
 ;; =============================================================================

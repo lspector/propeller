@@ -1,8 +1,9 @@
 (ns propeller.core
-  (:gen-class)
+  #?(:clj (:gen-class))
   (:require [propeller.gp :as gp]
             [propeller.problems.simple-regression :as regression]
-            [propeller.problems.string-classification :as string-classif]))
+            [propeller.problems.string-classification :as string-classif]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn -main
   "Runs propel-gp, giving it a map of arguments."

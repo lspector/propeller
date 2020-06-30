@@ -1,9 +1,12 @@
 (ns propeller.push.instructions.code
+  #?(:cljs (:require-macros [propeller.push.utils :refer [def-instruction
+                                                          generate-instructions
+                                                          make-instruction]]))
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
-            [propeller.push.utils :refer [def-instruction
-                                          generate-instructions
-                                          make-instruction]]))
+            #?(:clj [propeller.push.utils :refer [def-instruction
+                                                  generate-instructions
+                                                  make-instruction]])))
 
 ;; =============================================================================
 ;; Polymorphic Instructions
