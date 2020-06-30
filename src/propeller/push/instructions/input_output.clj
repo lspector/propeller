@@ -1,6 +1,7 @@
 (ns propeller.push.instructions.input-output
   (:require [propeller.push.state :as state]
-            [propeller.push.utils :refer [def-instruction]]))
+            [propeller.push.utils :refer [def-instruction
+                                          generate-instructions]]))
 
 ;; =============================================================================
 ;; INPUT Instructions
@@ -17,5 +18,34 @@
     (throw (Exception. (str "Undefined input instruction " instruction)))))
 
 ;; =============================================================================
-;; OUTPUT and PRINT Instructions
+;; OUTPUT Instructions
 ;; =============================================================================
+
+(def-instruction
+  :print_newline
+  ^{:stacks [:print]}
+  (fn [state]
+    (let [current-output (state/peek-stack state :output)
+          popped-state (state/pop-stack state :output)]
+      (state/push-to-stack popped-state :output (str current-output \newline)))))
+
+(def _print
+  ^{:stacks [:print]}
+  (fn [stack state]
+    (if (state/empty-stack? state stack)
+      state
+      (let [top-item (state/peek-stack state stack)
+            top-item-str (if (or (string? top-item)
+                                 (char? top-item))
+                           top-item
+                           (pr-str top-item))
+            current-output (state/peek-stack state :output)
+            popped-state (state/pop-stack (state/pop-stack state stack) :output)]
+        (state/push-to-stack popped-state
+                             :output
+                             (str current-output top-item-str))))))
+
+(generate-instructions
+  [:boolean :char :code :exec :float :integer :string
+   :vector_boolean :vector_float :vector_integer :vector_string]
+  [_print])
