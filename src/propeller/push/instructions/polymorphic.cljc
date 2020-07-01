@@ -109,7 +109,7 @@
             popped-state (state/pop-stack state :integer)
             top-item (state/peek-stack popped-state stack)
             popped-state (state/pop-stack popped-state stack)
-            index (max 0 (min index-raw (count (get popped-state stack))))]
+            index (max 0 (min index-raw (dec (count (get popped-state stack)))))]
         (update popped-state stack #(utils/not-lazy (concat (take index %)
                                                             (list top-item)
                                                             (drop index %)))))
@@ -144,7 +144,7 @@
                  (not (state/empty-stack? state stack))))
       (let [index-raw (state/peek-stack state :integer)
             popped-state (state/pop-stack state :integer)
-            index (max 0 (min index-raw (count (get popped-state stack))))
+            index (max 0 (min index-raw (dec (count (get popped-state stack)))))
             indexed-item (nth (get popped-state stack) index)]
         (update popped-state stack #(utils/not-lazy
                                       (concat (list indexed-item)
@@ -164,20 +164,14 @@
                  (not (state/empty-stack? state stack))))
       (let [index-raw (state/peek-stack state :integer)
             popped-state (state/pop-stack state :integer)
-            index (max 0 (min index-raw (count (get popped-state stack))))
+            index (max 0 (min index-raw (dec (count (get popped-state stack)))))
             indexed-item (nth (get popped-state stack) index)]
         (state/push-to-stack popped-state stack indexed-item))
       state)))
 
-;; 9 types x 1 functions = 9 instructions
-(generate-instructions
-  [:boolean :char :float :integer :string
-   :vector_boolean :vector_float :vector_integer :vector_string]
-  [_eq])
-
-;; 11 types x 12 functions = 132 instructions
+;; 11 types x 13 functions = 143 instructions
 (generate-instructions
   [:boolean :char :code :exec :float :integer :string
    :vector_boolean :vector_float :vector_integer :vector_string]
-  [_dup _duptimes _dupitems _empty _flush _pop _rot _shove _stackdepth
-   _swap _yank _yankdup])
+  [_dup _duptimes _dupitems _empty _eq _flush _pop _rot _shove
+   _stackdepth _swap _yank _yankdup])

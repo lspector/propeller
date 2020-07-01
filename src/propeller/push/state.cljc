@@ -55,7 +55,9 @@
 (defn push-to-stack
   "Pushes an item onto a stack."
   [state stack item]
-  (update state stack conj item))
+  (if (nil? item)
+    state
+    (update state stack conj item)))
 
 (defn push-to-stack-multiple
   "Pushes a list of items onto a stack, leaving them in the order they are in."

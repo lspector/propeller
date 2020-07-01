@@ -1,5 +1,6 @@
 (ns propeller.gp
-  (:require [propeller.genome :as genome]
+  (:require [clojure.string]
+            [propeller.genome :as genome]
             [propeller.variation :as variation]
             [propeller.push.core :as push]
             [propeller.push.instructions.bool]
@@ -23,7 +24,7 @@
     (print "Best program: ") (prn (genome/plushy->push (:plushy best)))
     (println "Best total error:" (:total-error best))
     (println "Best errors:" (:errors best))
-    (println "Best behaviors:" (:behaviors best))
+    (println "Best behaviors:" (map clojure.string/trim (:behaviors best)))
     (println "Genotypic diversity:"
              (float (/ (count (distinct (map :plushy pop))) (count pop))))
     (println "Average genome length:"
@@ -45,11 +46,18 @@
                                            instructions
                                            max-initial-plushy-size)))]
     (let [evaluated-pop (sort-by :total-error
-                                 (map (partial error-function argmap)
-                                      population))]
+                                 (map (partial error-function argmap) population))
+          best-individual (first evaluated-pop)]
       (report evaluated-pop generation)
       (cond
-        (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
+        ;; Success on training cases is verified on testing cases
+        (zero? (:total-error best-individual))
+        (do (println "SUCCESS at generation" generation)
+            (print "Checking program on test cases... ")
+            (if (zero? (:total-error (error-function argmap best-individual :test)))
+              (println "Test cases passed.")
+              (println "Test cases failed.")))
+        ;;
         (>= generation max-generations) nil
         :else (recur (inc generation)
                      (if (:elitism argmap)

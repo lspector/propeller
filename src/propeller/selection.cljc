@@ -10,7 +10,7 @@
 (defn lexicase-selection
   "Selects an individual from the population using lexicase selection."
   [pop argmap]
-  (loop [survivors pop
+  (loop [survivors (map rand-nth (vals (group-by :errors pop)))
          cases (shuffle (range (count (:errors (first pop)))))]
     (if (or (empty? cases)
             (empty? (rest survivors)))
