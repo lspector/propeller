@@ -1,16 +1,14 @@
 (ns propeller.push.instructions.polymorphic
-  #?(:cljs (:require-macros [propeller.push.utils :refer [generate-instructions
-                                                          make-instruction]]))
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
-            #?(:clj [propeller.push.utils :refer [generate-instructions
-                                                  make-instruction]])))
+            [propeller.push.utils.helpers :refer [make-instruction]]
+            [propeller.push.utils.macros :refer [def-instruction
+                                                 generate-instructions]]))
 
 ;; =============================================================================
 ;; Polymorphic Instructions
 ;;
-;; (for all stacks, with the exception of non-data ones like auxiliary, input,
-;; and output)
+;; (for all stacks, with the exception of non-data ones like input and output)
 ;; =============================================================================
 
 ;; Duplicates the top item of the stack. Does not pop its argument (since that
@@ -41,7 +39,7 @@
             top-item (state/peek-stack popped-state stack)
             top-item-dup (take (- n 1) (repeat top-item))]
         (cond
-          (< 0 n) (state/push-to-stack-multiple popped-state stack top-item-dup)
+          (< 0 n) (state/push-to-stack-many popped-state stack top-item-dup)
           :else (state/pop-stack popped-state stack)))
       state)))
 
@@ -56,7 +54,7 @@
       (let [n (state/peek-stack state :integer)
             popped-state (state/pop-stack state :integer)
             top-items (take n (get popped-state stack))]
-        (state/push-to-stack-multiple popped-state stack top-items)))))
+        (state/push-to-stack-many popped-state stack top-items)))))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the stack is empty. Otherwise FALSE
 (def _empty
@@ -89,10 +87,10 @@
   ^{:stacks #{}}
   (fn [stack state]
     (if (<= 3 (count (get state stack)))
-      (let [top-three (state/peek-stack-multiple state stack 3)
-            popped-state (state/pop-stack-multiple state stack 3)
+      (let [top-three (state/peek-stack-many state stack 3)
+            popped-state (state/pop-stack-many state stack 3)
             top-three-rot (take 3 (conj top-three (last top-three)))]
-        (state/push-to-stack-multiple popped-state stack top-three-rot))
+        (state/push-to-stack-many popped-state stack top-three-rot))
       state)))
 
 ;; Inserts the top item deeper into the stack, using the top INTEGER to
@@ -127,9 +125,9 @@
   ^{:stacks #{}}
   (fn [stack state]
     (if (<= 2 (count (get state stack)))
-      (let [top-two (state/peek-stack-multiple state stack 2)
-            popped-state (state/pop-stack-multiple state stack 2)]
-        (state/push-to-stack-multiple popped-state stack (reverse top-two)))
+      (let [top-two (state/peek-stack-many state stack 2)
+            popped-state (state/pop-stack-many state stack 2)]
+        (state/push-to-stack-many popped-state stack (reverse top-two)))
       state)))
 
 ;; Pushes an indexed item from deep in the stack, removing it. The top INTEGER

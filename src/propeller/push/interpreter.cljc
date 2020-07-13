@@ -1,8 +1,8 @@
 (ns propeller.push.interpreter
   (:require [propeller.push.core :as push]
             [propeller.push.state :as state]
-            [propeller.push.utils :refer [get-literal-type]]
-            [propeller.push.instructions.input-output :as io]))
+            [propeller.push.instructions.input-output :as io]
+            [propeller.push.utils.helpers :refer [get-literal-type]]))
 
 (defn interpret-one-step
   "Takes a Push state and executes the next instruction on the exec stack."

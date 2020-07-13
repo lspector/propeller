@@ -13,8 +13,8 @@
   (gp/gp
     (update-in
       (merge
-        {:instructions            smallest/instructions
-         :error-function          smallest/error-function
+        {:instructions            number-io/instructions
+         :error-function          number-io/error-function
          :max-generations         500
          :population-size         500
          :max-initial-plushy-size 100

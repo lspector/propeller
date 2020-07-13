@@ -1,16 +1,7 @@
 (ns propeller.push.core)
 
-;; =============================================================================
-;; PushGP Instructions
-;;
-;; Instructions are represented as keywords, and stored in an atom.
-;;
-;; Instructions must all be either functions that take one Push state and
-;; return another, or constant literals.
-;;
-;; TMH: ERCs?
-;; =============================================================================
-
+;; PushGP instructions are represented as keywords, and stored in an atom. They
+;; can be either constant literals or functions that take and return a Push state
 (def instruction-table (atom (hash-map)))
 
 ;; Number of blocks opened by instructions (default = 0)

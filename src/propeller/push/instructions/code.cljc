@@ -1,12 +1,9 @@
 (ns propeller.push.instructions.code
-  #?(:cljs (:require-macros [propeller.push.utils :refer [def-instruction
-                                                          generate-instructions
-                                                          make-instruction]]))
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
-            #?(:clj [propeller.push.utils :refer [def-instruction
-                                                  generate-instructions
-                                                  make-instruction]])))
+            [propeller.push.utils.helpers :refer [make-instruction]]
+            [propeller.push.utils.macros :refer [def-instruction
+                                                 generate-instructions]]))
 
 ;; =============================================================================
 ;; Polymorphic Instructions
@@ -188,10 +185,10 @@
   (fn [state]
     (if (< (count (:exec state)) 3)
       state
-      (let [[a b c] (state/peek-stack-multiple state :exec 3)
-            popped-state (state/pop-stack-multiple state :exec 3)
+      (let [[a b c] (state/peek-stack-many state :exec 3)
+            popped-state (state/pop-stack-many state :exec 3)
             to-push-back (list a c (list b c))]
-        (state/push-to-stack-multiple popped-state :exec to-push-back)))))
+        (state/push-to-stack-many popped-state :exec to-push-back)))))
 
 ;; The "Y combinator" - inserts beneath the top item of the EXEC stack a new
 ;; item of the form "(:exec_y TOP_ITEM)"
@@ -204,4 +201,4 @@
       (let [top-item (state/peek-stack state :exec)
             popped-state (state/pop-stack state :exec)
             to-push-back (list top-item (list :exec_y top-item))]
-        (state/push-to-stack-multiple popped-state :exec to-push-back)))))
+        (state/push-to-stack-many popped-state :exec to-push-back)))))

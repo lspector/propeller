@@ -2,9 +2,8 @@
   (:require [clojure.string]
             [propeller.genome :as genome]
             [propeller.variation :as variation]
-            [propeller.push.core :as push]
             [propeller.push.instructions.bool]
-            [propeller.push.instructions.chara]
+            [propeller.push.instructions.character]
             [propeller.push.instructions.code]
             [propeller.push.instructions.input-output]
             [propeller.push.instructions.numeric]
@@ -46,7 +45,9 @@
                                            instructions
                                            max-initial-plushy-size)))]
     (let [evaluated-pop (sort-by :total-error
-                                 (map (partial error-function argmap) population))
+                                 (#?(:clj pmap
+                                     :cljs map)
+                                   (partial error-function argmap) population))
           best-individual (first evaluated-pop)]
       (report evaluated-pop generation)
       (cond
@@ -56,7 +57,8 @@
             (print "Checking program on test cases... ")
             (if (zero? (:total-error (error-function argmap best-individual :test)))
               (println "Test cases passed.")
-              (println "Test cases failed.")))
+              (println "Test cases failed."))
+            (#?(:clj shutdown-agents)))
         ;;
         (>= generation max-generations) nil
         :else (recur (inc generation)

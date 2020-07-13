@@ -1,16 +1,15 @@
 (ns propeller.push.instructions.vector
-  #?(:cljs (:require-macros [propeller.push.utils :refer [def-instruction
-                                                          generate-instructions
-                                                          make-instruction]]))
   (:require [clojure.string]
             [propeller.utils :as utils]
             [propeller.push.state :as state]
-            #?(:clj [propeller.push.utils :refer [def-instruction
-                                                  generate-instructions
-                                                  make-instruction]])))
+            [propeller.push.utils.helpers :refer [get-vector-literal-type
+                                                  make-instruction]]
+            [propeller.push.utils.macros :refer [generate-instructions]]))
 
 ;; =============================================================================
 ;; VECTOR Instructions
+;;
+;; (common for all vector element subtypes: BOOLEAN, FLOAT, INTEGER, and STRING)
 ;; =============================================================================
 
 ;; Pushes the butlast of the top item
@@ -28,9 +27,9 @@
 ;; Conj's the top item of the appropriately-typed literal stack onto the vector
 ;; stack (e.g. pop the top INTEGER and conj it onto the top VECTOR_INTEGER)
 (def _conj
-  ^{:stacks #{}}
+  ^{:stacks #{:elem}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state #(conj %2 %1) [lit-stack stack] stack))))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the top element of the vector stack
@@ -39,7 +38,7 @@
 (def _contains
   ^{:stacks #{:boolean}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state #(contains? (set %2) %1) [lit-stack stack] :boolean))))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the top element is an empty vector.
@@ -52,25 +51,25 @@
 ;; Pushes the first item of the top element of the vector stack onto the
 ;; approrpiately-typed literal stack
 (def _first
-  ^{:stacks #{}}
+  ^{:stacks #{:elem}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state first [stack] lit-stack))))
 
 ;; Pushes onto the INTEGER stack the index of the top element of the
 ;; appropriately-typed literal stack within the top element of the vector stack
 (def _indexof
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:elem :integer}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state #(utils/indexof %1 %2) [lit-stack stack] :integer))))
 
 ;; Pushes the last item of the top element of the vector stack onto the
 ;; approrpiately-typed literal stack
 (def _last
-  ^{:stacks #{}}
+  ^{:stacks #{:elem}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state last [stack] lit-stack))))
 
 ;; Pushes the length of the top item onto the INTEGER stack
@@ -83,9 +82,9 @@
 ;; approrpiately-typed literal stack, where N is taken from the INTEGER stack.
 ;; To insure the index is within bounds, N is taken mod the vector length
 (def _nth
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:elem :integer}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         #(get %2 (mod %1 (count %2)))
                         [:integer stack]
@@ -95,9 +94,9 @@
 ;; the appropriately-typed literal stack within the top element of the vector
 ;; stack
 (def _occurrencesof
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:elem :integer}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit vect] (count (filter #(= lit %) vect)))
                         [lit-stack stack]
@@ -105,21 +104,21 @@
 
 ;; Pushes every item of the top element onto the appropriately-typed stack
 (def _pushall
-  ^{:stacks #{}}
+  ^{:stacks #{:elem}}
   (fn [stack state]
     (if (state/empty-stack? state stack)
       state
-      (let [lit-stack (utils/get-vector-literal-type stack)
+      (let [lit-stack (get-vector-literal-type stack)
             top-vector (state/peek-stack state stack)
             popped-state (state/pop-stack state stack)]
-        (state/push-to-stack-multiple popped-state lit-stack top-vector)))))
+        (state/push-to-stack-many popped-state lit-stack top-vector)))))
 
 ;; Removes all occurrences of the top element of the appropriately-typed literal
 ;; stack from the first element of the vector stack
 (def _remove
-  ^{:stacks #{}}
+  ^{:stacks #{:elem}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit vect] (vec (filter #(not= lit %) vect)))
                         [lit-stack stack]
@@ -129,9 +128,9 @@
 ;; literal stack with the top element of the appropriately-typed literal stack
 ;; within the top item of the vector stack
 (def _replace
-  ^{:stacks #{}}
+  ^{:stacks #{:elem}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit1 lit2 vect]
                           (replace {lit1 lit2} vect))
@@ -142,9 +141,9 @@
 ;; literal stack with the top element of the appropriately-typed literal stack
 ;; within the top item of the vector stack
 (def _replacefirst
-  ^{:stacks #{}}
+  ^{:stacks #{:elem}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit1 lit2 vect]
                           (assoc vect (utils/indexof lit1 vect) lit2))
@@ -167,9 +166,9 @@
 ;; with the top item from the appropriately-typed literal stack. To insure the
 ;; index is within bounds, N is taken mod the vector length
 (def _set
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:elem :integer}}
   (fn [stack state]
-    (let [lit-stack (utils/get-vector-literal-type stack)]
+    (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit n vect]
                           (assoc vect (mod n (count vect)) lit))
@@ -202,6 +201,3 @@
   [_butlast _concat _conj _contains _emptyvector _first _indexof _last
    _length _nth _occurrencesof _pushall _remove _replace _replacefirst
    _rest _reverse _set _subvec _take])
-
-;; Manually add extra metadata for _conj
-

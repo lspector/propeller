@@ -1,10 +1,9 @@
-(ns propeller.push.instructions.chara
-  #?(:cljs (:require-macros [propeller.push.utils :refer [def-instruction
-                                                          make-instruction]]))
+(ns propeller.push.instructions.character
   (:require [propeller.push.state :as state]
-            [propeller.tools.character :as char]
-            #?(:clj [propeller.push.utils :refer [def-instruction
-                                                  make-instruction]])))
+            [propeller.push.utils.helpers :refer [make-instruction]]
+            [propeller.push.utils.macros :refer [def-instruction
+                                                 generate-instructions]]
+            [propeller.tools.character :as char]))
 
 ;; =============================================================================
 ;; CHAR Instructions
@@ -62,4 +61,4 @@
       state
       (let [top-string (state/peek-stack state :string)
             popped-state (state/pop-stack state :string)]
-        (state/push-to-stack-multiple popped-state :char (map char top-string))))))
+        (state/push-to-stack-many popped-state :char (map char top-string))))))
