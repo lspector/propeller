@@ -5,7 +5,8 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.utils :as utils]
             [propeller.push.state :as state]
-            [propeller.tools.math :as math]))
+            [propeller.tools.math :as math]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 ;; =============================================================================
 ;; Tom Helmuth, thelmuth@cs.umass.edu
@@ -78,7 +79,8 @@
                       inputs)
          parsed-outputs (map (fn [output]
                                (try (read-string output)
-                                    (catch Exception e 1000.0)))
+                                    #?(:clj (catch Exception e 1000.0)
+                                       :cljs (catch js/Error. e 1000.0))))
                              outputs)
          errors (map (fn [correct-output output]
                        (min 1000.0 (math/abs (- correct-output output))))
@@ -87,4 +89,5 @@
      (assoc individual
        :behaviors parsed-outputs
        :errors errors
-       :total-error (apply +' errors)))))
+       :total-error #?(:clj (apply +' errors)
+                       :cljs (apply + errors))))))

@@ -1,9 +1,11 @@
 (ns propeller.push.instructions.string
+  #?(:cljs (:require-macros
+             [propeller.push.utils.macros :refer [def-instruction]]))
   (:require [clojure.string :as string]
             [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [make-instruction]]
-            [propeller.push.utils.macros :refer [def-instruction]]
-            [propeller.push.state :as state]))
+            [propeller.push.state :as state]
+            #?(:clj [propeller.push.utils.macros :refer [def-instruction]])))
 
 ;; =============================================================================
 ;; STRING Instructions

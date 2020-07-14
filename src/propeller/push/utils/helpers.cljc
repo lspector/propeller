@@ -1,7 +1,10 @@
 (ns propeller.push.utils.helpers
   (:require [clojure.set]
             [propeller.push.core :as push]
-            [propeller.push.state :as state]))
+            [propeller.push.state :as state]
+            #?(:cljs [goog.string :as gstring])
+            #?(:cljs [goog.string.format])))
+
 
 ;; Takes a state and a collection of stacks to take args from. If there are
 ;; enough args on each of the desired stacks, returns a map with keys
@@ -42,8 +45,12 @@
   (doseq [[instruction-name function] @push/instruction-table]
     (assert
       (:stacks (meta function))
-      (format "ERROR: Instruction %s does not have :stacks defined in metadata."
-              (name instruction-name))))
+      #?(:clj (format
+                "ERROR: Instruction %s does not have :stacks defined in metadata."
+                (name instruction-name))
+         :cljs (gstring/format
+                 "ERROR: Instruction %s does not have :stacks defined in metadata."
+                 (name instruction-name)))))
   (for [[instruction-name function] @push/instruction-table
         :when (clojure.set/subset? (:stacks (meta function)) stacks)]
     instruction-name))
@@ -80,6 +87,7 @@
 (defn print-state
   [state]
   (doseq [stack (keys state/empty-state)]
-    (printf "%-15s = " stack)
+    #?(:clj (printf "%-15s = " stack)
+       :cljs (print (gstring/format "%-15s = " stack)))
     (prn (if (get state stack) (get state stack) '()))
     (flush)))
