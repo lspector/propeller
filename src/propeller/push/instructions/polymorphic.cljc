@@ -26,7 +26,7 @@
 ;; number n is determined by the top INTEGER. For n = 0, equivalent to POP.
 ;; For n = 1, equivalent to NOOP. For n = 2, equivalent to DUP. Negative values
 ;; of n are treated as 0
-(def _duptimes
+(def _dup_times
   ^{:stacks #{:integer}}
   (fn [stack state]
     (if (or (and (= stack :integer)
@@ -46,7 +46,7 @@
 ;; Duplicates the top n items on the stack, one time each. The number n is
 ;; determined by the top INTEGER. If n <= 0, no items will be duplicated. If
 ;; fewer than n items are on the stack, the entire stack will be duplicated.
-(def _dupitems
+(def _dup_items
   ^{:stacks #{:integer}}
   (fn [stack state]
     (if (state/empty-stack? state :integer)
@@ -114,7 +114,7 @@
       state)))
 
 ;; Pushes the given stack's depth onto the INTEGER stack
-(def _stackdepth
+(def _stack_depth
   ^{:stacks #{:integer}}
   (fn [stack state]
     (let [stack-depth (count (get state stack))]
@@ -152,7 +152,7 @@
 
 ;; Pushes a copy of an indexed item from deep in the stack, without removing it.
 ;; The top INTEGER is used to determine how deep to yankdup from
-(def _yankdup
+(def _yank_dup
   ^{:stacks #{:integer}}
   (fn [stack state]
     (if (or (and (= stack :integer)
@@ -171,5 +171,5 @@
 (generate-instructions
   [:boolean :char :code :exec :float :integer :string
    :vector_boolean :vector_float :vector_integer :vector_string]
-  [_dup _duptimes _dupitems _empty _eq _flush _pop _rot _shove
-   _stackdepth _swap _yank _yankdup])
+  [_dup _dup_times _dup_items _empty _eq _flush _pop _rot _shove
+   _stack_depth _swap _yank _yank_dup])

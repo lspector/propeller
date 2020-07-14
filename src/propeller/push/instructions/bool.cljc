@@ -55,14 +55,14 @@
 
 ;; Pushes FALSE if the top FLOAT is 0.0, and TRUE otherwise
 (def-instruction
-  :boolean_fromfloat
+  :boolean_from_float
   ^{:stacks #{:boolean :float}}
   (fn [state]
     (make-instruction state #(not (zero? %)) [:float] :boolean)))
 
 ;; Pushes FALSE if the top INTEGER is 0, and TRUE otherwise
 (def-instruction
-  :boolean_frominteger
+  :boolean_from_integer
   ^{:stacks #{:boolean :integer}}
   (fn [state]
     (make-instruction state #(not (zero? %)) [:integer] :boolean)))

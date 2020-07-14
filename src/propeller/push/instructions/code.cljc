@@ -6,16 +6,6 @@
                                                  generate-instructions]]))
 
 ;; =============================================================================
-;; Polymorphic Instructions
-;; =============================================================================
-
-(def _noop
-  ^{:stacks #{}}
-  (fn [stack state] state))
-
-(generate-instructions [:exec :code] [_noop])
-
-;; =============================================================================
 ;; CODE Instructions
 ;; =============================================================================
 
@@ -46,7 +36,7 @@
 ;; is pushed onto the EXEC stack for subsequent execution. If the integers are
 ;; not equal, then the current index will still be pushed onto the INTEGER stack
 ;; but two items will be pushed onto the EXEC stack - first a recursive call to
-;; :exec_do*range (with the same code and destination index, but with a current
+;; :exec_do_range (with the same code and destination index, but with a current
 ;; index that has been either incremented or decremented by 1 to be closer to
 ;; the destination index) and then the body code. Note that the range is
 ;; inclusive of both endpoints; a call with integer arguments 3 and 5 will cause
@@ -54,7 +44,7 @@
 ;; 4, and 5. Note also that one can specify a loop that "counts down" by
 ;; providing a destination index that is less than the specified current index.
 (def-instruction
-  :exec_do*range
+  :exec_do_range
   ^{:stacks #{:exec :integer}}
   (fn [state]
     (if (or (state/empty-stack? state :exec)
@@ -76,7 +66,7 @@
                                                 :exec
                                                 (list (+' current-index increment)
                                                       destination-index
-                                                      :exec_do*range
+                                                      :exec_do_range
                                                       to-do)))]
         (state/push-to-stack
           (state/push-to-stack continuation :integer current-index) :exec to-do)))))
@@ -86,7 +76,7 @@
 ;; total number of iterations) onto the INTEGER stack prior to each execution
 ;; of the loop body. If the top INTEGER argument is <= 0, this becomes a NOOP
 (def-instruction
-  :exec_do*count
+  :exec_do_count
   ^{:stacks #{:exec :integer}}
   (fn [state]
     (if (or (state/empty-stack? state :integer)
@@ -98,12 +88,12 @@
             popped-state (state/pop-stack (state/pop-stack state :exec) :integer)]
         (state/push-to-stack popped-state :exec (list 0
                                                       (dec index)
-                                                      :exec_do*range
+                                                      :exec_do_range
                                                       to-do))))))
 
-;; Like :exec_do*count, but does not push the loop counter onto the INTEGER stack
+;; Like :exec_do_count, but does not push the loop counter onto the INTEGER stack
 (def-instruction
-  :exec_do*times
+  :exec_do_times
   ^{:stacks #{:exec :integer}}
   (fn [state]
     (if (or (state/empty-stack? state :integer)
@@ -116,7 +106,7 @@
             popped-state (state/pop-stack (state/pop-stack state :exec) :integer)]
         (state/push-to-stack popped-state :exec (list 0
                                                       (dec index)
-                                                      :exec_do*range
+                                                      :exec_do_range
                                                       to-do-with-pop))))))
 
 ;; If the top BOOLEAN is TRUE, removes the the second item on the EXEC stack,
@@ -159,7 +149,7 @@
 ;; the BOOLEAN stack is true. Differs from :exec_while in that it executes
 ;; the top instruction at least once
 (def-instruction
-  :exec_do*while
+  :exec_do_while
   ^{:stacks #{:boolean :exec}}
   (fn [state]
     (if (state/empty-stack? state :exec)

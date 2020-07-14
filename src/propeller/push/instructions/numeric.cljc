@@ -84,7 +84,7 @@
     (make-instruction state min [stack stack] stack)))
 
 ;; Pushes 1 / 1.0 if the top BOOLEAN is TRUE, or 0 / 0.0 if FALSE
-(def _fromboolean
+(def _from_boolean
   ^{:stacks #{:boolean}}
   (fn [stack state]
     (make-instruction state
@@ -93,14 +93,14 @@
                       stack)))
 
 ;; Pushes the ASCII value of the top CHAR
-(def _fromchar
+(def _from_char
   ^{:stacks #{:char}}
   (fn [stack state]
     (make-instruction state (if (= stack :integer) int float) [:char] stack)))
 
 ;; Pushes the value of the top STRING, if it can be parsed as a number.
 ;; Otherwise, acts as a NOOP
-(def _fromstring
+(def _from_string
   ^{:stacks #{:string}}
   (fn [stack state]
     (make-instruction state
@@ -125,7 +125,7 @@
 (generate-instructions
   [:float :integer]
   [_gt _gte _lt _lte _add _subtract _mult _quot _mod _max _min _inc _dec
-   _fromboolean _fromchar _fromstring])
+   _from_boolean _from_char _from_string])
 
 ;; =============================================================================
 ;; FLOAT Instructions only
@@ -154,7 +154,7 @@
 
 ;; Pushes the floating point version of the top INTEGER
 (def-instruction
-  :float_frominteger
+  :float_from_integer
   ^{:stacks #{:float :integer}}
   (fn [state]
     (make-instruction state float [:integer] :float)))
@@ -165,7 +165,7 @@
 
 ;; Pushes the result of truncating the top FLOAT towards negative infinity
 (def-instruction
-  :integer_fromfloat
+  :integer_from_float
   ^{:stacks #{:float :integer}}
   (fn [state]
     (make-instruction state int [:float] :integer)))

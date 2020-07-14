@@ -76,13 +76,15 @@
                             (:step-limit argmap))
                           :output))
                       inputs)
+         parsed-outputs (map (fn [output]
+                               (try (read-string output)
+                                    (catch Exception e 1000.0)))
+                             outputs)
          errors (map (fn [correct-output output]
-                       (let [parsed-output (try (read-string output)
-                                                (catch Exception e 1000.0))]
-                         (min 1000.0 (math/abs (- correct-output parsed-output)))))
+                       (min 1000.0 (math/abs (- correct-output output))))
                      correct-outputs
-                     outputs)]
+                     parsed-outputs)]
      (assoc individual
-       :behaviors outputs
+       :behaviors parsed-outputs
        :errors errors
        :total-error (apply +' errors)))))

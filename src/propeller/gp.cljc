@@ -7,7 +7,6 @@
             [propeller.push.instructions.code]
             [propeller.push.instructions.input-output]
             [propeller.push.instructions.numeric]
-            [propeller.push.instructions.random]
             [propeller.push.instructions.polymorphic]
             [propeller.push.instructions.string]
             [propeller.push.instructions.vector]))
@@ -23,7 +22,7 @@
     (print "Best program: ") (prn (genome/plushy->push (:plushy best)))
     (println "Best total error:" (:total-error best))
     (println "Best errors:" (:errors best))
-    (println "Best behaviors:" (map clojure.string/trim (:behaviors best)))
+    (println "Best behaviors:" (:behaviors best))
     (println "Genotypic diversity:"
              (float (/ (count (distinct (map :plushy pop))) (count pop))))
     (println "Average genome length:"
@@ -45,7 +44,7 @@
                                            instructions
                                            max-initial-plushy-size)))]
     (let [evaluated-pop (sort-by :total-error
-                                 (#?(:clj pmap
+                                 (#?(:clj  pmap
                                      :cljs map)
                                    (partial error-function argmap) population))
           best-individual (first evaluated-pop)]
@@ -60,7 +59,9 @@
               (println "Test cases failed."))
             (#?(:clj shutdown-agents)))
         ;;
-        (>= generation max-generations) nil
+        (>= generation max-generations)
+        nil
+        ;;
         :else (recur (inc generation)
                      (if (:elitism argmap)
                        (conj (repeatedly (dec population-size)

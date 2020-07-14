@@ -64,6 +64,30 @@
     (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state #(utils/indexof %1 %2) [lit-stack stack] :integer))))
 
+;; Iterates over the vector using the code on the exec stack
+(def _iterate
+  ^{:stacks #{:elem :integer}}
+  (fn [stack state]
+    (let [lit-stack (get-vector-literal-type stack)]
+      (if (or (state/empty-stack? state :exec)
+              (state/empty-stack? state stack))
+        state
+        (let [vect (state/peek-stack state stack)
+              popped-state (state/pop-stack state stack)]
+          (cond
+            (empty? vect)
+            (state/pop-stack popped-state :exec)
+            ;;
+            (empty? (rest vect))
+            (state/push-to-stack popped-state lit-stack (first vect))
+            ;;
+            :else
+            (-> popped-state
+                (state/push-to-stack :exec (keyword (str (name stack) "_iterate")))
+                (state/push-to-stack :exec (vec (rest vect)))
+                (state/push-to-stack :exec (state/peek-stack state :exec))
+                (state/push-to-stack lit-stack (first vect)))))))))
+
 ;; Pushes the last item of the top element of the vector stack onto the
 ;; approrpiately-typed literal stack
 (def _last
@@ -195,9 +219,9 @@
   (fn [stack state]
     (make-instruction state #(vec (take %1 %2)) [:integer stack] stack)))
 
-;; 4 types x 20 functions = 80 instructions
+;; 4 types x 21 functions = 84 instructions
 (generate-instructions
   [:vector_boolean :vector_float :vector_integer :vector_string]
-  [_butlast _concat _conj _contains _emptyvector _first _indexof _last
-   _length _nth _occurrencesof _pushall _remove _replace _replacefirst
+  [_butlast _concat _conj _contains _emptyvector _first _indexof _iterate
+   _last _length _nth _occurrencesof _pushall _remove _replace _replacefirst
    _rest _reverse _set _subvec _take])
