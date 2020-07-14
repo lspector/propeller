@@ -9,7 +9,7 @@
   [state]
   (let [popped-state (state/pop-stack state :exec)
         instruction (first (:exec state))
-        literal-type (get-literal-type instruction)] ; nil for non-literals
+        literal-type (get-literal-type instruction)]     ; nil for non-literals
     (cond
       ;;
       ;; Recognize functional instruction or input instruction
@@ -31,8 +31,10 @@
       (update popped-state :exec #(concat %2 %1) instruction)
       ;;
       :else
-      (throw (Exception. (str "Unrecognized Push instruction in program: "
-                              (name instruction)))))))
+      (throw #?(:clj  (Exception. (str "Unrecognized Push instruction in program: "
+                                       (name instruction)))
+                :cljs (js/Error. (str "Unrecognized Push instruction in program: "
+                                      (name instruction))))))))
 
 (defn interpret-program
   "Runs the given problem starting with the stacks in start-state."

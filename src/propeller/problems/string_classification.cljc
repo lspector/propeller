@@ -68,4 +68,5 @@
     (assoc individual
       :behaviors outputs
       :errors errors
-      :total-error (apply +' errors))))
+      :total-error #?(:clj (apply +' errors)
+                      :cljs (apply + errors)))))

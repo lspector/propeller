@@ -1,8 +1,12 @@
 (ns propeller.push.instructions.numeric
+  #?(:cljs (:require-macros
+             [propeller.push.utils.macros :refer [def-instruction
+                                                  generate-instructions]]))
   (:require [propeller.push.utils.helpers :refer [make-instruction]]
-            [propeller.push.utils.macros :refer [def-instruction
-                                                 generate-instructions]]
-            [propeller.tools.math :as math]))
+            [propeller.tools.math :as math]
+            #?(:cljs [cljs.reader :refer [read-string]]
+               :clj [propeller.push.utils.macros
+                     :refer [def-instruction generate-instructions]])))
 
 ;; =============================================================================
 ;; FLOAT and INTEGER Instructions (polymorphic)
@@ -40,20 +44,23 @@
 (def _add
   ^{:stacks #{}}
   (fn [stack state]
-    (make-instruction state +' [stack stack] stack)))
+    #?(:clj (make-instruction state +' [stack stack] stack)
+       :cljs (make-instruction state + [stack stack] stack))))
 
 ;; Pushes the difference of the top two items (i.e. the second item minus the
 ;; top item) onto the same stack
 (def _subtract
   ^{:stacks #{}}
   (fn [stack state]
-    (make-instruction state -' [stack stack] stack)))
+    #?(:clj (make-instruction state -' [stack stack] stack)
+       :cljs (make-instruction state - [stack stack] stack))))
 
 ;; Pushes the product of the top two items onto the same stack
 (def _mult
   ^{:stacks #{}}
   (fn [stack state]
-    (make-instruction state *' [stack stack] stack)))
+    #?(:clj (make-instruction state *' [stack stack] stack)
+       :cljs (make-instruction state * [stack stack] stack))))
 
 ;; Pushes the quotient of the top two items (i.e. the second item divided by the
 ;; top item) onto the same stack. If the top item is zero, pushes 1
@@ -105,7 +112,8 @@
   (fn [stack state]
     (make-instruction state
                       #(try ((if (= stack :integer) int float) (read-string %))
-                            (catch Exception e))
+                            #?(:clj (catch Exception e)
+                               :cljs (catch js/Error. e)))
                       [:string]
                       stack)))
 

@@ -1,9 +1,13 @@
 (ns propeller.push.instructions.code
+  #?(:cljs (:require-macros
+             [propeller.push.utils.macros :refer [def-instruction
+                                                  generate-instructions]]))
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
             [propeller.push.utils.helpers :refer [make-instruction]]
-            [propeller.push.utils.macros :refer [def-instruction
-                                                 generate-instructions]]))
+            #?(:clj
+               [propeller.push.utils.macros :refer [def-instruction
+                                                    generate-instructions]])))
 
 ;; =============================================================================
 ;; CODE Instructions
@@ -64,8 +68,11 @@
                            popped-state
                            (state/push-to-stack popped-state
                                                 :exec
-                                                (list (+' current-index increment)
-                                                      destination-index
+                                                (list #? (:clj
+                                                          (+' current-index increment)
+                                                          :cljs
+                                                          (+ current-index increment))
+                                                          destination-index
                                                       :exec_do_range
                                                       to-do)))]
         (state/push-to-stack
