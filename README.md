@@ -39,16 +39,6 @@ After page is loaded, you may also start a REPL connected to browser with:
 yarn shadow-cljs cljs-repl app
 ```
 
-### Release
-
-Compile with optimizations with `release` sub-command:
-
-```bash
-yarn shadow-cljs release app
-mkdir -p target && cp assets/index.html target/
-yarn serve # serving target/ on http://localhost:8080
-```
-
 ## Description
 
 Propel is an implementation of the Push programming 
