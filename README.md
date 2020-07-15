@@ -39,6 +39,13 @@ After page is loaded, you may also start a REPL connected to browser with:
 yarn shadow-cljs cljs-repl app
 ```
 
+Once the REPL is loaded, load the core namespace with:
+
+```
+(ns propeller.core)
+```
+Calling `(-main)` will run the default genetic programming problem.
+
 ## Description
 
 Propel is an implementation of the Push programming 
