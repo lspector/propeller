@@ -15,6 +15,37 @@ example, `lein run :population-size 100`. You can use something
 like `lein run | tee outfile` to send output both to the terminal 
 and to `outfile`.
 
+## CLJS Usage
+
+### Development
+
+Run in development:
+
+```bash
+yarn
+(mkdir -p target && cp assets/index.html target/)
+yarn shadow-cljs watch app
+```
+
+`shadow-cljs` will be installed in `node_modules/` when you run `yarn`.
+
+`:dev-http` specifies that `target/` will be served at http://localhost:8080 .
+
+### REPL
+
+After page is loaded, you may also start a REPL connected to browser with:
+
+```bash
+yarn shadow-cljs cljs-repl app
+```
+
+Once the REPL is loaded, load the core namespace with:
+
+```
+(ns propeller.core)
+```
+Calling `(-main)` will run the default genetic programming problem.
+
 ## Description
 
 Propel is an implementation of the Push programming 

@@ -19,7 +19,9 @@
   [state instruction]
   (if-let [input (instruction (:input state))]
     (state/push-to-stack state :exec input)
-    (throw (Exception. (str "Undefined input instruction " instruction)))))
+    (throw #?(:clj (Exception. (str "Undefined input instruction " instruction))
+              :cljs (js/Error
+                      (str "Undefined input instruction " instruction))))))
 
 ;; =============================================================================
 ;; OUTPUT Instructions

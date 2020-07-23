@@ -1,0 +1,21 @@
+{
+  "name": "propeller-cljs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "shadow-cljs watch app",
+    "compile": "shadow-cljs compile app",
+    "release": "shadow-cljs release app",
+    "html": "mkdir -p target && cp assets/index.html target/",
+    "serve": "yarn html && http-server target/",
+    "del": "rm -r target/*",
+    "build": "yarn release && yarn html && yarn serve"
+  },
+  "author": "",
+  "license": "EPL",
+  "devDependencies": {
+    "http-server": "^0.12.3",
+    "shadow-cljs": "^2.10.10"
+  }
+}
