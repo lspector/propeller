@@ -25,11 +25,17 @@
         state
         (state/push-to-stack state stack top-item)))))
 
+;; Limits the number of items that can be duplicated onto a stack at once.
+;; We might want to extend to limit all the different that things may be
+;; placed on a stack.
+(def max-stack-items 100)
+
 ;; Duplicates n copies of the top item (i.e leaves n copies there). Does not pop
 ;; its argument (since that would negate the effect of the duplication). The
 ;; number n is determined by the top INTEGER. For n = 0, equivalent to POP.
 ;; For n = 1, equivalent to NOOP. For n = 2, equivalent to DUP. Negative values
-;; of n are treated as 0
+;; of n are treated as 0. The final number of items on the stack is limited to
+;; max-stack-items.
 (def _dup_times
   ^{:stacks #{:integer}}
   (fn [stack state]
@@ -38,7 +44,8 @@
             (and (not= stack :integer)
                  (not (state/empty-stack? state :integer))
                  (not (state/empty-stack? state stack))))
-      (let [n (state/peek-stack state :integer)
+      (let [n (min (state/peek-stack state :integer)
+                   (inc (- max-stack-items (state/stack-size state stack))))
             popped-state (state/pop-stack state :integer)
             top-item (state/peek-stack popped-state stack)
             top-item-dup (take (- n 1) (repeat top-item))]
@@ -50,12 +57,14 @@
 ;; Duplicates the top n items on the stack, one time each. The number n is
 ;; determined by the top INTEGER. If n <= 0, no items will be duplicated. If
 ;; fewer than n items are on the stack, the entire stack will be duplicated.
+;; The final number of items on the stack is limited to max-stack-items.
 (def _dup_items
   ^{:stacks #{:integer}}
   (fn [stack state]
     (if (state/empty-stack? state :integer)
       state
-      (let [n (state/peek-stack state :integer)
+      (let [n (min (state/peek-stack state :integer)
+                   (- max-stack-items (state/stack-size state stack)))
             popped-state (state/pop-stack state :integer)
             top-items (take n (get popped-state stack))]
         (state/push-to-stack-many popped-state stack top-items)))))
