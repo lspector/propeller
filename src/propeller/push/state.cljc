@@ -35,6 +35,11 @@
   [state stack]
   (empty? (get state stack)))
 
+;; Returns the stack size
+(defn stack-size
+  [state stack]
+  (count (get state stack)))
+
 ;; Returns the top item on the stack
 (defn peek-stack
   [state stack]
