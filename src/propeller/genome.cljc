@@ -11,7 +11,7 @@
 
 (defn plushy->push
   "Returns the Push program expressed by the given plushy representation."
-  [plushy]
+  [plushy argmap]
   (let [opener? #(and (vector? %) (= (first %) 'open))]     ;; [open <n>] marks opens
     (loop [push ()                                          ;; iteratively build the Push program from the plushy
            plushy (mapcat #(if-let [n (get push/opens %)] [% ['open n]] [%]) plushy)]

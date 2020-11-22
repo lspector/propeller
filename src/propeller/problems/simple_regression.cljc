@@ -38,7 +38,7 @@
   or 1000000 if no behavior is produced. The behavior is here defined as the
   final top item on the INTEGER stack."
   [argmap individual]
-  (let [program (genome/plushy->push (:plushy individual))
+  (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (range -10 11)
         correct-outputs (map target-function inputs)
         outputs (map (fn [input]

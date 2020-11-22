@@ -46,7 +46,7 @@
   behavior is produced. The behavior is here defined as the final top item on
   the BOOLEAN stack."
   [argmap individual]
-  (let [program (genome/plushy->push (:plushy individual))
+  (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs ["GCG" "GACAG" "AGAAG" "CCCA" "GATTACA" "TAGG" "GACT"]
         correct-outputs [false false false false true true true]
         outputs (map (fn [input]
