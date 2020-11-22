@@ -44,7 +44,7 @@
        (crossover (:plushy (selection/select-parent pop argmap))
                   (:plushy (selection/select-parent pop argmap)))
        (< prob (+ (:crossover (:variation argmap))
-                  (:umad (:variation argmap)) 2))
+                  (:umad (:variation argmap))))
        (uniform-deletion (uniform-addition (:plushy (selection/select-parent pop argmap))
                                            (:instructions argmap)
                                            (:umad-rate argmap))
