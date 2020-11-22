@@ -48,5 +48,5 @@
        (uniform-deletion (uniform-addition (:plushy (selection/select-parent pop argmap))
                                            (:instructions argmap)
                                            (:umad-rate argmap))
-                         (:umad-rate argmap))
+                         (/ 1 (+ (/ 1 (:umad-rate argmap)) 1)))
        :else (:plushy (selection/select-parent pop argmap))))})
