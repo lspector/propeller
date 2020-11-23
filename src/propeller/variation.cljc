@@ -4,7 +4,7 @@
 
 (defn crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
-  [plushy-a plushy-b]
+  [plushy-a plushy-b argmap]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (= shorter plushy-a)
                  plushy-b
@@ -19,7 +19,7 @@
 (defn uniform-addition
   "Returns plushy with new instructions possibly added before or after each
   existing instruction."
-  [plushy instructions umad-rate]
+  [plushy instructions umad-rate argmap]
   (apply concat
          (map #(if (< (rand) umad-rate)
                  (shuffle [% (utils/random-instruction instructions)])
@@ -28,7 +28,7 @@
 
 (defn uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
-  [plushy umad-rate]
+  [plushy umad-rate argmap]
   (remove (fn [_] (< (rand)
                      (/ 1 (+ 1 (/ 1 umad-rate)))))
           plushy))
@@ -42,11 +42,14 @@
      (cond
        (< prob (:crossover (:variation argmap)))
        (crossover (:plushy (selection/select-parent pop argmap))
-                  (:plushy (selection/select-parent pop argmap)))
+                  (:plushy (selection/select-parent pop argmap))
+                  argmap)
        (< prob (+ (:crossover (:variation argmap))
                   (:umad (:variation argmap))))
        (uniform-deletion (uniform-addition (:plushy (selection/select-parent pop argmap))
                                            (:instructions argmap)
-                                           (:umad-rate argmap))
-                         (/ 1 (+ (/ 1 (:umad-rate argmap)) 1)))
+                                           (:umad-rate argmap)
+                                           argmap)
+                         (/ 1 (+ (/ 1 (:umad-rate argmap)) 1))
+                         argmap)
        :else (:plushy (selection/select-parent pop argmap))))})
