@@ -32,6 +32,7 @@
 (defn make-instruction
   [state function arg-stacks return-stack]
   (let [popped-args (get-args-from-stacks state arg-stacks)]
+    (println popped-args)
     (if (= popped-args :not-enough-args)
       state
       (let [result (apply function (:args popped-args))

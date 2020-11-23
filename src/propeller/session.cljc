@@ -13,21 +13,21 @@
     '(1 2 :integer_add) state/empty-state 1000)
 
 (interpreter/interpret-program
-    '(3 5 :integer_eq :exec_if (1 "yes") (2 "no"))
+    '(3 3 :integer_eq :exec_if (1 "yes") (2 "no"))
     state/empty-state
     1000)
 
-#_(interpreter/interpret-program
-    '(in1 :string_reverse 1 :string_take "?" :string_eq :exec_if
-          (in1 " I am asking." :string_concat)
-          (in1 " I am saying." :string_concat))
+(interpreter/interpret-program
+    '(:in1 :string_reverse 1 :string_take "?" :string_eq :exec_if
+          (:in1 " I am asking." :string_concat)
+          (:in1 " I am saying." :string_concat))
     (assoc state/empty-state :input {:in1 "Can you hear me?"})
     1000)
 
-#_(interpreter/interpret-program
-    '(in1 :string_reverse 1 :string_take "?" :string_eq :exec_if
-          (in1 " I am asking." :string_concat)
-          (in1 " I am saying." :string_concat))
+(interpreter/interpret-program
+    '(:in1 :string_reverse 1 :string_take "?" :string_eq :exec_if
+          (:in1 " I am asking." :string_concat)
+          (:in1 " I am saying." :string_concat))
     (assoc state/empty-state :input {:in1 "I can hear you."})
     1000)
 
@@ -61,7 +61,7 @@
           :step-limit              100
           :parent-selection        :lexicase})
 
-(gp/gp {:instructions            propeller.problems.software.number-io/instructions
+#_(gp/gp {:instructions            propeller.problems.software.number-io/instructions
         :error-function          propeller.problems.software.number-io/error-function
         :max-generations         500
         :population-size         500
