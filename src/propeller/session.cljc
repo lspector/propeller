@@ -10,9 +10,9 @@
             [propeller.push.state :as state]))
 
 #_(interpreter/interpret-program
-    '(1 2 integer_add) state/empty-state 1000)
+    '(1 2 :integer_add) state/empty-state 1000)
 
-#_(interpreter/interpret-program
+(interpreter/interpret-program
     '(3 5 :integer_eq :exec_if (1 "yes") (2 "no"))
     state/empty-state
     1000)
@@ -60,3 +60,15 @@
           :max-initial-plushy-size 50
           :step-limit              100
           :parent-selection        :lexicase})
+
+(gp/gp {:instructions            propeller.problems.software.number-io/instructions
+        :error-function          propeller.problems.software.number-io/error-function
+        :max-generations         500
+        :population-size         500
+        :max-initial-plushy-size 100
+        :step-limit              200
+        :parent-selection        :lexicase
+        :tournament-size         5
+        :umad-rate               0.1
+        :variation               {:umad 0.5 :crossover 0.5}
+        :elitism                 false})
