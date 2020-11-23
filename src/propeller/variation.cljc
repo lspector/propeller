@@ -67,6 +67,14 @@
                               (/ 1 (+ 1 (/ 1 umad-rate)))))
                    (partition 2 plushy))))
 
+(defn diploid-flip
+  "Randomly flips pairs in a diploid plushy at some rate."
+  [plushy flip-rate]
+  (flatten (map #(if (< (rand) flip-rate)
+                   (reverse %)
+                   %)
+                (partition 2 plushy))))
+
 (defn new-individual
   "Returns a new individual produced by selection and variation of
   individuals in the population."
