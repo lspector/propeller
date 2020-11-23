@@ -124,7 +124,7 @@
   :exec_if
   ^{:stacks #{:boolean :exec}}
   (fn [state]
-    (make-instruction state #(if %1 %3 %2) [:boolean :exec :exec] :exec)))
+    (make-instruction state #(if %1 %2 %3) [:boolean :exec :exec] :exec)))
 
 ;; If the top BOOLEAN is TRUE, leaves the first item on the EXEC stack to be
 ;; executed. Otherwise, it removes it. Acts as a NOOP unless there is at least
