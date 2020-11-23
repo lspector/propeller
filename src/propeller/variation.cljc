@@ -47,9 +47,10 @@
   existing instruction."
   [plushy instructions umad-rate]
   (flatten
-    (map #(if (< (rand) umad-rate)
-            (shuffle [% (repeatedly 2 #(utils/random-instruction instructions))])
-            [%])
+    (map (fn [pair]
+           (if (< (rand) umad-rate)
+             (shuffle [pair (repeatedly 2 #(utils/random-instruction instructions))])
+             [pair]))
          (partition 2 plushy))))
 
 (defn uniform-deletion
@@ -63,7 +64,7 @@
   "Randomly deletes instructions from plushy at some rate."
   [plushy umad-rate]
   (flatten (remove (fn [_] (< (rand)
-                     (/ 1 (+ 1 (/ 1 umad-rate)))))
+                              (/ 1 (+ 1 (/ 1 umad-rate)))))
                    (partition 2 plushy))))
 
 (defn new-individual
@@ -71,15 +72,18 @@
   individuals in the population."
   [pop argmap]
   {:plushy
-   (let [prob (rand)]
+   (let [prob (rand)
+         [xover add del] (if (:diploid argmap)
+                           [diploid-crossover diploid-uniform-addition diploid-uniform-deletion]
+                           [crossover uniform-addition uniform-deletion])]
      (cond
        (< prob (:crossover (:variation argmap)))
-       (crossover (:plushy (selection/select-parent pop argmap))
-                  (:plushy (selection/select-parent pop argmap)))
+       (xover (:plushy (selection/select-parent pop argmap))
+              (:plushy (selection/select-parent pop argmap)))
        (< prob (+ (:crossover (:variation argmap))
                   (:umad (:variation argmap))))
-       (uniform-deletion (uniform-addition (:plushy (selection/select-parent pop argmap))
-                                           (:instructions argmap)
-                                           (:umad-rate argmap))
-                         (:umad-rate argmap))
+       (del (add (:plushy (selection/select-parent pop argmap))
+                 (:instructions argmap)
+                 (:umad-rate argmap))
+            (:umad-rate argmap))
        :else (:plushy (selection/select-parent pop argmap))))})
