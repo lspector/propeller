@@ -35,7 +35,7 @@
 #_(genome/plushy->push
     (genome/make-random-plushy (get-stack-instructions #{:float :integer :exec :boolean}) 20))
 
-(gp/gp {:instructions            propeller.problems.software.number-io/instructions
+#_(gp/gp {:instructions            propeller.problems.software.number-io/instructions
         :error-function          propeller.problems.software.number-io/error-function
         :max-generations         500
         :population-size         500
@@ -46,3 +46,30 @@
         :umad-rate               0.1
         :variation               {:umad 0.5 :crossover 0.5}
         :elitism                 false})
+
+#_(gp/gp {:instructions            propeller.problems.simple-regression/instructions
+        :error-function          propeller.problems.simple-regression/error-function
+        :max-generations         500
+        :population-size         500
+        :max-initial-plushy-size 100
+        :step-limit              200
+        :parent-selection        :tournament
+        :tournament-size         5
+        :umad-rate               0.01
+        :variation               {:umad 1.0
+                                  :crossover 0.0}
+        :elitism                 false})
+
+(gp/gp {:instructions            propeller.problems.simple-regression/instructions
+        :error-function          propeller.problems.simple-regression/error-function
+        :max-generations         500
+        :population-size         500
+        :max-initial-plushy-size 100
+        :step-limit              200
+        :parent-selection        :tournament
+        :tournament-size         5
+        :umad-rate               0.1
+        :variation               {:umad 1.0
+                                  :crossover 0.0}
+        :elitism                 false})
+

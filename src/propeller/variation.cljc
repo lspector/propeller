@@ -84,21 +84,21 @@
          [xover add del] (if (:diploid argmap)
                            [diploid-crossover diploid-uniform-addition diploid-uniform-deletion]
                            [crossover uniform-addition uniform-deletion])
-         xover-rate (or (:crossover (:variation argmap)) 0)
-         umad-rate (or (:umad (:variation argmap)) 0)
-         flip-rate (or (:flip (:variation argmap)) 0)]
+         xover-prob (or (:crossover (:variation argmap)) 0)
+         umad-prob (or (:umad (:variation argmap)) 0)
+         flip-prob (or (:flip (:variation argmap)) 0)]
      (cond
-       (< prob xover-rate)
+       (< prob xover-prob)
        (xover (:plushy (selection/select-parent pop argmap))
               (:plushy (selection/select-parent pop argmap)))
        ;
-       (< prob (+ xover-rate umad-rate))
+       (< prob (+ xover-prob umad-prob))
        (del (add (:plushy (selection/select-parent pop argmap))
                  (:instructions argmap)
-                 umad-rate)
-            umad-rate)
+                 (:umad-rate argmap))
+            (:umad-rate argmap))
        ;
-       (< prob (+ xover-rate umad-rate flip-rate))
-       (diploid-flip (:plushy (selection/select-parent pop argmap)) flip-rate)
+       (< prob (+ xover-prob umad-prob flip-prob))
+       (diploid-flip (:plushy (selection/select-parent pop argmap)) flip-prob)
        ;
        :else (:plushy (selection/select-parent pop argmap))))})
