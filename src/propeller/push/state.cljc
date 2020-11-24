@@ -43,9 +43,9 @@
 ;; Returns the top item on the stack
 (defn peek-stack
   [state stack]
-  (if-let [top-item (first (get state stack))]
-    top-item
-    :no-stack-item))
+  (if (empty? (get state stack))
+    :no-stack-item
+    (first (get state stack))))
 
 ;; Returns the top n items on the stack, as a chunk. If there are less than n
 ;; items on the stack, returns the entire stack

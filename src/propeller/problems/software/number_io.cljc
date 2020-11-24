@@ -37,7 +37,7 @@
 (defn random-float [] (- (* (rand) 200) 100.0))
 
 ; Random integer between -100 and 100
-(defn random-int [] (- (rand-int 201) 100.0))
+(defn random-int [] (- (rand-int 201) 100))
 
 (def instructions
   (utils/not-lazy
