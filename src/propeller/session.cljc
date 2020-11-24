@@ -20,15 +20,15 @@
 
 #_(interpreter/interpret-program
     '(:in1 :string_reverse 1 :string_take "?" :string_eq :exec_if
-          (:in1 " I am asking." :string_concat)
-          (:in1 " I am saying." :string_concat))
+       (:in1 " I am asking." :string_concat)
+       (:in1 " I am saying." :string_concat))
     (assoc state/empty-state :input {:in1 "Can you hear me?"})
     1000)
 
 #_(interpreter/interpret-program
     '(:in1 :string_reverse 1 :string_take "?" :string_eq :exec_if
-          (:in1 " I am asking." :string_concat)
-          (:in1 " I am saying." :string_concat))
+       (:in1 " I am asking." :string_concat)
+       (:in1 " I am saying." :string_concat))
     (assoc state/empty-state :input {:in1 "I can hear you."})
     1000)
 
@@ -36,16 +36,56 @@
     (genome/make-random-plushy (get-stack-instructions #{:float :integer :exec :boolean}) 20))
 
 #_(gp/gp {:instructions            propeller.problems.software.number-io/instructions
-        :error-function          propeller.problems.software.number-io/error-function
-        :max-generations         500
-        :population-size         500
-        :max-initial-plushy-size 100
-        :step-limit              200
-        :parent-selection        :lexicase
-        :tournament-size         5
-        :umad-rate               0.1
-        :variation               {:umad 0.5 :crossover 0.5}
-        :elitism                 false})
+          :error-function          propeller.problems.software.number-io/error-function
+          :max-generations         500
+          :population-size         500
+          :max-initial-plushy-size 100
+          :step-limit              200
+          :parent-selection        :lexicase
+          :tournament-size         5
+          :umad-rate               0.1
+          :variation               {:umad 0.5 :crossover 0.5}
+          :elitism                 false})
+
+#_(gp/gp {:instructions            propeller.problems.simple-regression/instructions
+          :error-function          propeller.problems.simple-regression/error-function
+          :max-generations         500
+          :population-size         500
+          :max-initial-plushy-size 100
+          :step-limit              200
+          :parent-selection        :tournament
+          :tournament-size         5
+          :umad-rate               0.01
+          :variation               {:umad      1.0
+                                    :crossover 0.0}
+          :elitism                 false})
+
+#_(gp/gp {:instructions            propeller.problems.simple-regression/instructions
+          :error-function          propeller.problems.simple-regression/error-function
+          :max-generations         500
+          :population-size         500
+          :max-initial-plushy-size 100
+          :step-limit              200
+          :parent-selection        :tournament
+          :tournament-size         5
+          :umad-rate               0.1
+          :variation               {:umad      1.0
+                                    :crossover 0.0}
+          :elitism                 false})
+
+
+#_(gp/gp {:instructions            propeller.problems.simple-regression/instructions
+          :error-function          propeller.problems.simple-regression/error-function
+          :max-generations         500
+          :population-size         500
+          :max-initial-plushy-size 100
+          :step-limit              200
+          :parent-selection        :lexicase
+          :tournament-size         5
+          :umad-rate               0.1
+          :variation               {:umad      1.0
+                                    :crossover 0.0}
+          :elitism                 false})
 
 #_(gp/gp {:instructions            propeller.problems.simple-regression/instructions
         :error-function          propeller.problems.simple-regression/error-function
@@ -53,23 +93,43 @@
         :population-size         500
         :max-initial-plushy-size 100
         :step-limit              200
-        :parent-selection        :tournament
+        :parent-selection        :lexicase
         :tournament-size         5
-        :umad-rate               0.01
-        :variation               {:umad 1.0
-                                  :crossover 0.0}
-        :elitism                 false})
+        :umad-rate               0.1
+        :variation               {:umad 0.8
+                                  :flip  0.2}
+        :elitism                 false
+        :diploid                 true})
 
-(gp/gp {:instructions            propeller.problems.simple-regression/instructions
-        :error-function          propeller.problems.simple-regression/error-function
+
+#_(gp/gp {:instructions            propeller.problems.software.smallest/instructions
+        :error-function          propeller.problems.software.smallest/error-function
         :max-generations         500
         :population-size         500
         :max-initial-plushy-size 100
         :step-limit              200
-        :parent-selection        :tournament
+        :parent-selection        :lexicase
         :tournament-size         5
         :umad-rate               0.1
-        :variation               {:umad 1.0
-                                  :crossover 0.0}
-        :elitism                 false})
+        :variation               {;:umad 0.8
+                                  ;:flip  0.2
+                                  :umad 1
+                                  }
+        :elitism                 false
+        :diploid                 false})
 
+(gp/gp {:instructions            propeller.problems.software.smallest/instructions
+        :error-function          propeller.problems.software.smallest/error-function
+        :max-generations         500
+        :population-size         500
+        :max-initial-plushy-size 200 ;100
+        :step-limit              200
+        :parent-selection        :lexicase
+        :tournament-size         5
+        :umad-rate               0.1
+        :variation               {:umad 0.8
+                                  :flip  0.2
+                                  ;:umad 1
+                                  }
+        :elitism                 false
+        :diploid                 true})
