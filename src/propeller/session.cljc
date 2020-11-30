@@ -97,7 +97,7 @@
           :tournament-size         5
           :umad-rate               0.1
           :diploid-flip-rate       0.1
-          :variation               {:umad 0.8
+          :variation               {:umad         0.8
                                     :diploid-flip 0.2}
           :elitism                 false
           :diploid                 true})
@@ -121,21 +121,21 @@
           :diploid                 false})
 
 #_(gp/gp {:instructions            propeller.problems.software.smallest/instructions
-        :error-function          propeller.problems.software.smallest/error-function
-        :max-generations         500
-        :population-size         500
-        :max-initial-plushy-size 200                        ;100
-        :step-limit              200
-        :parent-selection        :lexicase
-        :tournament-size         5
-        :umad-rate               0.1
-        :diploid-flip-rate       0.1
-        :variation               {:umad 0.8
-                                  :diploid-flip 0.2
-                                  ;:umad 1
-                                  }
-        :elitism                 false
-        :diploid                 true})
+          :error-function          propeller.problems.software.smallest/error-function
+          :max-generations         500
+          :population-size         500
+          :max-initial-plushy-size 200                      ;100
+          :step-limit              200
+          :parent-selection        :lexicase
+          :tournament-size         5
+          :umad-rate               0.1
+          :diploid-flip-rate       0.1
+          :variation               {:umad         0.8
+                                    :diploid-flip 0.2
+                                    ;:umad 1
+                                    }
+          :elitism                 false
+          :diploid                 true})
 
 #_(gp/gp {:instructions            propeller.problems.string-classification/instructions
           :error-function          propeller.problems.string-classification/error-function
@@ -147,7 +147,7 @@
           :tournament-size         5
           :umad-rate               0.1
           :diploid-flip-rate       0.1
-          :variation               {:umad 0.8
+          :variation               {:umad         0.8
                                     :diploid-flip 0.2
                                     }
           :elitism                 false
