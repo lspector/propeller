@@ -86,7 +86,7 @@
                            [crossover uniform-addition uniform-deletion])
          xover-prob (or (:crossover (:variation argmap)) 0)
          umad-prob (or (:umad (:variation argmap)) 0)
-         flip-prob (or (:flip (:variation argmap)) 0)]
+         flip-prob (or (:diploid-flip (:variation argmap)) 0)]
      (cond
        (< prob xover-prob)
        (xover (:plushy (selection/select-parent pop argmap))

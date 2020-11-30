@@ -35,13 +35,6 @@
   [state stack]
   (empty? (get state stack)))
 
-;;; Returns the top item on the stack
-;(defn peek-stack
-;  [state stack]
-;  (if-let [top-item (first (get state stack))]
-;    top-item
-;    :no-stack-item))
-
 ;; Returns the top item on the stack
 (defn peek-stack
   [state stack]
