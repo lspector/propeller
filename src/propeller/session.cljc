@@ -88,47 +88,50 @@
           :elitism                 false})
 
 #_(gp/gp {:instructions            propeller.problems.simple-regression/instructions
-        :error-function          propeller.problems.simple-regression/error-function
-        :max-generations         500
-        :population-size         500
-        :max-initial-plushy-size 100
-        :step-limit              200
-        :parent-selection        :lexicase
-        :tournament-size         5
-        :umad-rate               0.1
-        :variation               {:umad 0.8
-                                  :flip  0.2}
-        :elitism                 false
-        :diploid                 true})
+          :error-function          propeller.problems.simple-regression/error-function
+          :max-generations         500
+          :population-size         500
+          :max-initial-plushy-size 100
+          :step-limit              200
+          :parent-selection        :lexicase
+          :tournament-size         5
+          :umad-rate               0.1
+          :diploid-flip-rate       0.1
+          :variation               {:umad 0.8
+                                    :diploid-flip 0.2}
+          :elitism                 false
+          :diploid                 true})
 
+
+#_(gp/gp {:instructions            propeller.problems.software.smallest/instructions
+          :error-function          propeller.problems.software.smallest/error-function
+          :max-generations         500
+          :population-size         500
+          :max-initial-plushy-size 100
+          :step-limit              200
+          :parent-selection        :lexicase
+          :tournament-size         5
+          :umad-rate               0.1
+          :diploid-flip-rate       0.1
+          :variation               {;:umad 0.8
+                                    ;:diploid-flip  0.2
+                                    :umad 1
+                                    }
+          :elitism                 false
+          :diploid                 false})
 
 #_(gp/gp {:instructions            propeller.problems.software.smallest/instructions
         :error-function          propeller.problems.software.smallest/error-function
         :max-generations         500
         :population-size         500
-        :max-initial-plushy-size 100
+        :max-initial-plushy-size 200                        ;100
         :step-limit              200
         :parent-selection        :lexicase
         :tournament-size         5
         :umad-rate               0.1
-        :variation               {;:umad 0.8
-                                  ;:flip  0.2
-                                  :umad 1
-                                  }
-        :elitism                 false
-        :diploid                 false})
-
-(gp/gp {:instructions            propeller.problems.software.smallest/instructions
-        :error-function          propeller.problems.software.smallest/error-function
-        :max-generations         500
-        :population-size         500
-        :max-initial-plushy-size 200 ;100
-        :step-limit              200
-        :parent-selection        :lexicase
-        :tournament-size         5
-        :umad-rate               0.1
+        :diploid-flip-rate       0.1
         :variation               {:umad 0.8
-                                  :flip  0.2
+                                  :diploid-flip 0.2
                                   ;:umad 1
                                   }
         :elitism                 false

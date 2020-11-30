@@ -99,6 +99,7 @@
             (:umad-rate argmap))
        ;
        (< prob (+ xover-prob umad-prob flip-prob))
-       (diploid-flip (:plushy (selection/select-parent pop argmap)) flip-prob)
+       (diploid-flip (:plushy (selection/select-parent pop argmap))
+                     (:diploid-flip-rate argmap))
        ;
        :else (:plushy (selection/select-parent pop argmap))))})
