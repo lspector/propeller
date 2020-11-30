@@ -57,7 +57,8 @@
             (if (zero? (:total-error (error-function argmap best-individual :test)))
               (println "Test cases passed.")
               (println "Test cases failed."))
-            (#?(:clj shutdown-agents)))
+            ;(#?(:clj shutdown-agents))
+            )
         ;;
         (>= generation max-generations)
         nil
