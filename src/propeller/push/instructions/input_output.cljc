@@ -16,9 +16,10 @@
 ;; stack.
 (defn handle-input-instruction
   [state instruction]
-  (if-let [input (instruction (:input state))]
-    (state/push-to-stack state :exec input)
-    (throw #?(:clj (Exception. (str "Undefined instruction " instruction))
+  (if (contains? (:input state) instruction)
+    (let [input (instruction (:input state))]
+      (state/push-to-stack state :exec input))
+    (throw #?(:clj  (Exception. (str "Undefined instruction " instruction))
               :cljs (js/Error
                       (str "Undefined instruction " instruction))))))
 

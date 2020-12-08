@@ -1,7 +1,14 @@
-(ns propeller.problems.valiant)
+(ns propeller.problems.valiant
+  (:require [propeller.genome :as genome]
+            [propeller.push.interpreter :as interpreter]
+            [propeller.push.state :as state]))
 
-(defn train-and-test-data
-  [num-vars num-inputs num-train num-test]
+(def num-vars 100)                                          ;1000)
+(def num-inputs 50)                                         ;500)
+(def num-train 500)                                         ;5000)
+(def num-test 200)
+
+(def train-and-test-data
   (let [input-indices (take num-inputs (shuffle (range num-vars)))
         rand-vars (fn [] (vec (repeatedly num-vars #(< (rand) 0.5))))
         even-parity? (fn [vars]
@@ -16,150 +23,38 @@
              :outputs (map even-parity? test-inputs)}}))
 
 (def instructions
-  (list :in1
-        :integer_add
-        :integer_subtract
-        :integer_mult
-        :integer_quot
-        :integer_eq
-        :exec_dup
-        :exec_if
-        'close
-        0
-        1))
+  (vec (concat (for [i (range num-inputs)] (keyword (str "in" i)))
+               (take num-inputs
+                     (cycle [:boolean_and
+                             :boolean_or
+                             :boolean_not
+                             :exec_if
+                             'close])))))
 
-boolean_and boolean_or boolean_not exec_if
-
-;============== NOTE NOTE NOTE =================
-; This file has note been updated for Clojush 2.0, and will likely not work
-;============== NOTE NOTE NOTE =================
-;
-;(ns clojush.problems.boolean.valiant
-;  (:use [clojush.pushgp.pushgp]
-;        [clojush.pushstate]
-;        [clojush.random]
-;        [clojush.interpreter]
-;        [clojure.math.numeric-tower]))
-;
-;(def numvars 100) ;1000)
-;(def numinputs 50) ;500)
-;(def numcases 500) ;5000)
-;
-;(def input-indices
-;  (vec (take numinputs (shuffle (range numvars)))))
-;
-;(def cases
-;  (vec (repeatedly numcases
-;                   (fn [] (let [vars (vec (repeatedly numvars #(< (lrand) 0.5)))]
-;                            [vars (even? (count (filter #(= % true)
-;                                                        (map #(nth vars %)
-;                                                             input-indices))))])))))
-;
-;(println "input-indices:" input-indices)
-;
-;;; ugly way to define all of the input instructions, since I haven't fully
-;;; grokked Clojure macros
-;
-;(def n-hack (atom 0))
-;
-;(defn define-input [n]
-;  (reset! n-hack n)
-;  (eval `(define-registered ~(symbol (str "input" @n-hack))
-;                            (fn [state#]
-;                              (push-item (nth (first (:auxiliary state#)) ~(+ @n-hack))
-;                                         :boolean
-;                                         state#)))))
-;
-;(dotimes [n numvars] (define-input n))
-;
-;;; this gives the instructions: (registered-for-type "input")
-;
-;(defn rp [prog state] (run-push prog state true))
-;
-;(defn valiant-fitness
-;  [individual]
-;  (assoc individual
-;    :errors
-;    (doall (for [c (range numcases)]
-;             (let [[inputs answer] (nth cases c)
-;                   output (->> (make-push-state)
-;                               (push-item inputs :auxiliary)
-;                               (run-push (:program individual))
-;                               ;(rp (:program individual))
-;                               (top-item :boolean))]
-;               ;(println "output" output "answer" answer)
-;               (if (= output answer) 0 1))))))
-;
-;;input-indices
-;
-;;(reduce + (valiant-fitness '(input1 input4 input0 input7 input9 boolean_and boolean_and boolean_and boolean_and)))
-;
-;;; oversized-offspring-fail-to-random? -- take fail to random code from here and use right
-;;; parameters
-;;(in-ns 'clojush.pushgp.genetic-operators)
-;;(defn crossover
-;;  "Returns a copy of parent1 with a random subprogram replaced with a random
-;;   subprogram of parent2."
-;;  [parent1 parent2 max-points]
-;;  (let [new-program (case (lrand-int 2)
-;;                      0 (insert-code-at-point
-;;                          (:program parent1)
-;;                          (select-node-index (:program parent1))
-;;                          (code-at-point (:program parent2)
-;;                                         (select-node-index (:program parent2))))
-;;                      1 (list (random-code 10 @global-atom-generators) 'exec_if (:program parent1) (:program parent2)))]
-;;    (if (> (count-points new-program) max-points)
-;;      ;parent1
-;;      (make-individual :program (random-code 10 @global-atom-generators) :history (:history parent1)
-;;                       :ancestors (if global-maintain-ancestors
-;;                                    (cons (:program parent1) (:ancestors parent1))
-;;                                    (:ancestors parent1)))
-;;      (make-individual :program new-program :history (:history parent1)
-;;                       :ancestors (if global-maintain-ancestors
-;;                                    (cons (:program parent1) (:ancestors parent1))
-;;                                    (:ancestors parent1))))))
-;;(in-ns 'experimental.valiant)
-;;;
-;;; Probabilistic Pseudo Hillclimbing (persistence)
-;;;
-;
-;;(def argmap
-;;  {:error-function valiant-fitness
-;;   :atom-generators (concat (vec (registered-for-type "input"))
-;;                            ;)
-;;                            (apply concat
-;;                                   (repeat 25
-;;                                           '(boolean_and boolean_or boolean_not exec_if))))
-;;   :use-lexicase-selection true
-;;   :max-points 40000
-;;   :max-genome-size-in-initial-program 10
-;;   :population-size 100
-;;   :evalpush-limit 10000
-;;   :mutation-probability 0.4
-;;   :mutation-max-points 50
-;;   ;:crossover-probability 0.4
-;;   :simplification-probability 0.2
-;;   :reproduction-simplifications 1
-;;   ;:deletion-mutation-probability 0.2
-;;   :boolean-gsxover-probability 0.4
-;;   :boolean-gsxover-new-code-max-points 10
-;;   :parent-reversion-probability 0.95
-;;   ;:decimation-ratio 0.01
-;;   ;:use-single-thread true
-;;   })
-;
-;(def argmap
-;  {:error-function valiant-fitness
-;   :atom-generators (concat (vec (registered-for-type "input"))
-;                            ;)
-;                            (apply concat
-;                                   (repeat 25
-;                                           '(boolean_and boolean_or boolean_not exec_if))))
-;   :max-points 4000
-;   :max-genome-size-in-initial-program 100
-;   :population-size 100
-;   :evalpush-limit 2000
-;   :genetic-operator-probabilities {[:alternation :uniform-mutation] 1.0} ;Somewhat equivalent to normal Push's ULTRA operator
-;   :alignment-deviation 20
-;   ;:use-single-thread true
-;   })
+(defn error-function
+  ([argmap individual]
+   (error-function argmap individual :train))
+  ([argmap individual subset]
+   (let [program (genome/plushy->push (:plushy individual) argmap)
+         data (get train-and-test-data subset)
+         inputs (:inputs data)
+         correct-outputs (:outputs data)
+         outputs (map (fn [input]
+                        (state/peek-stack
+                          (interpreter/interpret-program
+                            program
+                            (assoc state/empty-state
+                              :input (zipmap (for [i (range (count input))]
+                                               (keyword (str "in" i)))
+                                             input))
+                            (:step-limit argmap))
+                          :boolean))
+                      inputs)
+         errors (map #(if (= %1 %2) 0 1)
+                     correct-outputs
+                     outputs)]
+     (assoc individual
+       :behaviors outputs
+       :errors errors
+       :total-error #?(:clj  (apply +' errors)
+                       :cljs (apply + errors))))))
