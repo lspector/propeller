@@ -12,16 +12,16 @@
 ;; =============================================================================
 
 ;; Allows Push to handle input instructions of the form :inN, e.g. :in2, taking
-;; elements thus labeled from the :input stack and pushing them onto the :exec
-;; stack. We can tell whether a particular inN instruction is valid if N-1
-;; values are on the input stack.
+;; elements thus labeled from the :input map and pushing them onto the :exec
+;; stack.
 (defn handle-input-instruction
   [state instruction]
-  (if-let [input (instruction (:input state))]
-    (state/push-to-stack state :exec input)
-    (throw #?(:clj (Exception. (str "Undefined input instruction " instruction))
+  (if (contains? (:input state) instruction)
+    (let [input (instruction (:input state))]
+      (state/push-to-stack state :exec input))
+    (throw #?(:clj  (Exception. (str "Undefined instruction " instruction))
               :cljs (js/Error
-                      (str "Undefined input instruction " instruction))))))
+                      (str "Undefined instruction " instruction))))))
 
 ;; =============================================================================
 ;; OUTPUT Instructions
