@@ -18,7 +18,7 @@
 
 (defn diploid-crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
-  [plushy-a plushy-b argmap]
+  [plushy-a plushy-b]
   (let [plushy-a (partition 2 plushy-a)
         plushy-b (partition 2 plushy-b)
         shorter (min-key count plushy-a plushy-b)
