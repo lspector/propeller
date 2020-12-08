@@ -156,19 +156,55 @@
 ;          :diploid                 true})
 
 
+;(gp/gp {:instructions            propeller.problems.valiant/instructions
+;        :error-function          propeller.problems.valiant/error-function
+;        :max-generations         500
+;        :population-size         50
+;        :max-initial-plushy-size 1000
+;        :step-limit              2000
+;        :parent-selection        :tournament
+;        :tournament-size         10
+;        :umad-rate               0.01
+;        :diploid-flip-rate       0.01
+;        :variation               {:umad         0.9
+;                                  :diploid-flip 0.1
+;                                  }
+;        :elitism                 false
+;        :diploid                 true})
+
+;(gp/gp {:instructions            propeller.problems.valiant/instructions
+;        :error-function          propeller.problems.valiant/error-function
+;        :max-generations         500
+;        :population-size         100
+;        :max-initial-plushy-size 1000
+;        :step-limit              2000
+;        :parent-selection        :tournament
+;        :tournament-size         10
+;        :umad-rate               0.01
+;        :diploid-flip-rate       0.01
+;        :variation               {:umad         0.9
+;                                  :diploid-flip 0.1
+;                                  }
+;        :elitism                 false
+;        :diploid                 true})
+
+;;; below is when I switched to just xor
+
 (gp/gp {:instructions            propeller.problems.valiant/instructions
         :error-function          propeller.problems.valiant/error-function
         :max-generations         500
         :population-size         500
-        :max-initial-plushy-size 1000
+        :max-initial-plushy-size 50
         :step-limit              2000
         :parent-selection        :lexicase
-        :tournament-size         5
-        :umad-rate               0.001
-        :diploid-flip-rate       0.001
+        :tournament-size         2
+        :umad-rate               0.01
+        :diploid-flip-rate       0.01
         :variation               {:umad         0.5
-                                  :diploid-flip 0.5
+                                  :crossover    0.25
+                                  :diploid-flip 0.25
                                   }
         :elitism                 false
         :diploid                 true})
+
 
