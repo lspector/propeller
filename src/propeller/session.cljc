@@ -212,16 +212,18 @@
 (gp/gp {:instructions            propeller.problems.valiant/instructions
         :error-function          propeller.problems.valiant/error-function
         :max-generations         500
-        :population-size         50
-        :max-initial-plushy-size 50
-        :step-limit              2000
+        :population-size         1000
+        :max-initial-plushy-size 10
+        :step-limit              1000
         :parent-selection        :lexicase
         :tournament-size         2
         :umad-rate               0.01
+        :replacement-rate        0.01
         :diploid-flip-rate       0.01
-        :variation               {:diploid-umad         0.5
-                                  :diploid-crossover    0.25
-                                  :diploid-flip 0.25
+        :variation               {:diploid-umad        0.25
+                                  :diploid-crossover   0.25
+                                  :diploid-flip        0.25
+                                  :uniform-replacement 0.25
                                   }
         :elitism                 false
         :diploid                 true})

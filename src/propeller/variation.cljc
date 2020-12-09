@@ -42,6 +42,15 @@
                  [%])
               plushy)))
 
+(defn uniform-replacement
+  "Returns plushy with new instructions possibly replacing existing
+   instructions."
+  [plushy instructions replacement-rate]
+  (map #(if (< (rand) replacement-rate)
+          (utils/random-instruction instructions)
+          %)
+       plushy))
+
 (defn diploid-uniform-addition
   "Returns plushy with new instructions possibly added before or after each
   existing instruction."
@@ -105,6 +114,10 @@
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-addition (:instructions argmap) (:umad-rate argmap)))
        ;
+       :uniform-replacement
+       (-> (:plushy (selection/select-parent pop argmap))
+           (uniform-replacement (:instructions argmap) (:replacement-rate argmap)))
+       ;
        :uniform-deletion
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-deletion (:umad-rate argmap)))
@@ -138,4 +151,3 @@
        (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
                  :cljs (js/Error
                          (str "No match in new-individual for " op))))))})
-
