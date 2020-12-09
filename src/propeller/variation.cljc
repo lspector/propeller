@@ -80,26 +80,61 @@
   individuals in the population."
   [pop argmap]
   {:plushy
-   (let [prob (rand)
-         [xover add del] (if (:diploid argmap)
-                           [diploid-crossover diploid-uniform-addition diploid-uniform-deletion]
-                           [crossover uniform-addition uniform-deletion])
-         xover-prob (or (:crossover (:variation argmap)) 0)
-         umad-prob (or (:umad (:variation argmap)) 0)
-         flip-prob (or (:diploid-flip (:variation argmap)) 0)]
-     (cond
-       (< prob xover-prob)
-       (xover (:plushy (selection/select-parent pop argmap))
-              (:plushy (selection/select-parent pop argmap)))
+   (let [r (rand)
+         op (loop [accum 0.0
+                   ops-probs (vec (:variation argmap))]
+              (if (empty? ops-probs)
+                :reproduction
+                (let [[op1 prob1] (first ops-probs)]
+                  (if (>= (+ accum prob1) r)
+                    op1
+                    (recur (+ accum prob1)
+                           (rest ops-probs))))))]
+     (case op
+       :crossover
+       (crossover
+         (:plushy (selection/select-parent pop argmap))
+         (:plushy (selection/select-parent pop argmap)))
        ;
-       (< prob (+ xover-prob umad-prob))
-       (del (add (:plushy (selection/select-parent pop argmap))
-                 (:instructions argmap)
-                 (:umad-rate argmap))
-            (:umad-rate argmap))
+       :umad
+       (-> (:plushy (selection/select-parent pop argmap))
+           (uniform-addition (:instructions argmap) (:umad-rate argmap))
+           (uniform-deletion (:umad-rate argmap)))
        ;
-       (< prob (+ xover-prob umad-prob flip-prob))
-       (diploid-flip (:plushy (selection/select-parent pop argmap))
-                     (:diploid-flip-rate argmap))
+       :uniform-addition
+       (-> (:plushy (selection/select-parent pop argmap))
+           (uniform-addition (:instructions argmap) (:umad-rate argmap)))
        ;
-       :else (:plushy (selection/select-parent pop argmap))))})
+       :uniform-deletion
+       (-> (:plushy (selection/select-parent pop argmap))
+           (uniform-deletion (:umad-rate argmap)))
+       ;
+       :diploid-crossover
+       (diploid-crossover
+         (:plushy (selection/select-parent pop argmap))
+         (:plushy (selection/select-parent pop argmap)))
+       ;
+       :diploid-umad
+       (-> (:plushy (selection/select-parent pop argmap))
+           (diploid-uniform-addition (:instructions argmap) (:umad-rate argmap))
+           (diploid-uniform-deletion (:umad-rate argmap)))
+       ;
+       :diploid-uniform-addition
+       (-> (:plushy (selection/select-parent pop argmap))
+           (diploid-uniform-addition (:instructions argmap) (:umad-rate argmap)))
+       ;
+       :diploid-uniform-deletion
+       (-> (:plushy (selection/select-parent pop argmap))
+           (diploid-uniform-deletion (:umad-rate argmap)))
+       ;
+       :diploid-flip
+       (-> (:plushy (selection/select-parent pop argmap))
+           (diploid-flip (:diploid-flip-rate argmap)))
+       ;
+       :reproduction
+       (:plushy (selection/select-parent pop argmap))
+       ;
+       :else
+       (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
+                 :cljs (js/Error
+                         (str "No match in new-individual for " op))))))})
