@@ -26,10 +26,10 @@
   (vec (concat (for [i (range num-inputs)] (keyword (str "in" i)))
                (take num-inputs
                      (cycle [:boolean_xor
-                             ;:boolean_or
-                             ;:boolean_not
-                             ;:exec_if
-                             ;'close
+                             :boolean_or
+                             :boolean_not
+                             :exec_if
+                             'close
                              ])))))
 
 (defn error-function
