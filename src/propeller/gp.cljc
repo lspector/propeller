@@ -19,7 +19,7 @@
     (println "               Report for Generation" generation)
     (println "-------------------------------------------------------")
     (print "Best plushy: ") (prn (:plushy best))
-    (print "Best program: ") (prn (genome/plushy->push (:plushy best)))
+    (print "Best program: ") (prn (genome/plushy->push (:plushy best) argmap))
     (println "Best total error:" (:total-error best))
     (println "Best errors:" (:errors best))
     (println "Best behaviors:" (:behaviors best))
