@@ -13,7 +13,7 @@
 
 (defn report
   "Reports information each generation."
-  [pop generation]
+  [pop generation argmap]
   (let [best (first pop)]
     (println "-------------------------------------------------------")
     (println "               Report for Generation" generation)
@@ -48,7 +48,7 @@
                                      :cljs map)
                                    (partial error-function argmap) population))
           best-individual (first evaluated-pop)]
-      (report evaluated-pop generation)
+      (report evaluated-pop generation argmap)
       (cond
         ;; Success on training cases is verified on testing cases
         (zero? (:total-error best-individual))
