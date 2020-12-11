@@ -28,7 +28,11 @@
 ;; A utility function for making Push instructions. Takes a state, a function
 ;; to apply to the args, the stacks to take the args from, and the stack to
 ;; return the result to. Applies the function to the args (popped from the
-;; given stacks), and pushes the result onto the return-stack
+;; given stacks), and pushes the result onto the return-stack.
+;;
+;; If the function returns :ignore-instruction, then we will return the
+;; initial state unchanged. This allows instructions to fail gracefully
+;; without consuming stack values.
 (defn make-instruction
   [state function arg-stacks return-stack]
   (let [popped-args (get-args-from-stacks state arg-stacks)]
@@ -36,7 +40,9 @@
       state
       (let [result (apply function (:args popped-args))
             new-state (:state popped-args)]
-        (state/push-to-stack new-state return-stack result)))))
+        (if (= result :ignore-instruction)
+          state
+         (state/push-to-stack new-state return-stack result))))))
 
 ;; Given a set of stacks, returns all instructions that operate on those stacks
 ;; only. Won't include random instructions unless :random is in the set as well
