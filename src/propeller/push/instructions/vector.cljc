@@ -208,9 +208,9 @@
   ^{:stacks #{:integer}}
   (fn [stack state]
     (make-instruction state
-                      (fn [stop-raw start-raw vect]
+                      (fn [start-raw stop-raw vect]
                         (let [start (min (count vect) (max 0 start-raw))
-                              stop (min (count vect) (max start-raw stop-raw))]
+                              stop (min (count vect) (max 0 start-raw stop-raw))]
                           (subvec vect start stop)))
                       [:integer :integer stack]
                       stack)))
