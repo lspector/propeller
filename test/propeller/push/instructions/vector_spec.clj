@@ -60,6 +60,36 @@
 (first-spec gen/boolean "boolean")
 (first-spec gen/string "string")
 
+;;; vector/_last
+
+(defn check-last
+  [generator value-type]
+  (let [stack-type (keyword (str "vector_" value-type))]
+    (prop/for-all [vect (gen/vector generator)]
+                  (let [start-state (state/push-to-stack state/empty-state
+                                                         stack-type
+                                                         vect)
+                        end-state (vector/_last stack-type start-state)]
+                    (or
+                     (and (empty? vect)
+                          (= (state/peek-stack end-state stack-type)
+                             vect))
+                     (and
+                      (= (last vect)
+                         (state/peek-stack end-state (keyword value-type)))
+                      (state/empty-stack? end-state stack-type)))))))
+
+(defmacro last-spec
+  [generator value-type]
+  `(defspec ~(symbol (str "last-spec-" value-type))
+     100
+     (check-last ~generator ~value-type)))
+
+(last-spec gen/small-integer "integer")
+(last-spec gen/double "float")
+(last-spec gen/boolean "boolean")
+(last-spec gen/string "string")
+
 ;;; vector/_indexof
 
 (defn check-expected-index
