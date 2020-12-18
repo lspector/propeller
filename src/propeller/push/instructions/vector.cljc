@@ -52,7 +52,7 @@
     (make-instruction state empty? [stack] :boolean)))
 
 ;; Pushes the first item of the top element of the vector stack onto the
-;; approrpiately-typed literal stack. If the vector is empty, return
+;; appropriately-typed literal stack. If the vector is empty, return
 ;; :ignore-instruction so that nothing is changed on the stacks.
 (def _first
   ^{:stacks #{:elem}}
@@ -101,7 +101,11 @@
   ^{:stacks #{:elem}}
   (fn [stack state]
     (let [lit-stack (get-vector-literal-type stack)]
-      (make-instruction state last [stack] lit-stack))))
+      (make-instruction 
+       state 
+       #(if (empty? %) :ignore-instruction (last %)) 
+       [stack] 
+       lit-stack))))
 
 ;; Pushes the length of the top item onto the INTEGER stack
 (def _length
