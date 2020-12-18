@@ -6,6 +6,8 @@
    [propeller.push.state :as state]
    [propeller.push.instructions.vector :as vector]))
 
+;;; vector/_emptyvector
+
 (defn check-empty-vector
   [generator value-type]
   (let [stack-type (keyword (str "vector_" value-type))]
@@ -27,6 +29,38 @@
 (empty-vector-spec gen/double "float")
 (empty-vector-spec gen/boolean "boolean")
 (empty-vector-spec gen/string "string")
+
+;;; vector/_first
+
+(defn check-first
+  [generator value-type]
+  (let [stack-type (keyword (str "vector_" value-type))]
+    (prop/for-all [vect (gen/vector generator)]
+                  (let [start-state (state/push-to-stack state/empty-state
+                                                         stack-type
+                                                         vect)
+                        end-state (vector/_first stack-type start-state)]
+                    (or
+                     (and (empty? vect)
+                          (= (state/peek-stack end-state stack-type)
+                             vect))
+                     (and
+                      (= (first vect)
+                         (state/peek-stack end-state (keyword value-type)))
+                      (state/empty-stack? end-state stack-type)))))))
+
+(defmacro first-spec
+  [generator value-type]
+  `(defspec ~(symbol (str "first-spec-" value-type))
+     100
+     (check-first ~generator ~value-type)))
+
+(first-spec gen/small-integer "integer")
+(first-spec gen/double "float")
+(first-spec gen/boolean "boolean")
+(first-spec gen/string "string")
+
+;;; vector/_indexof
 
 (defn check-expected-index
   "Creates an otherwise empty Push state with the given vector on the
@@ -67,6 +101,8 @@
 (indexof-spec gen/double "float")
 (indexof-spec gen/boolean "boolean")
 (indexof-spec gen/string "string")
+
+;;; vector/_subvec
 
 (defn clean-subvec-bounds
   [start stop vect-size]
