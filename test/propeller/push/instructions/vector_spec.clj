@@ -132,6 +132,40 @@
 (indexof-spec gen/boolean "boolean")
 (indexof-spec gen/string "string")
 
+;;; vector/_concat
+
+(defn check-concat
+  "Creates an otherwise empty Push state with the two given vectors on the
+   appropriate vector stack (assumed to be :vector_<value-type>).
+   It then runs the vector/_concat instruction, and confirms that the
+   result (on the :vector_<value-type> stack) is the expected value.
+   The order of concatenation is that the top of the stack will be
+   _second_ in the concatenation, i.e., its elements will come _after_
+   the elements in the vector one below it in the stack."
+  [first-vect second-vect value-type]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          first-vect)
+                     stack-type second-vect)
+        end-state (vector/_concat stack-type start-state)]
+    (= (concat second-vect first-vect)
+       (state/peek-stack end-state stack-type))))
+
+(defmacro concat-spec
+  [generator value-type]
+  `(defspec ~(symbol (str "concat-spec-" value-type))
+     100
+     (prop/for-all [first-vect#  (gen/vector ~generator)
+                    second-vect# (gen/vector ~generator)]
+                   (check-concat first-vect# second-vect# ~value-type))))
+
+(concat-spec gen/small-integer "integer")
+(concat-spec gen/double "float")
+(concat-spec gen/boolean "boolean")
+(concat-spec gen/string "string")
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
