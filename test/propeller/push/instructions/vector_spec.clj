@@ -6,6 +6,12 @@
    [propeller.push.state :as state]
    [propeller.push.instructions.vector :as vector]))
 
+(def gen-type-pairs
+  [['gen/small-integer "integer"]
+   ['gen/double "float"]
+   ['gen/boolean "boolean"]
+   ['gen/string "string"]])
+
 ;;; vector/_emptyvector
 
 (defn check-empty-vector
@@ -154,17 +160,15 @@
        (state/peek-stack end-state stack-type))))
 
 (defmacro concat-spec
-  [generator value-type]
-  `(defspec ~(symbol (str "concat-spec-" value-type))
-     100
-     (prop/for-all [first-vect#  (gen/vector ~generator)
-                    second-vect# (gen/vector ~generator)]
-                   (check-concat first-vect# second-vect# ~value-type))))
+  []
+  `(do ~@(for [[generator value-type] gen-type-pairs
+               :let [name (symbol (str "concat-spec-" value-type))]]
+           `(defspec ~name
+              (prop/for-all [first-vect#  (gen/vector ~generator)
+                             second-vect# (gen/vector ~generator)]
+                            (check-concat first-vect# second-vect# ~value-type))))))
 
-(concat-spec gen/small-integer "integer")
-(concat-spec gen/double "float")
-(concat-spec gen/boolean "boolean")
-(concat-spec gen/string "string")
+(concat-spec)
 
 ;;; vector/_subvec
 
@@ -199,14 +203,13 @@
        (state/peek-stack end-state stack-type))))
 
 (defmacro subvec-spec
-  [generator value-type]
-  `(defspec ~(symbol (str "subvec-spec-" value-type))
-     (prop/for-all [vect# (gen/vector ~generator)
-                    start# gen/small-integer
-                    stop# gen/small-integer]
-                   (check-subvec vect# start# stop# ~value-type))))
+  []
+  `(do ~@(for [[generator value-type] gen-type-pairs
+               :let [name (symbol (str "subvec-spec-" value-type))]]
+           `(defspec ~name
+              (prop/for-all [vect# (gen/vector ~generator)
+                             start# gen/small-integer
+                             stop# gen/small-integer]
+                            (check-subvec vect# start# stop# ~value-type))))))
 
-(subvec-spec gen/small-integer "integer")
-(subvec-spec gen/double "float")
-(subvec-spec gen/boolean "boolean")
-(subvec-spec gen/string "string")
+(subvec-spec)
