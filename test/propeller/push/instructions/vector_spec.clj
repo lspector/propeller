@@ -12,6 +12,48 @@
    ['gen/boolean "boolean"]
    ['gen/string "string"]])
 
+;;; vector/_contains
+
+(defn check-expected-contains
+  "Creates an otherwise empty Push state with the given vector on the
+   appropriate vector stack (assumed to be :vector_<value-type>), and
+   the given value on the appropriate stack (determined by value-type).
+   It then runs the vector/_contains instruction, and confirms that the
+   result (on the :boolean stack) is the expected value."
+  [vect value value-type]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          vect)
+                     (keyword value-type) value)
+        end-state (vector/_contains stack-type start-state)
+        expected-result (not (= (.indexOf vect value) -1))]
+    (= expected-result
+       (state/peek-stack end-state :boolean))))
+
+(defmacro contains-vector-spec
+  [generator value-type]
+  `(do
+     (defspec ~(symbol (str "contains-vector-spec-" value-type))
+       ; Should this be smaller for booleans? (Ditto for below.)
+       100
+       (prop/for-all [vect# (gen/vector ~generator)
+                      value# ~generator]
+                     (check-expected-contains vect# value# ~value-type)))
+       ; For float and string vectors, it's rather rare to actually have a random value that
+       ; appears in the vector, so we don't consistently test the case where it should 
+       ; return TRUE. So maybe we do need a separate test for those? 
+     (defspec ~(symbol (str "contains-vector-spec-has-value-" value-type))
+       100
+       (prop/for-all [vect# (gen/not-empty (gen/vector ~generator))]
+                     (check-expected-contains vect# (rand-nth vect#) ~value-type)))))
+
+(contains-vector-spec gen/small-integer "integer")
+(contains-vector-spec gen/double "float")
+(contains-vector-spec gen/boolean "boolean")
+(contains-vector-spec gen/string "string")
+
 ;;; vector/_emptyvector
 
 (defn check-empty-vector
