@@ -57,21 +57,21 @@
 ;;; vector/_emptyvector
 
 (defn check-empty-vector
-  [generator value-type]
-  (let [stack-type (keyword (str "vector_" value-type))]
-    (prop/for-all [vect (gen/vector generator)]
-                  (let [start-state (state/push-to-stack state/empty-state
-                                                         stack-type
-                                                         vect)
-                        end-state (vector/_emptyvector stack-type start-state)]
-                    (= (empty? vect)
-                       (state/peek-stack end-state :boolean))))))
+  [vect value-type]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_emptyvector stack-type start-state)]
+    (= (empty? vect)
+       (state/peek-stack end-state :boolean))))
 
 (defmacro empty-vector-spec
   [generator value-type]
-    `(defspec ~(symbol (str "empty-vector-spec-" value-type))
-       100
-       (check-empty-vector ~generator ~value-type)))
+  `(defspec ~(symbol (str "empty-vector-spec-" value-type))
+     100
+     (prop/for-all [vect# (gen/vector ~generator)]
+                   (check-empty-vector vect# ~value-type))))
 
 (empty-vector-spec gen/small-integer "integer")
 (empty-vector-spec gen/double "float")
@@ -81,27 +81,27 @@
 ;;; vector/_first
 
 (defn check-first
-  [generator value-type]
-  (let [stack-type (keyword (str "vector_" value-type))]
-    (prop/for-all [vect (gen/vector generator)]
-                  (let [start-state (state/push-to-stack state/empty-state
-                                                         stack-type
-                                                         vect)
-                        end-state (vector/_first stack-type start-state)]
-                    (or
-                     (and (empty? vect)
-                          (= (state/peek-stack end-state stack-type)
-                             vect))
-                     (and
-                      (= (first vect)
-                         (state/peek-stack end-state (keyword value-type)))
-                      (state/empty-stack? end-state stack-type)))))))
+  [vect value-type]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_first stack-type start-state)]
+    (or
+     (and (empty? vect)
+          (= (state/peek-stack end-state stack-type)
+             vect))
+     (and
+      (= (first vect)
+         (state/peek-stack end-state (keyword value-type)))
+      (state/empty-stack? end-state stack-type)))))
 
 (defmacro first-spec
   [generator value-type]
   `(defspec ~(symbol (str "first-spec-" value-type))
      100
-     (check-first ~generator ~value-type)))
+     (prop/for-all [vect# (gen/vector ~generator)]
+                   (check-first vect# ~value-type))))
 
 (first-spec gen/small-integer "integer")
 (first-spec gen/double "float")
@@ -111,27 +111,27 @@
 ;;; vector/_last
 
 (defn check-last
-  [generator value-type]
-  (let [stack-type (keyword (str "vector_" value-type))]
-    (prop/for-all [vect (gen/vector generator)]
-                  (let [start-state (state/push-to-stack state/empty-state
-                                                         stack-type
-                                                         vect)
-                        end-state (vector/_last stack-type start-state)]
-                    (or
-                     (and (empty? vect)
-                          (= (state/peek-stack end-state stack-type)
-                             vect))
-                     (and
-                      (= (last vect)
-                         (state/peek-stack end-state (keyword value-type)))
-                      (state/empty-stack? end-state stack-type)))))))
+  [vect value-type]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_last stack-type start-state)]
+    (or
+     (and (empty? vect)
+          (= (state/peek-stack end-state stack-type)
+             vect))
+     (and
+      (= (last vect)
+         (state/peek-stack end-state (keyword value-type)))
+      (state/empty-stack? end-state stack-type)))))
 
 (defmacro last-spec
   [generator value-type]
   `(defspec ~(symbol (str "last-spec-" value-type))
      100
-     (check-last ~generator ~value-type)))
+     (prop/for-all [vect# (gen/vector ~generator)]
+                   (check-last vect# ~value-type))))
 
 (last-spec gen/small-integer "integer")
 (last-spec gen/double "float")
@@ -149,10 +149,10 @@
   [vect value value-type]
   (let [stack-type (keyword (str "vector_" value-type))
         start-state (state/push-to-stack
-                      (state/push-to-stack state/empty-state
-                                           stack-type
-                                           vect)
-                      (keyword value-type) value)
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          vect)
+                     (keyword value-type) value)
         end-state (vector/_indexof stack-type start-state)
         expected-index (.indexOf vect value)]
     (= expected-index
