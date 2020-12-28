@@ -190,7 +190,7 @@
    The order of concatenation is that the top of the stack will be
    _second_ in the concatenation, i.e., its elements will come _after_
    the elements in the vector one below it in the stack."
-  [first-vect second-vect value-type]
+  [value-type first-vect second-vect]
   (let [stack-type (keyword (str "vector_" value-type))
         start-state (state/push-to-stack
                      (state/push-to-stack state/empty-state
@@ -210,7 +210,7 @@
                              second-vect# (gen/vector ~generator)]
                             (check-concat first-vect# second-vect# ~value-type))))))
 
-(concat-spec)
+; (concat-spec)
 
 ;;; vector/_subvec
 
@@ -229,7 +229,7 @@
    the given values on the integer stack.
    It then runs the vector/_subvec instruction, and confirms that the
    result (on the :vector_<value-type> stack) is the expected value."
-  [vect start stop value-type]
+  [value-type vect start stop]
   (let [stack-type (keyword (str "vector_" value-type))
         start-state (state/push-to-stack
                      (state/push-to-stack
@@ -254,4 +254,37 @@
                              stop# gen/small-integer]
                             (check-subvec vect# start# stop# ~value-type))))))
 
-(subvec-spec)
+; (subvec-spec)
+
+(defn generator-for-arg-type
+  [arg-type generator]
+  (case arg-type
+    :boolean 'gen/boolean
+    :integer 'gen/small-integer
+    :float   'gen/double
+    :string  'gen/string
+    ; This is for "generic" vectors where the element is provided by
+    ; the `generator` argument.
+    :vector  `(gen/vector ~generator)
+    :vector_boolean '(gen/vector gen/boolean)
+    :vector_integer '(gen/vector gen/small-integer)
+    :vector_float   '(gen/vector gen/double)
+    :vector_string  '(gen/vector gen/string)
+    ))
+
+(defmacro gen-specs
+  [spec-name check-fn & arg-types]
+  (let [symbol-names (repeatedly (count arg-types) gensym)]
+  `(do ~@(for [[generator value-type] gen-type-pairs
+               :let [name (symbol (str spec-name "-spec-" value-type))]]
+           `(defspec ~name
+              (prop/for-all
+               [~@(mapcat 
+                   (fn [symbol-name arg-type]
+                    [symbol-name (generator-for-arg-type arg-type generator)])
+                   symbol-names
+                   arg-types) ]
+               (~check-fn ~value-type ~@symbol-names)))))))
+
+(gen-specs "concat" check-concat :vector :vector)
+(gen-specs "subvec" check-subvec :vector :integer :integer)
