@@ -154,26 +154,6 @@
 
 (gen-specs "first" check-first :vector)
 
-;;; vector/_last
-
-(defn check-last
-  [value-type vect]
-  (let [stack-type (keyword (str "vector_" value-type))
-        start-state (state/push-to-stack state/empty-state
-                                         stack-type
-                                         vect)
-        end-state (vector/_last stack-type start-state)]
-    (or
-     (and (empty? vect)
-          (= (state/peek-stack end-state stack-type)
-             vect))
-     (and
-      (= (last vect)
-         (state/peek-stack end-state (keyword value-type)))
-      (state/empty-stack? end-state stack-type)))))
-
-(gen-specs "last" check-last :vector)
-
 ;;; vector/_indexof
 
 (defn check-indexof
@@ -195,6 +175,41 @@
        (state/peek-stack end-state :integer))))
 
 (gen-specs "indexof" check-indexof :vector :item)
+
+;;; vector/_last
+
+(defn check-last
+  [value-type vect]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_last stack-type start-state)]
+    (or
+     (and (empty? vect)
+          (= (state/peek-stack end-state stack-type)
+             vect))
+     (and
+      (= (last vect)
+         (state/peek-stack end-state (keyword value-type)))
+      (state/empty-stack? end-state stack-type)))))
+
+(gen-specs "last" check-last :vector)
+
+;;; vector/_length
+
+(defn check-length
+  [value-type vect]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_length stack-type start-state)
+        expected-result (count vect)]
+    (= expected-result
+       (state/peek-stack end-state :integer))))
+
+(gen-specs "length" check-length :vector)
 
 ;;; vector/_subvec
 
