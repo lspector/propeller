@@ -42,6 +42,21 @@
                      arg-types)]
                  (~check-fn ~value-type ~@symbol-names)))))))
 
+;;; vector/_butlast
+
+(defn check-butlast
+  [value-type vect]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_butlast stack-type start-state)
+        expected-result (vec (butlast vect))]
+    (= expected-result
+       (state/peek-stack end-state stack-type))))
+
+(gen-specs "butlast" check-butlast :vector)
+
 ;;; vector/_contains
 
 (defn check-contains
