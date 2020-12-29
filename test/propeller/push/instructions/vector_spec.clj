@@ -211,6 +211,28 @@
 
 (gen-specs "length" check-length :vector)
 
+;;; vector/_nth
+
+(defn check-nth
+  [value-type vect n]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          vect)
+                     :integer
+                     n)
+        end-state (vector/_nth stack-type start-state)]
+    (or
+     (and (empty? vect)
+          (= (state/peek-stack end-state stack-type)
+             vect))
+     (and 
+          (= (get vect (mod n (count vect)))
+             (state/peek-stack end-state (keyword value-type)))))))
+
+(gen-specs "nth" check-nth :vector :integer)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
