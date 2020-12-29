@@ -121,7 +121,9 @@
   (fn [stack state]
     (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
-                        #(get %2 (mod %1 (count %2)))
+                        #(if (empty? %2)
+                           :ignore-instruction
+                           (get %2 (mod %1 (count %2))))
                         [:integer stack]
                         lit-stack))))
 
