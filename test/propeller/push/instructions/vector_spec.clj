@@ -57,6 +57,47 @@
 
 (gen-specs "butlast" check-butlast :vector)
 
+;;; vector/_concat
+
+(defn check-concat
+  "Creates an otherwise empty Push state with the two given vectors on the
+   appropriate vector stack (assumed to be :vector_<value-type>).
+   It then runs the vector/_concat instruction, and confirms that the
+   result (on the :vector_<value-type> stack) is the expected value.
+   The order of concatenation is that the top of the stack will be
+   _second_ in the concatenation, i.e., its elements will come _after_
+   the elements in the vector one below it in the stack."
+  [value-type first-vect second-vect]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          first-vect)
+                     stack-type second-vect)
+        end-state (vector/_concat stack-type start-state)]
+    (= (concat second-vect first-vect)
+       (state/peek-stack end-state stack-type))))
+
+(gen-specs "concat" check-concat :vector :vector)
+
+;;; vecotr/_conj
+
+(defn check-conj
+  [value-type vect value]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          vect)
+                     (keyword (str value-type))
+                     value)
+        end-state (vector/_conj stack-type start-state)
+        expected-result (conj vect value)]
+    (= expected-result
+       (state/peek-stack end-state stack-type))))
+
+(gen-specs "conj" check-conj :vector :item)
+
 ;;; vector/_contains
 
 (defn check-contains
@@ -154,29 +195,6 @@
        (state/peek-stack end-state :integer))))
 
 (gen-specs "indexof" check-indexof :vector :item)
-
-;;; vector/_concat
-
-(defn check-concat
-  "Creates an otherwise empty Push state with the two given vectors on the
-   appropriate vector stack (assumed to be :vector_<value-type>).
-   It then runs the vector/_concat instruction, and confirms that the
-   result (on the :vector_<value-type> stack) is the expected value.
-   The order of concatenation is that the top of the stack will be
-   _second_ in the concatenation, i.e., its elements will come _after_
-   the elements in the vector one below it in the stack."
-  [value-type first-vect second-vect]
-  (let [stack-type (keyword (str "vector_" value-type))
-        start-state (state/push-to-stack
-                     (state/push-to-stack state/empty-state
-                                          stack-type
-                                          first-vect)
-                     stack-type second-vect)
-        end-state (vector/_concat stack-type start-state)]
-    (= (concat second-vect first-vect)
-       (state/peek-stack end-state stack-type))))
-
-(gen-specs "concat" check-concat :vector :vector)
 
 ;;; vector/_subvec
 
