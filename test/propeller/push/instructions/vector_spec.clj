@@ -251,6 +251,27 @@
 
 (gen-specs "occurrencesof" check-occurrencesof :vector :item)
 
+;;; vector/_pushall
+
+(defn check-pushall
+  [value-type vect]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_pushall stack-type start-state)
+        value-stack (keyword value-type)
+        vect-length (count vect)]
+    (and
+       (=
+          (vec (state/peek-stack-many end-state value-stack vect-length))
+          vect)
+       (state/empty-stack?
+          (state/pop-stack-many end-state value-stack vect-length)
+          value-stack))))
+
+(gen-specs "pushall" check-pushall :vector)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
