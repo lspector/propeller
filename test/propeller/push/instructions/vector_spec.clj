@@ -233,6 +233,24 @@
 
 (gen-specs "nth" check-nth :vector :integer)
 
+;;; vector/_occurrencesof
+
+(defn check-occurrencesof
+  [value-type vect value]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          vect)
+                     (keyword value-type)
+                     value)
+        end-state (vector/_occurrencesof stack-type start-state)
+        expected-result (count (filterv #(= value %) vect))]
+    (= expected-result
+       (state/peek-stack end-state :integer))))
+
+(gen-specs "occurrencesof" check-occurrencesof :vector :item)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
