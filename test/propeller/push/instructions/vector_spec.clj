@@ -289,6 +289,28 @@
 
 (gen-specs "remove" check-remove :vector :item)
 
+;;; vector/_replace
+
+(defn check-replace
+  [value-type vect toreplace replacement]
+  (let [stack-type (keyword (str "vector_" value-type))
+        value-stack (keyword value-type)
+        start-state (state/push-to-stack
+                     (state/push-to-stack
+                      (state/push-to-stack state/empty-state
+                                           stack-type
+                                           vect)
+                      value-stack
+                      toreplace)
+                     value-stack
+                     replacement)
+        end-state (vector/_replace stack-type start-state)
+        expected-result (replace {toreplace replacement} vect)]
+    (= expected-result
+       (state/peek-stack end-state stack-type))))
+
+(gen-specs "replace" check-replace :vector :item :item)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
