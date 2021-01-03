@@ -272,6 +272,23 @@
 
 (gen-specs "pushall" check-pushall :vector)
 
+;;; vector/_remove
+
+(defn check-remove
+  [value-type vect value]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          vect)
+                     (keyword value-type)
+                     value)
+        end-state (vector/_remove stack-type start-state)]
+    (= []
+       (filterv #(= % value) (state/peek-stack end-state stack-type)))))
+
+(gen-specs "remove" check-remove :vector :item)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
