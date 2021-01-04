@@ -183,7 +183,10 @@
     (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit1 lit2 vect]
-                          (assoc vect (utils/indexof lit1 vect) lit2))
+                          (let [replaceindex (utils/indexof lit1 vect)]
+                            (if (= replaceindex -1)
+                              :ignore-instruction
+                              (assoc vect replaceindex lit2))))
                         [lit-stack lit-stack stack]
                         stack))))
 
