@@ -311,6 +311,33 @@
 
 (gen-specs "replace" check-replace :vector :item :item)
 
+;;; vector/_replacefirst
+
+(defn check-replacefirst
+  [value-type vect toreplace replacement]
+  (let [stack-type (keyword (str "vector_" value-type))
+        value-stack (keyword value-type)
+        start-state (state/push-to-stack
+                     (state/push-to-stack
+                      (state/push-to-stack state/empty-state
+                                           stack-type
+                                           vect)
+                      value-stack
+                      toreplace)
+                     value-stack
+                     replacement)
+        end-state (vector/_replacefirst stack-type start-state)
+        end-vector (state/peek-stack end-state stack-type)
+        replacement-index (.indexOf vect toreplace)]
+    (or
+     (and (= replacement-index -1)
+          (= [replacement toreplace] (state/peek-stack-many end-state value-stack 2))
+          (= vect end-vector))
+     (and (state/empty-stack? end-state value-stack)
+          (= end-vector (assoc vect replacement-index replacement))))))
+
+(gen-specs "replacefirst" check-replacefirst :vector :item :item)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
