@@ -431,3 +431,21 @@
        (state/peek-stack end-state stack-type))))
 
 (gen-specs "subvec" check-subvec :vector :integer :integer)
+
+;;; vector/_take
+
+(defn check-take
+  [value-type vect n]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack
+                     (state/push-to-stack state/empty-state
+                                          stack-type
+                                          vect)
+                     :integer
+                     n)
+        end-state (vector/_take stack-type start-state)
+        expected-result (vec (take n vect))]
+    (= expected-result
+       (state/peek-stack end-state stack-type))))
+
+(gen-specs "take" check-take :vector :integer)
