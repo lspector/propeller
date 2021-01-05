@@ -353,6 +353,21 @@
 
 (gen-specs "rest" check-rest :vector)
 
+;;; vector/_reverse
+
+(defn check-reverse
+  [value-type vect]
+  (let [stack-type (keyword (str "vector_" value-type))
+        start-state (state/push-to-stack state/empty-state
+                                         stack-type
+                                         vect)
+        end-state (vector/_reverse stack-type start-state)
+        expected-result (vec (rest vect))]
+    (= expected-result
+       (state/peek-stack end-state stack-type))))
+
+(gen-specs "reverse" check-reverse :vector)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
