@@ -368,6 +368,36 @@
 
 (gen-specs "reverse" check-reverse :vector)
 
+;;; vector/_set
+
+(defn check-set
+  [value-type vect value n]
+  (let [stack-type (keyword (str "vector_" value-type))
+        value-stack (keyword value-type)
+        start-state (state/push-to-stack
+                      (state/push-to-stack
+                        (state/push-to-stack state/empty-state
+                                             stack-type
+                                             vect)
+                        value-stack
+                        value)
+                      :integer
+                      n)
+        end-state (vector/_set stack-type start-state)]
+    (or
+     (and
+      (empty? vect)
+      (not (state/empty-stack? end-state :integer))
+      (not (state/empty-stack? end-state value-stack))
+      (= vect (state/peek-stack end-state stack-type)))
+     (and
+      (= (state/peek-stack end-state stack-type)
+         (assoc vect (mod n (count vect)) value))
+      (state/empty-stack? end-state :integer)
+      (state/empty-stack? end-state value-stack)))))
+
+(gen-specs "set" check-set :vector :item :integer)
+
 ;;; vector/_subvec
 
 (defn clean-subvec-bounds
