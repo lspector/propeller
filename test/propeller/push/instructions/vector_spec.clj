@@ -362,7 +362,7 @@
                                          stack-type
                                          vect)
         end-state (vector/_reverse stack-type start-state)
-        expected-result (vec (rest vect))]
+        expected-result (vec (reverse vect))]
     (= expected-result
        (state/peek-stack end-state stack-type))))
 
