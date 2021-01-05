@@ -211,8 +211,10 @@
     (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit n vect]
-                          (assoc vect (mod n (count vect)) lit))
-                        [:integer lit-stack stack]
+                          (if (empty? vect)
+                            :ignore-instruction
+                            (assoc vect (mod n (count vect)) lit)))
+                        [lit-stack :integer stack]
                         stack))))
 
 ;; Pushes a subvector of the top item, with start and end indices determined by
