@@ -4,7 +4,8 @@
    [clojure.test.check.properties :as prop]
    [clojure.test.check.clojure-test :as ct :refer [defspec]]
    [propeller.push.state :as state]
-   [propeller.push.instructions.vector :as vector]))
+   [propeller.push.instructions.vector :as vector]
+   [propeller.push.interpreter :as interpreter]))
 
 (def gen-type-pairs
   [['gen/small-integer "integer"]
@@ -175,6 +176,29 @@
        (state/peek-stack end-state :integer))))
 
 (gen-specs "indexof" check-indexof :vector :item)
+
+;;; vector/_iterate
+
+(defn check-iterate
+  [value-type vect]
+  (let [stack-type (keyword (str "vector_" value-type))
+        print-instr (keyword (str value-type "_print"))
+        iter-instr (keyword (str "vector_" value-type "_iterate"))
+        program [iter-instr print-instr]
+        start-state (-> state/empty-state
+                        (state/push-to-stack stack-type vect)
+                        (state/push-to-stack :output ""))
+        ; 4 times the vector length should be enough for this iteration, perhaps even
+        ; more than we strictly need.
+        end-state (interpreter/interpret-program program start-state (* 4 (count vect)))
+        ; pr-str adds escaped quote marks, which causes tests to fail because _print
+        ; treats strings and characters specially and does not call pr-str on them.
+        to-str-fn (if (= value-type "string") identity pr-str)
+        expected-result (apply str (map to-str-fn vect))]
+    (= expected-result
+       (state/peek-stack end-state :output))))
+
+(gen-specs "iterate" check-iterate :vector)
 
 ;;; vector/_last
 
