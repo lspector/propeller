@@ -185,7 +185,7 @@
                         (fn [lit1 lit2 vect]
                           (let [replaceindex (utils/indexof lit1 vect)]
                             (if (= replaceindex -1)
-                              :ignore-instruction
+                              vect
                               (assoc vect replaceindex lit2))))
                         [lit-stack lit-stack stack]
                         stack))))
