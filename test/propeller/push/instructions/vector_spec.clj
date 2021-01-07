@@ -331,7 +331,7 @@
         replacement-index (.indexOf vect toreplace)]
     (or
      (and (= replacement-index -1)
-          (= [replacement toreplace] (state/peek-stack-many end-state value-stack 2))
+          (state/empty-stack? end-state value-stack)
           (= vect end-vector))
      (and (state/empty-stack? end-state value-stack)
           (= end-vector (assoc vect replacement-index replacement))))))
