@@ -14,3 +14,4 @@ pom.xml.asc
 .idea/
 out
 notes
+.clj-kondo/
