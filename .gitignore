@@ -10,6 +10,8 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+*.iml
+.idea/
 out
 notes
 .idea/

@@ -5,6 +5,7 @@
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
             [propeller.push.utils.helpers :refer [make-instruction]]
+            [propeller.push.utils.globals :as globals]
             #?(:clj
                [propeller.push.utils.macros :refer [def-instruction
                                                     generate-instructions]])))
@@ -29,7 +30,8 @@
 ;; its argument (since that would negate the effect of the duplication). The
 ;; number n is determined by the top INTEGER. For n = 0, equivalent to POP.
 ;; For n = 1, equivalent to NOOP. For n = 2, equivalent to DUP. Negative values
-;; of n are treated as 0
+;; of n are treated as 0. The final number of items on the stack is limited to
+;; globals/max-stack-items.
 (def _dup_times
   ^{:stacks #{:integer}}
   (fn [stack state]
@@ -38,7 +40,8 @@
             (and (not= stack :integer)
                  (not (state/empty-stack? state :integer))
                  (not (state/empty-stack? state stack))))
-      (let [n (state/peek-stack state :integer)
+      (let [n (min (state/peek-stack state :integer)
+                   (inc (- globals/max-stack-items (state/stack-size state stack))))
             popped-state (state/pop-stack state :integer)
             top-item (state/peek-stack popped-state stack)
             top-item-dup (take (- n 1) (repeat top-item))]
@@ -50,12 +53,14 @@
 ;; Duplicates the top n items on the stack, one time each. The number n is
 ;; determined by the top INTEGER. If n <= 0, no items will be duplicated. If
 ;; fewer than n items are on the stack, the entire stack will be duplicated.
+;; The final number of items on the stack is limited to globals/max-stack-items.
 (def _dup_items
   ^{:stacks #{:integer}}
   (fn [stack state]
     (if (state/empty-stack? state :integer)
       state
-      (let [n (state/peek-stack state :integer)
+      (let [n (min (state/peek-stack state :integer)
+                   (- globals/max-stack-items (state/stack-size state stack)))
             popped-state (state/pop-stack state :integer)
             top-items (take n (get popped-state stack))]
         (state/push-to-stack-many popped-state stack top-items)))))
