@@ -14,3 +14,11 @@ pom.xml.asc
 .idea/
 out
 notes
+.clj-kondo/
+.idea/
+.calva/
+
+# Don't commit the data directory that we'll
+# use to hold the data from
+# https://github.com/thelmuth/program-synthesis-benchmark-datasets
+/data

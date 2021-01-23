@@ -52,12 +52,16 @@
     (make-instruction state empty? [stack] :boolean)))
 
 ;; Pushes the first item of the top element of the vector stack onto the
-;; approrpiately-typed literal stack
+;; appropriately-typed literal stack. If the vector is empty, return
+;; :ignore-instruction so that nothing is changed on the stacks.
 (def _first
   ^{:stacks #{:elem}}
   (fn [stack state]
     (let [lit-stack (get-vector-literal-type stack)]
-      (make-instruction state first [stack] lit-stack))))
+      (make-instruction state
+                        #(if (empty? %) :ignore-instruction (first %))
+                        [stack] 
+                        lit-stack))))
 
 ;; Pushes onto the INTEGER stack the index of the top element of the
 ;; appropriately-typed literal stack within the top element of the vector stack
@@ -97,7 +101,11 @@
   ^{:stacks #{:elem}}
   (fn [stack state]
     (let [lit-stack (get-vector-literal-type stack)]
-      (make-instruction state last [stack] lit-stack))))
+      (make-instruction 
+       state 
+       #(if (empty? %) :ignore-instruction (last %)) 
+       [stack] 
+       lit-stack))))
 
 ;; Pushes the length of the top item onto the INTEGER stack
 (def _length
@@ -113,7 +121,9 @@
   (fn [stack state]
     (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
-                        #(get %2 (mod %1 (count %2)))
+                        #(if (empty? %2)
+                           :ignore-instruction
+                           (get %2 (mod %1 (count %2))))
                         [:integer stack]
                         lit-stack))))
 
@@ -173,7 +183,10 @@
     (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit1 lit2 vect]
-                          (assoc vect (utils/indexof lit1 vect) lit2))
+                          (let [replaceindex (utils/indexof lit1 vect)]
+                            (if (= replaceindex -1)
+                              vect
+                              (assoc vect replaceindex lit2))))
                         [lit-stack lit-stack stack]
                         stack))))
 
@@ -198,8 +211,10 @@
     (let [lit-stack (get-vector-literal-type stack)]
       (make-instruction state
                         (fn [lit n vect]
-                          (assoc vect (mod n (count vect)) lit))
-                        [:integer lit-stack stack]
+                          (if (empty? vect)
+                            :ignore-instruction
+                            (assoc vect (mod n (count vect)) lit)))
+                        [lit-stack :integer stack]
                         stack))))
 
 ;; Pushes a subvector of the top item, with start and end indices determined by
@@ -208,9 +223,9 @@
   ^{:stacks #{:integer}}
   (fn [stack state]
     (make-instruction state
-                      (fn [stop-raw start-raw vect]
+                      (fn [start-raw stop-raw vect]
                         (let [start (min (count vect) (max 0 start-raw))
-                              stop (min (count vect) (max start-raw stop-raw))]
+                              stop (min (count vect) (max 0 start-raw stop-raw))]
                           (subvec vect start stop)))
                       [:integer :integer stack]
                       stack)))
