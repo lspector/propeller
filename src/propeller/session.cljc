@@ -5,7 +5,6 @@
             [propeller.variation :as variation]
             [propeller.problems.simple-regression :as regression]
             [propeller.problems.string-classification :as string-classif]
-            propeller.problems.valiant
             [propeller.push.core :as push]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
@@ -154,76 +153,3 @@
 ;                                    }
 ;          :elitism                 false
 ;          :diploid                 true})
-
-
-;(gp/gp {:instructions            propeller.problems.valiant/instructions
-;        :error-function          propeller.problems.valiant/error-function
-;        :max-generations         500
-;        :population-size         50
-;        :max-initial-plushy-size 1000
-;        :step-limit              2000
-;        :parent-selection        :tournament
-;        :tournament-size         10
-;        :umad-rate               0.01
-;        :diploid-flip-rate       0.01
-;        :variation               {:umad         0.9
-;                                  :diploid-flip 0.1
-;                                  }
-;        :elitism                 false
-;        :diploid                 true})
-
-;(gp/gp {:instructions            propeller.problems.valiant/instructions
-;        :error-function          propeller.problems.valiant/error-function
-;        :max-generations         500
-;        :population-size         100
-;        :max-initial-plushy-size 1000
-;        :step-limit              2000
-;        :parent-selection        :tournament
-;        :tournament-size         10
-;        :umad-rate               0.01
-;        :diploid-flip-rate       0.01
-;        :variation               {:umad         0.9
-;                                  :diploid-flip 0.1
-;                                  }
-;        :elitism                 false
-;        :diploid                 true})
-
-;;; below is when I switched to just xor
-
-;(gp/gp {:instructions            propeller.problems.valiant/instructions
-;        :error-function          propeller.problems.valiant/error-function
-;        :max-generations         500
-;        :population-size         500
-;        :max-initial-plushy-size 50
-;        :step-limit              2000
-;        :parent-selection        :lexicase
-;        :tournament-size         2
-;        :umad-rate               0.01
-;        :diploid-flip-rate       0.01
-;        :variation               {:umad         0.5
-;                                  :crossover    0.25
-;                                  :diploid-flip 0.25
-;                                  }
-;        :elitism                 false
-;        :diploid                 true})
-
-;; separated diploid from other operators
-
-(gp/gp {:instructions            propeller.problems.valiant/instructions
-        :error-function          propeller.problems.valiant/error-function
-        :max-generations         500
-        :population-size         1000
-        :max-initial-plushy-size 10
-        :step-limit              1000
-        :parent-selection        :lexicase
-        :tournament-size         2
-        :umad-rate               0.01
-        :replacement-rate        0.01
-        :diploid-flip-rate       0.01
-        :variation               {:diploid-umad        0.25
-                                  :diploid-crossover   0.25
-                                  :diploid-flip        0.25
-                                  :uniform-replacement 0.25
-                                  }
-        :elitism                 false
-        :diploid                 true})

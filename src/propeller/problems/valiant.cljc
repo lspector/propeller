@@ -3,8 +3,8 @@
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]))
 
-(def num-vars 100)                                          ;1000)
-(def num-inputs 50)                                         ;500)
+(def num-vars 100) ;10) ;100)                                          ;1000)
+(def num-inputs 50) ;5) ; 50)                                         ;500)
 (def num-train 500)                                         ;5000)
 (def num-test 200)
 
@@ -23,10 +23,11 @@
              :outputs (map even-parity? test-inputs)}}))
 
 (def instructions
-  (vec (concat (for [i (range num-inputs)] (keyword (str "in" i)))
+  (vec (concat (for [i (range num-vars)] (keyword (str "in" i)))
                (take num-inputs
                      (cycle [:boolean_xor
                              :boolean_or
+                             :boolean_and
                              :boolean_not
                              :exec_if
                              'close
