@@ -25,8 +25,12 @@
     (println "Best behaviors:" (:behaviors best))
     (println "Genotypic diversity:"
              (float (/ (count (distinct (map :plushy pop))) (count pop))))
+    (println "Behavioral diversity:"
+             (float (/ (count (distinct (map :behaviors pop))) (count pop))))
     (println "Average genome length:"
              (float (/ (reduce + (map count (map :plushy pop))) (count pop))))
+    (println "Average total error:"
+             (float (/ (reduce + (map :total-error pop)) (count pop))))
     (println)))
 
 (defn gp
