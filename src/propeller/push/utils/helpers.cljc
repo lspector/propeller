@@ -17,10 +17,13 @@
       :else n)
     :else
     (cond
-      (Double/isNaN n) 0.0
-      (or (= n Double/POSITIVE_INFINITY)
+      (#?(:clj Double/isNaN
+          :cljs js/isNaN) n) 0.0
+      (or (= n #?(:clj Double/POSITIVE_INFINITY
+                  :cljs js/Infinity))
           (> n globals/max-number-magnitude)) globals/max-number-magnitude
-      (or (= n Double/NEGATIVE_INFINITY)
+      (or (= n #?(:clj Double/NEGATIVE_INFINITY
+                  :cljs js/-Infinity))
           (< n (- globals/max-number-magnitude))) (- globals/max-number-magnitude)
       (< (- globals/min-number-magnitude) n globals/min-number-magnitude) 0.0
       :else n)))
