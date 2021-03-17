@@ -51,7 +51,7 @@
   (let [start-state (-> state/empty-state
                         (state/push-to-stack :string value)
                         (state/push-to-stack :char char))
-        end-state ((:string_conj-char @core/instruction-table) start-state)
+        end-state ((:string_conj_char @core/instruction-table) start-state)
         expected-result (str value char)]
     (= expected-result
        (state/peek-stack end-state :string))))
@@ -59,7 +59,7 @@
 (defspec conj-char-spec 100
   (prop/for-all [str gen/string
                  char gen/char]
-                (check-concat str char)))
+                (check-conj-char str char)))
 
 
 ;; string/contains
@@ -87,9 +87,15 @@
   (let [start-state (-> state/empty-state
                         (state/push-to-stack :string value)
                         (state/push-to-stack :char char))
-        end-state ((:string_contains-char @core/instruction-table) start-state)
-        expected-result (string/includes? value char)]
+        end-state ((:string_contains_char @core/instruction-table) start-state)
+        expected-result (string/includes? value (str char))]
     (= expected-result
+       (state/peek-stack end-state :boolean))))
+
+(defspec contains-char-spec 100
+  (prop/for-all [str gen/string
+                 char gen/char]
+                (check-contains-char str char)))
        (state/peek-stack end-state :string))))
 
 (defspec contains-char-spec 100
