@@ -59,3 +59,21 @@
   (prop/for-all [str gen/string
                  char gen/char]
                 (check-concat str char)))
+
+
+;; string/contains
+
+(defn check-contains
+  [value1 value2]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value1)
+                        (state/push-to-stack :string value2))
+        end-state ((:string_contains @core/instruction-table) start-state)
+        expected-result (string/includes? value2 value1)]
+    (= expected-result
+       (state/peek-stack end-state :boolean))))
+
+(defspec contains-spec 100
+  (prop/for-all [str1 gen/string
+                 str2 gen/string]
+                (check-contains str1 str2)))
