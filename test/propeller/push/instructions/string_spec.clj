@@ -96,9 +96,21 @@
   (prop/for-all [str gen/string
                  char gen/char]
                 (check-contains-char str char)))
+
+
+;; string/drop
+
+(defn check-drop
+  [value n]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :integer n))
+        end-state ((:string_drop @core/instruction-table) start-state)
+        expected-result (apply str (drop n value))]
+    (= expected-result
        (state/peek-stack end-state :string))))
 
-(defspec contains-char-spec 100
+(defspec drop-spec 100
   (prop/for-all [str gen/string
-                 char gen/string]
-                (check-concat str char)))
+                 int gen/small-integer]
+                (check-drop str int)))
