@@ -41,3 +41,21 @@
   (prop/for-all [s1 gen/string
                  s2 gen/string]
                 (check-concat s1 s2)))
+
+
+;; string/conj-char
+
+(defn check-conj-char
+  [value char]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :char char))
+        end-state ((:string_concat @core/instruction-table) start-state)
+        expected-result (str value char)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec conj-char-spec 100
+  (prop/for-all [str gen/string
+                 char gen/char]
+                (check-concat str char)))
