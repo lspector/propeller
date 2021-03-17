@@ -38,7 +38,7 @@
   :string_contains
   ^{:stacks #{:boolean :string}}
   (fn [state]
-    (make-instruction state string/includes? [:string :string] :boolean)))
+    (make-instruction state #(string/includes? %2 %1) [:string :string] :boolean)))
 
 ;; Pushes TRUE if the top CHAR is contained in the top STRING, and FALSE
 ;; otherwise
