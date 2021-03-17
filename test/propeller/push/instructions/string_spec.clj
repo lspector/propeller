@@ -1,11 +1,12 @@
 (ns propeller.push.instructions.string-spec
   (:require
+   [clojure.string :as string]
    [clojure.test.check.generators :as gen]
    [clojure.test.check.properties :as prop]
    [clojure.test.check.clojure-test :as ct :refer [defspec]]
    [propeller.push.state :as state]
    [propeller.push.core :as core]
-   [propeller.push.instructions.string :as string]))
+   [propeller.push.instructions.string :as string-instructions]))
 
 
 ;; string/butlast
@@ -21,8 +22,8 @@
        (state/peek-stack end-state :string))))
 
 (defspec butlast-spec 100
-  (prop/for-all [s gen/string] 
-                (check-butlast s)))
+  (prop/for-all [str gen/string] 
+                (check-butlast str)))
 
 
 ;; string/concat
@@ -38,9 +39,9 @@
        (state/peek-stack end-state :string))))
   
 (defspec concat-spec 100
-  (prop/for-all [s1 gen/string
-                 s2 gen/string]
-                (check-concat s1 s2)))
+  (prop/for-all [str1 gen/string
+                 str2 gen/string]
+                (check-concat str1 str2)))
 
 
 ;; string/conj-char
@@ -50,7 +51,7 @@
   (let [start-state (-> state/empty-state
                         (state/push-to-stack :string value)
                         (state/push-to-stack :char char))
-        end-state ((:string_concat @core/instruction-table) start-state)
+        end-state ((:string_conj-char @core/instruction-table) start-state)
         expected-result (str value char)]
     (= expected-result
        (state/peek-stack end-state :string))))
