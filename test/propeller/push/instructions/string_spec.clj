@@ -129,3 +129,23 @@
 (defspec empty-string-spec 100
   (prop/for-all [str gen/string]
                 (check-empty-string str)))
+
+
+;; string/first
+
+(defn check-first
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_first @core/instruction-table) start-state)
+        expected-result (first value)]
+    (or
+     (and (empty? value)
+          (= (state/peek-stack end-state :string) value)
+          (state/empty-stack? end-state :char))
+     (and (= expected-result
+             (state/peek-stack end-state :char))
+          (state/empty-stack? end-state :string)))))
+
+(defspec first-spec 100
+  (prop/for-all [str gen/string]
+                (check-first str)))
