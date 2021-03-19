@@ -193,4 +193,19 @@
 
 (defspec from-float-spec 100
   (prop/for-all [float gen/double]
-                (check-from-boolean float)))
+                (check-from-float float)))
+
+
+;; string/from-integer
+
+(defn check-from-integer
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :integer value)
+        end-state ((:string_from_integer @core/instruction-table) start-state)
+        expected-result (str value)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec from-integer-spec 100
+  (prop/for-all [int gen/small-integer]
+                (check-from-integer int)))
