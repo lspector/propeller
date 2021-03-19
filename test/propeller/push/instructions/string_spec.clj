@@ -164,3 +164,18 @@
 (defspec from-boolean-spec 10
   (prop/for-all [bool gen/boolean]
                 (check-from-boolean bool)))
+
+
+;; string/from-char
+
+(defn check-from-char
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :char value)
+        end-state ((:string_from_char @core/instruction-table) start-state)
+        expected-result (str value)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec from-char-spec 10
+  (prop/for-all [char gen/char]
+                (check-from-char char)))
