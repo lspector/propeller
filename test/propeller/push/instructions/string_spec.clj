@@ -114,3 +114,18 @@
   (prop/for-all [str gen/string
                  int gen/small-integer]
                 (check-drop str int)))
+
+
+;; string/empty-string
+
+(defn check-empty-string
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_empty_string @core/instruction-table) start-state)
+        expected-result (empty? value)]
+    (= expected-result
+       (state/peek-stack end-state :boolean))))
+
+(defspec empty-string-spec 100
+  (prop/for-all [str gen/string]
+                (check-empty-string str)))
