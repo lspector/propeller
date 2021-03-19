@@ -149,3 +149,18 @@
 (defspec first-spec 100
   (prop/for-all [str gen/string]
                 (check-first str)))
+
+
+;; string/from-boolean
+
+(defn check-from-boolean
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :boolean value)
+        end-state ((:string_from_boolean @core/instruction-table) start-state)
+        expected-result (str value)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec from-boolean-spec 10
+  (prop/for-all [bool gen/boolean]
+                (check-from-boolean bool)))
