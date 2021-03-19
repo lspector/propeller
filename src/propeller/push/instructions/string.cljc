@@ -68,7 +68,9 @@
   :string_first
   ^{:stacks #{:char :string}}
   (fn [state]
-    (make-instruction state first [:string] :char)))
+    (make-instruction state
+                      #(if (empty? %) :ignore-instruction (first %))
+                      [:string] :char)))
 
 ;; Pushes the STRING version of the top BOOLEAN, e.g. "true"
 (def-instruction
