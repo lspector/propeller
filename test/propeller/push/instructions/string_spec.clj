@@ -176,6 +176,21 @@
     (= expected-result
        (state/peek-stack end-state :string))))
 
-(defspec from-char-spec 10
+(defspec from-char-spec 100
   (prop/for-all [char gen/char]
                 (check-from-char char)))
+
+
+;; string/from-float
+
+(defn check-from-float
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :float value)
+        end-state ((:string_from_float @core/instruction-table) start-state)
+        expected-result (str value)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec from-float-spec 100
+  (prop/for-all [float gen/double]
+                (check-from-boolean float)))
