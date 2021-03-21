@@ -209,3 +209,26 @@
 (defspec from-integer-spec 100
   (prop/for-all [int gen/small-integer]
                 (check-from-integer int)))
+
+
+;; string/indexof-char
+
+(defn check-indexof-char
+  [value char]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :char char))
+        end-state ((:string_indexof_char @core/instruction-table) start-state)
+        expected-result (string/index-of value char)]
+    (or
+     (and (not expected-result)
+          (= (state/peek-stack end-state :string) value)
+          (= (state/peek-stack end-state :char) char)
+          (state/empty-stack? end-state :integer))
+     (= expected-result
+        (state/peek-stack end-state :integer)))))
+
+(defspec indexof-char-spec 100
+  (prop/for-all [str gen/string
+                 char gen/char]
+                (check-indexof-char str char)))
