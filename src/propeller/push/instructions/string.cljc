@@ -106,7 +106,11 @@
   :string_indexof_char
   ^{:stacks #{:char :integer :string}}
   (fn [state]
-    (make-instruction state string/index-of [:string :char] :integer)))
+    (make-instruction state 
+                      #(let [index (string/index-of %1 %2)] 
+                               (if index index :ignore-instruction)) 
+                      [:string :char]
+                      :integer)))
 
 ;; Iterates over the top STRING using code on the EXEC stack
 (def-instruction
