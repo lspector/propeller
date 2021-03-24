@@ -247,3 +247,18 @@
 (defspec last-spec 100
   (prop/for-all [str gen/string]
                 (check-last str)))
+
+
+;; string/length
+
+(defn check-length
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_length @core/instruction-table) start-state)
+        expected-result (count value)]
+    (= expected-result
+       (state/peek-stack end-state :integer))))
+
+(defspec length-spec 100
+  (prop/for-all [str gen/string]
+                (check-length str)))
