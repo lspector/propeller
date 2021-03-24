@@ -136,12 +136,13 @@
               (state/push-to-stack :exec (state/peek-stack state :exec))
               (state/push-to-stack :char (first top-item))))))))
 
-;; Pushes the last CHAR of the top STRING
+;; Pushes the last CHAR of the top STRING. 
+;; If the string is empty, do nothing
 (def-instruction
   :string_last
   ^{:stacks #{:char :string}}
   (fn [state]
-    (make-instruction state last [:string] :char)))
+    (make-instruction state #(if (empty? %) :ignore-instruction (last %)) [:string] :char)))
 
 ;; Pushes the length of the top STRING onto the INTEGER stack
 (def-instruction
