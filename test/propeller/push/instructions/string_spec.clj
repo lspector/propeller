@@ -232,3 +232,18 @@
   (prop/for-all [str gen/string
                  char gen/char]
                 (check-indexof-char str char)))
+
+
+;; string/last
+
+(defn check-last
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_last @core/instruction-table) start-state)
+        expected-result (last value)]
+    (= expected-result
+       (state/peek-stack end-state :char))))
+
+(defspec last-spec 100
+  (prop/for-all [str gen/string]
+                (check-last str)))
