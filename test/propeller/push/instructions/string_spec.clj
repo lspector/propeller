@@ -241,8 +241,13 @@
   (let [start-state (state/push-to-stack state/empty-state :string value)
         end-state ((:string_last @core/instruction-table) start-state)
         expected-result (last value)]
-    (= expected-result
-       (state/peek-stack end-state :char))))
+    (or
+     (and (empty? value)
+          (state/empty-stack? end-state :char)
+          (= value (state/peek-stack end-state :string)))
+     (and (state/empty-stack? end-state :string)
+          (= expected-result
+             (state/peek-stack end-state :char))))))
 
 (defspec last-spec 100
   (prop/for-all [str gen/string]
