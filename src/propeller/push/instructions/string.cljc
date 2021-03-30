@@ -158,7 +158,13 @@
   :string_nth
   ^{:stacks #{:char :integer :string}}
   (fn [state]
-    (make-instruction state #(nth %2 (mod %1 (count %2))) [:integer :string] :char)))
+    (make-instruction state 
+                      #(let [str-length (count %2)]
+                               (if (= 0 str-length)
+                                 :ignore-instruction
+                                 (nth %2 (mod %1 str-length))))
+                      [:integer :string] 
+                      :char)))
 
 ;; Pushes the number of times the top CHAR occurs in the top STRING onto the
 ;; INTEGER stack
