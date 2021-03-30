@@ -267,3 +267,25 @@
 (defspec length-spec 100
   (prop/for-all [str gen/string]
                 (check-length str)))
+
+
+;; string/nth
+
+(defn check-nth
+  [value n]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :integer n))
+        end-state ((:string_nth @core/instruction-table) start-state)]
+    (or
+     (and (empty? value)
+          (state/empty-stack? end-state :char)
+          (= value (state/peek-stack end-state :string))
+          (= n (state/peek-stack end-state :integer)))
+     (= (nth value (mod n (count value)))
+        (state/peek-stack end-state :char)))))
+
+(defspec nth-spec 100
+  (prop/for-all [str gen/string
+                 int gen/small-integer]
+                (check-nth str int)))
