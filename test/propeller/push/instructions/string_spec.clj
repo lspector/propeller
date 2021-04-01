@@ -459,3 +459,32 @@
 (defspec reverse-spec 100
   (prop/for-all [str gen/string]
                 (check-reverse str)))
+
+
+;; string/set-char
+
+(defn check-set-char
+  [value char n]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :char char)
+                        (state/push-to-stack :integer n))
+        end-state ((:string_set_char @core/instruction-table) start-state)]
+    (or
+     (and
+      (empty? value)
+      (= (state/peek-stack end-state :string) value)
+      (= (state/peek-stack end-state :char) char)
+      (= (state/peek-stack end-state :integer) n))
+     (=
+      (let [index (mod n (count value))
+            start (subs value 0 index)
+            end (subs value (+ index 1))]
+        (str start char end))
+      (state/peek-stack end-state :string)))))
+
+(defspec set-char-spec 100
+  (prop/for-all [str gen/string
+                 char gen/char
+                 int gen/small-integer]
+                (check-set-char str char int)))
