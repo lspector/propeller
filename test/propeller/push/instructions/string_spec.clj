@@ -349,3 +349,23 @@
   (prop/for-all [str gen/string
                  char gen/char]
                 (check-remove-char str char)))
+
+
+;; string/replace
+
+(defn check-replace
+  [value1 value2 value3]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value1)
+                        (state/push-to-stack :string value2)
+                        (state/push-to-stack :string value3))
+        end-state ((:string_replace @core/instruction-table) start-state)
+        expected-result (string/replace value1 value2 value3)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec replace-spec 100
+  (prop/for-all [str1 gen/string
+                 str2 gen/string
+                 str3 gen/string]
+                (check-replace str1 str2 str3)))
