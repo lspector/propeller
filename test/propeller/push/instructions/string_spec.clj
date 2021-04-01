@@ -310,3 +310,24 @@
   (prop/for-all [str gen/string
                  char gen/char]
                 (check-occurencesof-char str char)))
+
+
+;; string/parse-to-chars
+
+(defn check-parse-to-chars
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_parse_to_chars @core/instruction-table) start-state)
+        ;; Since split will return the empty string when given the empty string
+        string-length (if (= 0 (count value)) 1 (count value))
+        expected-result (string/split value #"")]
+    (and 
+     (= expected-result
+       (state/peek-stack-many end-state :string string-length))
+     (-> end-state
+         (state/pop-stack-many :string string-length)
+         (state/empty-stack? :string)))))
+
+(defspec parse-to-chars-spec 100
+  (prop/for-all [str gen/string]
+                (check-parse-to-chars str)))
