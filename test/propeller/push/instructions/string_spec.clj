@@ -234,6 +234,9 @@
                 (check-indexof-char str char)))
 
 
+;; string/iterate
+
+
 ;; string/last
 
 (defn check-last
@@ -289,3 +292,21 @@
   (prop/for-all [str gen/string
                  int gen/small-integer]
                 (check-nth str int)))
+
+
+;; string/occurencesof_char
+
+(defn check-occurencesof-char
+  [value char]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :char char))
+        end-state ((:string_occurencesof_char @core/instruction-table) start-state)
+        expected-result (count (filter #(= char %) value))]
+    (= expected-result
+       (state/peek-stack end-state :integer))))
+
+(defspec occurencesof-char-spec 100
+  (prop/for-all [str gen/string
+                 char gen/char]
+                (check-occurencesof-char str char)))
