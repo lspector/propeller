@@ -331,3 +331,21 @@
 (defspec parse-to-chars-spec 100
   (prop/for-all [str gen/string]
                 (check-parse-to-chars str)))
+
+
+;; string/remove-char
+
+(defn check-remove-char
+  [value char]
+  (let [start-state (-> state/empty-state 
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :char char))
+        end-state ((:string_remove_char @core/instruction-table) start-state)
+        expected-result (apply str (filter #(not= char %) value))]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec remove-char-spec 100
+  (prop/for-all [str gen/string
+                 char gen/char]
+                (check-remove-char str char)))
