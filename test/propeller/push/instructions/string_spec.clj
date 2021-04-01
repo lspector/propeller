@@ -388,7 +388,7 @@
   (prop/for-all [str gen/string
                  char1 gen/char
                  char2 gen/char]
-                (check-replace str char1 char2)))
+                (check-replace-char str char1 char2)))
 
 
 ;; string/replace-first
