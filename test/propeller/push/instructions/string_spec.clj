@@ -444,3 +444,18 @@
 (defspec rest-spec 100
   (prop/for-all [str gen/string]
                 (check-rest str)))
+
+
+;; string/reverse
+
+(defn check-reverse
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_reverse @core/instruction-table) start-state)
+        expected-result (apply str (reverse value))]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec reverse-spec 100
+  (prop/for-all [str gen/string]
+                (check-reverse str)))
