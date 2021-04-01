@@ -389,3 +389,23 @@
                  char1 gen/char
                  char2 gen/char]
                 (check-replace str char1 char2)))
+
+
+;; string/replace-first
+
+(defn check-replace-first
+  [value1 value2 value3]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value1)
+                        (state/push-to-stack :string value2)
+                        (state/push-to-stack :string value3))
+        end-state ((:string_replace_first @core/instruction-table) start-state)
+        expected-result (string/replace-first value1 value2 value3)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec replace-first-spec 100
+  (prop/for-all [str1 gen/string
+                 str2 gen/string
+                 str3 gen/string]
+                (check-replace-first str1 str2 str3)))
