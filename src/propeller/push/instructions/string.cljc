@@ -268,10 +268,12 @@
   ^{:stacks #{:char :integer :string}}
   (fn [state]
     (make-instruction state
-                      #(let [index (mod %2 (count %3))
+                      #(if (empty? %3)
+                         :ignore-instruction
+                         (let [index (mod %2 (count %3))
                              beginning (take index %3)
                              end (drop (inc index) %3)]
-                         (apply str (concat beginning (list %1) end)))
+                         (apply str (concat beginning (list %1) end))))
                       [:char :integer :string]
                       :string)))
 
