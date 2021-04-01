@@ -429,3 +429,18 @@
                  char1 gen/char
                  char2 gen/char]
                 (check-replace-first-char str char1 char2)))
+
+
+;; string/rest
+
+(defn check-rest
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_rest @core/instruction-table) start-state)
+        expected-result (apply str (rest value))]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec rest-spec 100
+  (prop/for-all [str gen/string]
+                (check-rest str)))
