@@ -508,3 +508,35 @@
 (defspec split-spec 100
   (prop/for-all [str gen/string]
                 (check-split str)))
+
+
+;; string/substr
+
+(defn check-substr
+  [instruction value start end]
+  (let [start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :integer start)
+                        (state/push-to-stack :integer end))
+        end-state ((instruction @core/instruction-table) start-state)
+        str-len (count value)
+        small (min str-len (max 0 start))
+        big (min str-len (max 0 small end))
+        expected-result (subs value small big)]
+    (= expected-result
+       (state/peek-stack end-state :string))))
+
+(defspec substr-spec 100
+    (prop/for-all
+     [tuple (gen/let [str gen/string
+                      int1 (gen/large-integer* {:min -5 :max (+ 5 (count str))})
+                      int2 (gen/large-integer* {:min -5 :max (+ 5 (count str))})]
+      [:string_substr, str, int1, int2])]
+     (apply check-substr tuple)))
+
+(defspec take-spec 100
+    (prop/for-all
+     [tuple (gen/let [str gen/string
+                      int (gen/large-integer* {:min -5 :max (+ 5 (count str))})]
+              [:string_take, str, 0, int])]
+     (apply check-substr tuple)))
