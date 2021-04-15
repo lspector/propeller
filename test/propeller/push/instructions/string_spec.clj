@@ -488,3 +488,23 @@
                  char gen/char
                  int gen/small-integer]
                 (check-set-char str char int)))
+
+
+;; string/split
+
+(defn check-split
+  [value]
+  (let [start-state (state/push-to-stack state/empty-state :string value)
+        end-state ((:string_split @core/instruction-table) start-state)
+        our-split (string/split (string/trim value) #"\s+")
+        num-items (count our-split)]
+    (and 
+     (= (state/stack-size end-state :string) num-items)
+     (every? identity
+             (map =
+                  our-split
+                  (state/peek-stack-many end-state :string num-items))))))
+
+(defspec split-spec 100
+  (prop/for-all [str gen/string]
+                (check-split str)))
