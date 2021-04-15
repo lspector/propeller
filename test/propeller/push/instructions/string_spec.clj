@@ -6,7 +6,8 @@
    [clojure.test.check.clojure-test :as ct :refer [defspec]]
    [propeller.push.state :as state]
    [propeller.push.core :as core]
-   [propeller.push.instructions.string :as string-instructions]))
+   [propeller.push.instructions.string :as string-instructions]
+   [propeller.push.interpreter :as interpreter]))
 
 
 ;; string/butlast
@@ -236,6 +237,23 @@
 
 ;; string/iterate
 
+(defn check-iterate
+  [value]
+  (let [print-instr (keyword "char_print")
+        iter-instr (keyword "string_iterate")
+        program [iter-instr print-instr]
+        start-state (-> state/empty-state
+                        (state/push-to-stack :string value)
+                        (state/push-to-stack :output ""))
+        ; 4 times the string length should be enough for this iteration, perhaps even
+        ; more than we strictly need.
+        end-state (interpreter/interpret-program program start-state (* 4 (count value)))]
+    (= value
+       (state/peek-stack end-state :output))))
+
+(defspec iterate-spec 100
+  (prop/for-all [value gen/string]
+                (check-iterate value)))
 
 ;; string/last
 
