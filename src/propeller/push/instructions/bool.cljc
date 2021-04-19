@@ -1,6 +1,5 @@
 (ns propeller.push.instructions.bool
-  #?(:cljs (:require-macros
-             [propeller.push.utils.macros :refer [def-instruction]]))
+  #?(:cljs (:require-macros [propeller.push.utils.macros :refer [def-instruction]]))
   (:require [propeller.push.utils.helpers :refer [make-instruction]]
             #?(:clj [propeller.push.utils.macros :refer [def-instruction]])))
 

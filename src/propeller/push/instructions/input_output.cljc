@@ -36,7 +36,8 @@
       (state/push-to-stack popped-state :output (str current-output \newline)))))
 
 (def _print
-  ^{:stacks [:print]}
+  ^{:stacks [:print]
+    :name "_print"}
   (fn [stack state]
     (if (state/empty-stack? state stack)
       state

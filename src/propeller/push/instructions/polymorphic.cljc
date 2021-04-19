@@ -6,9 +6,8 @@
             [propeller.push.state :as state]
             [propeller.push.utils.helpers :refer [make-instruction]]
             [propeller.push.utils.globals :as globals]
-            #?(:clj
-               [propeller.push.utils.macros :refer [def-instruction
-                                                    generate-instructions]])))
+            #?(:clj [propeller.push.utils.macros :refer [def-instruction
+                                                         generate-instructions]])))
 
 ;; =============================================================================
 ;; Polymorphic Instructions
@@ -19,7 +18,8 @@
 ;; Duplicates the top item of the stack. Does not pop its argument (since that
 ;; would negate the effect of the duplication)
 (def _dup
-  ^{:stacks #{}}
+  ^{:stacks #{}
+    :name "_dup"}
   (fn [stack state]
     (let [top-item (state/peek-stack state stack)]
       (if (state/empty-stack? state stack)
@@ -33,7 +33,8 @@
 ;; of n are treated as 0. The final number of items on the stack is limited to
 ;; globals/max-stack-items.
 (def _dup_times
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:integer}
+    :name "_dup_times"}
   (fn [stack state]
     (if (or (and (= stack :integer)
                  (<= 2 (count (:integer state))))
@@ -55,7 +56,8 @@
 ;; fewer than n items are on the stack, the entire stack will be duplicated.
 ;; The final number of items on the stack is limited to globals/max-stack-items.
 (def _dup_items
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:integer}
+    :name "_dup_items"}
   (fn [stack state]
     (if (state/empty-stack? state :integer)
       state
@@ -67,33 +69,38 @@
 
 ;; Pushes TRUE onto the BOOLEAN stack if the stack is empty. Otherwise FALSE
 (def _empty
-  ^{:stacks #{:boolean}}
+  ^{:stacks #{:boolean}
+    :name "_empty"}
   (fn [stack state]
     (state/push-to-stack state :boolean (state/empty-stack? state stack))))
 
 ;; Pushes TRUE onto the BOOLEAN stack if the top two items are equal.
 ;; Otherwise FALSE
 (def _eq
-  ^{:stacks #{:boolean}}
+  ^{:stacks #{:boolean}
+    :name "_eq"}
   (fn [stack state]
     (make-instruction state = [stack stack] :boolean)))
 
 ;; Empties the given stack
 (def _flush
-  ^{:stacks #{}}
+  ^{:stacks #{}
+    :name "_flush"}
   (fn [stack state]
     (assoc state stack '())))
 
 ;; Pops the given stack
 (def _pop
-  ^{:stacks #{}}
+  ^{:stacks #{}
+    :name "_pop"}
   (fn [stack state]
     (state/pop-stack state stack)))
 
 ;; Rotates the top three items on the stack (i.e. pulls the third item out and
 ;; pushes it on top). Equivalent to (yank state stack-type 2)
 (def _rot
-  ^{:stacks #{}}
+  ^{:stacks #{}
+    :name "_rot"}
   (fn [stack state]
     (if (<= 3 (count (get state stack)))
       (let [top-three (state/peek-stack-many state stack 3)
@@ -105,7 +112,8 @@
 ;; Inserts the top item deeper into the stack, using the top INTEGER to
 ;; determine how deep
 (def _shove
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:integer}
+    :name "_shove"}
   (fn [stack state]
     (if (or (and (= stack :integer)
                  (<= 2 (count (:integer state))))
@@ -124,14 +132,16 @@
 
 ;; Pushes the given stack's depth onto the INTEGER stack
 (def _stack_depth
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:integer}
+    :name "_stack_depth"}
   (fn [stack state]
     (let [stack-depth (count (get state stack))]
       (state/push-to-stack state :integer stack-depth))))
 
 ;; Swaps the top two items on the stack
 (def _swap
-  ^{:stacks #{}}
+  ^{:stacks #{}
+    :name "_swap"}
   (fn [stack state]
     (if (<= 2 (count (get state stack)))
       (let [top-two (state/peek-stack-many state stack 2)
@@ -142,7 +152,8 @@
 ;; Pushes an indexed item from deep in the stack, removing it. The top INTEGER
 ;; is used to determine how deep to yank from
 (def _yank
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:integer}
+    :name "_yank"}
   (fn [stack state]
     (if (or (and (= stack :integer)
                  (<= 2 (count (:integer state))))
@@ -162,7 +173,8 @@
 ;; Pushes a copy of an indexed item from deep in the stack, without removing it.
 ;; The top INTEGER is used to determine how deep to yankdup from
 (def _yank_dup
-  ^{:stacks #{:integer}}
+  ^{:stacks #{:integer}
+    :name "_yank_dup"}
   (fn [stack state]
     (if (or (and (= stack :integer)
                  (<= 2 (count (:integer state))))
