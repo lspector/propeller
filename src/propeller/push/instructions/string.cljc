@@ -2,7 +2,6 @@
   #?(:cljs (:require-macros
              [propeller.push.utils.macros :refer [def-instruction]]))
   (:require [clojure.string :as string]
-            [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [make-instruction]]
             [propeller.push.state :as state]
             #?(:clj [propeller.push.utils.macros :refer [def-instruction]])))

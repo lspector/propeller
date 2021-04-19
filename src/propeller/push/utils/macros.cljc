@@ -16,7 +16,8 @@
         (replace {:elem (get-vector-literal-type ~stack)})
         (cons ~stack)
         set
-        (assoc-in (meta ~function) [:stacks])))
+        (assoc-in (meta ~function) [:stacks])
+        (#(dissoc % :name))))
 
 ;; Given a sequence of stacks, e.g. [:float :integer], and a sequence of suffix
 ;; function strings, e.g. [_add, _mult, _eq], automates the generation of all
@@ -26,10 +27,9 @@
 ;; instructions, the placeholder :elem will be replaced with the stack of the
 ;; corresponding element type (e.g. for :vector_integer, with :integer)
 (defmacro generate-instructions [stacks functions]
-  `(do
-     ~@(for [stack stacks
-             func functions
-             :let [instruction-name (keyword (str (name stack) func))
-                   metadata (make-metadata func stack)
-                   new-func `(with-meta (partial ~func ~stack) ~metadata)]]
-         `(def-instruction ~instruction-name ~new-func))))
+  `(doseq [stack# ~stacks
+           func# ~functions
+           :let [instruction-name# (keyword (str (name stack#) (:name (meta func#))))
+                 metadata# (make-metadata func# stack#)
+                 new-func# (with-meta (partial func# stack#) metadata#)]]
+     (def-instruction instruction-name# new-func#)))
