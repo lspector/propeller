@@ -33,6 +33,7 @@
          :variation               {:umad 0.5 :crossover 0.5}
          :elitism                 false}
         (apply hash-map
-               (map read-string (rest args))))
+               (map #(if (string? %) (read-string %) %)
+                    (rest args))))
       [:error-function]
       identity)))
