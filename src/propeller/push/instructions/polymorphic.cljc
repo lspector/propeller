@@ -188,9 +188,27 @@
         (state/push-to-stack popped-state stack indexed-item))
       state)))
 
+;; Pushes a copy of an indexed item from deep in the stack, without removing it.
+;; The top INTEGER is used to determine the index from the BOTTOM of the stack.
+(def _deep_dup
+  ^{:stacks #{:integer}
+    :name "_deep_dup"}
+  (fn [stack state]
+    (if (or (and (= stack :integer)
+                 (<= 2 (count (:integer state))))
+            (and (not= stack :integer)
+                 (not (state/empty-stack? state :integer))
+                 (not (state/empty-stack? state stack))))
+      (let [index-raw (state/peek-stack state :integer)
+            popped-state (state/pop-stack state :integer)
+            index (max 0 (min index-raw (dec (count (get popped-state stack)))))
+            indexed-item (nth (reverse (get popped-state stack)) index)]
+        (state/push-to-stack popped-state stack indexed-item))
+      state)))
+
 ;; 11 types x 13 functions = 143 instructions
 (generate-instructions
   [:boolean :char :code :exec :float :integer :string
    :vector_boolean :vector_float :vector_integer :vector_string]
   [_dup _dup_times _dup_items _empty _eq _flush _pop _rot _shove
-   _stack_depth _swap _yank _yank_dup])
+   _stack_depth _swap _yank _yank_dup _deep_dup])
