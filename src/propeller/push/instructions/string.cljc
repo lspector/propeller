@@ -37,7 +37,7 @@
   :string_contains
   ^{:stacks #{:boolean :string}}
   (fn [state]
-    (make-instruction state string/includes? [:string :string] :boolean)))
+    (make-instruction state #(string/includes? %2 %1) [:string :string] :boolean)))
 
 ;; Pushes TRUE if the top CHAR is contained in the top STRING, and FALSE
 ;; otherwise
@@ -67,7 +67,9 @@
   :string_first
   ^{:stacks #{:char :string}}
   (fn [state]
-    (make-instruction state first [:string] :char)))
+    (make-instruction state
+                      #(if (empty? %) :ignore-instruction (first %))
+                      [:string] :char)))
 
 ;; Pushes the STRING version of the top BOOLEAN, e.g. "true"
 (def-instruction
@@ -103,7 +105,11 @@
   :string_indexof_char
   ^{:stacks #{:char :integer :string}}
   (fn [state]
-    (make-instruction state string/index-of [:string :char] :integer)))
+    (make-instruction state 
+                      #(let [index (string/index-of %1 %2)] 
+                               (if index index :ignore-instruction)) 
+                      [:string :char]
+                      :integer)))
 
 ;; Iterates over the top STRING using code on the EXEC stack
 (def-instruction
@@ -129,12 +135,13 @@
               (state/push-to-stack :exec (state/peek-stack state :exec))
               (state/push-to-stack :char (first top-item))))))))
 
-;; Pushes the last CHAR of the top STRING
+;; Pushes the last CHAR of the top STRING. 
+;; If the string is empty, do nothing
 (def-instruction
   :string_last
   ^{:stacks #{:char :string}}
   (fn [state]
-    (make-instruction state last [:string] :char)))
+    (make-instruction state #(if (empty? %) :ignore-instruction (last %)) [:string] :char)))
 
 ;; Pushes the length of the top STRING onto the INTEGER stack
 (def-instruction
@@ -150,7 +157,13 @@
   :string_nth
   ^{:stacks #{:char :integer :string}}
   (fn [state]
-    (make-instruction state #(nth %2 (mod %1 (count %2))) [:integer :string] :char)))
+    (make-instruction state 
+                      #(let [str-length (count %2)]
+                               (if (= 0 str-length)
+                                 :ignore-instruction
+                                 (nth %2 (mod %1 str-length))))
+                      [:integer :string] 
+                      :char)))
 
 ;; Pushes the number of times the top CHAR occurs in the top STRING onto the
 ;; INTEGER stack
@@ -254,10 +267,12 @@
   ^{:stacks #{:char :integer :string}}
   (fn [state]
     (make-instruction state
-                      #(let [index (mod %2 (count %3))
+                      #(if (empty? %3)
+                         :ignore-instruction
+                         (let [index (mod %2 (count %3))
                              beginning (take index %3)
                              end (drop (inc index) %3)]
-                         (apply str (concat beginning (list %1) end)))
+                         (apply str (concat beginning (list %1) end))))
                       [:char :integer :string]
                       :string)))
 

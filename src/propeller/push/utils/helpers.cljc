@@ -2,9 +2,43 @@
   (:require [clojure.set]
             [propeller.push.core :as push]
             [propeller.push.state :as state]
+            [propeller.push.utils.globals :as globals]
             #?(:cljs [goog.string :as gstring])
             #?(:cljs [goog.string.format])))
 
+;; Returns a version of the number n that is within reasonable size bounds
+(defn keep-number-reasonable
+  [n]
+  (cond
+    (integer? n)
+    (cond
+      (> n globals/max-number-magnitude) (long globals/max-number-magnitude)
+      (< n (- globals/max-number-magnitude)) (long (- globals/max-number-magnitude))
+      :else n)
+    :else
+    (cond
+      (#?(:clj Double/isNaN
+          :cljs js/isNaN) n) 0.0
+      (or (= n #?(:clj Double/POSITIVE_INFINITY
+                  :cljs js/Infinity))
+          (> n globals/max-number-magnitude)) globals/max-number-magnitude
+      (or (= n #?(:clj Double/NEGATIVE_INFINITY
+                  :cljs js/-Infinity))
+          (< n (- globals/max-number-magnitude))) (- globals/max-number-magnitude)
+      (< (- globals/min-number-magnitude) n globals/min-number-magnitude) 0.0
+      :else n)))
+
+;; Returns true if the string is of a reasonable size
+(defn reasonable-string-length?
+  [string]
+  (let [length (count string)]
+    (<= length globals/max-string-length)))
+
+;; Returns true if the vector is of a reasonable size
+(defn reasonable-vector-length?
+  [vector]
+  (let [length (count vector)]
+    (<= length globals/max-vector-length)))
 
 ;; Takes a state and a collection of stacks to take args from. If there are
 ;; enough args on each of the desired stacks, returns a map with keys
@@ -40,9 +74,23 @@
       state
       (let [result (apply function (:args popped-args))
             new-state (:state popped-args)]
-        (if (= result :ignore-instruction)
+        (cond
+          (number? result)
+          (state/push-to-stack new-state return-stack (keep-number-reasonable result))
+          ;;
+          (and (string? result)
+               (not (reasonable-string-length? result)))
           state
-         (state/push-to-stack new-state return-stack result))))))
+          ;;
+          (and (vector? result)
+               (not (reasonable-vector-length? result)))
+          state
+          ;;
+          (= result :ignore-instruction)
+          state
+          ;;
+          :else
+          (state/push-to-stack new-state return-stack result))))))
 
 ;; Given a set of stacks, returns all instructions that operate on those stacks
 ;; only. Won't include random instructions unless :random is in the set as well
