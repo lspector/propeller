@@ -72,3 +72,8 @@
        :errors errors
        :total-error #?(:clj  (apply +' errors)
                        :cljs (apply + errors))))))
+
+
+(defn test-thingy
+  [x]
+  (println x))

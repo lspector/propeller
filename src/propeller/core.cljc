@@ -7,7 +7,11 @@
 
 (defn eval-problem-var
   [problem-name var-name]
-  (eval (symbol (str "propeller.problems." problem-name "/" var-name))))
+  (eval (symbol (str "propeller.problems." problem-name "/" var-name)))
+  ;; Overload 2: PSB specific
+  ;; Passes into eval
+  [problem-name var-name PSB2-name]
+  ((eval (symbol (str "propeller.problems." problem-name "/" var-name))) PSB2-name))
 
 (defn -main
   "Runs propel-gp, giving it a map of arguments."
@@ -24,7 +28,15 @@
     (spit "PSB2_path.txt" (second args))
     (println (str "Set path to PSB2 as " (second args)))
     (System/exit 1))
-  
+
+  ;; Creates PSB2 problems
+  (when (= (first args) "PSB2")
+    ;; For tomorrow, Figure out what this does?
+    (require (symbol (str "propeller.problems.PSB2" (first args))))
+    ;; For tomorrow, add the gp/gp function here
+    ;; ---
+    
+
   ;; Creates regular problems
   (require (symbol (str "propeller.problems." (first args))))
   (gp/gp
