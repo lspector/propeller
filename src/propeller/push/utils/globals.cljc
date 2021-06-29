@@ -18,10 +18,10 @@
 ;; =============================================================================
 
 ;; Used by keep-number-reasonable as the maximum magnitude of any integer/float
-(def max-number-magnitude 1.0E12)
+(def max-number-magnitude 1.0E6)
 
 ;; Used by keep-number-reasonable as the minimum magnitude of any float
-(def min-number-magnitude 1.0E-10)
+(def min-number-magnitude 1.0E-6)
 
 ;; Used by reasonable-string-length? to ensure that strings don't get too large
 (def max-string-length 1000)

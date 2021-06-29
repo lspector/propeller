@@ -53,10 +53,7 @@
         ;; Success on training cases is verified on testing cases
         (zero? (:total-error best-individual))
         (do (println {:success-generation generation})
-            ;(print "Checking program on test cases... ")
-            (if (zero? (:total-error (error-function argmap best-individual :test)))
-              (println {:test-cases-pass-fail 1})
-              (println {:test-cases-pass-fail 0}))
+            (println {:total-test-error (:total-error (error-function argmap best-individual :test))})
             (#?(:clj shutdown-agents))
             )
         ;;
