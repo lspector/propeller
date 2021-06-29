@@ -1,6 +1,6 @@
 (ns propeller.variation
-  (:require [propeller.selection :as selection]
-            [propeller.utils :as utils]))
+    (:require [propeller.selection :as selection]
+      [propeller.utils :as utils]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
@@ -105,9 +105,11 @@
 (defn uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
   [plushy umad-rate]
-  (remove (fn [_] (< (rand)
-                     (/ 1 (+ 1 (/ 1 umad-rate)))))
-          plushy))
+  (if (zero? umad-rate)
+    plushy
+    (remove (fn [_] (< (rand)
+                       (/ 1 (+ 1 (/ 1 umad-rate)))))
+            plushy)))
 
 (defn diploid-uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
@@ -154,6 +156,16 @@
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-addition (:instructions argmap) (:umad-rate argmap))
            (uniform-deletion (:umad-rate argmap)))
+       ;
+       :rumad
+       (let [parent-genome (:plushy (selection/select-parent pop argmap))
+             after-addition (uniform-addition parent-genome
+                                              (:instructions argmap)
+                                              (:umad-rate argmap))
+             effective-addition-rate (/ (- (count after-addition)
+                                           (count parent-genome))
+                                        (count parent-genome))]
+         (uniform-deletion after-addition effective-addition-rate))
        ;
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
