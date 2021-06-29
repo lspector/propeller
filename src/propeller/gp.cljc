@@ -1,36 +1,31 @@
 (ns propeller.gp
-  (:require [clojure.string]
-            [propeller.genome :as genome]
-            [propeller.variation :as variation]
-            [propeller.push.instructions.bool]
-            [propeller.push.instructions.character]
-            [propeller.push.instructions.code]
-            [propeller.push.instructions.input-output]
-            [propeller.push.instructions.numeric]
-            [propeller.push.instructions.polymorphic]
-            [propeller.push.instructions.string]
-            [propeller.push.instructions.vector]))
+    (:require [clojure.string]
+              [clojure.pprint]
+              [propeller.genome :as genome]
+              [propeller.variation :as variation]
+              [propeller.push.instructions.bool]
+              [propeller.push.instructions.character]
+              [propeller.push.instructions.code]
+              [propeller.push.instructions.input-output]
+              [propeller.push.instructions.numeric]
+              [propeller.push.instructions.polymorphic]
+              [propeller.push.instructions.string]
+              [propeller.push.instructions.vector]))
 
 (defn report
   "Reports information each generation."
   [pop generation argmap]
   (let [best (first pop)]
-    (println "-------------------------------------------------------")
-    (println "               Report for Generation" generation)
-    (println "-------------------------------------------------------")
-    (print "Best plushy: ") (prn (:plushy best))
-    (print "Best program: ") (prn (genome/plushy->push (:plushy best) argmap))
-    (println "Best total error:" (:total-error best))
-    (println "Best errors:" (:errors best))
-    (println "Best behaviors:" (:behaviors best))
-    (println "Genotypic diversity:"
-             (float (/ (count (distinct (map :plushy pop))) (count pop))))
-    (println "Behavioral diversity:"
-             (float (/ (count (distinct (map :behaviors pop))) (count pop))))
-    (println "Average genome length:"
-             (float (/ (reduce + (map count (map :plushy pop))) (count pop))))
-    (println "Average total error:"
-             (float (/ (reduce + (map :total-error pop)) (count pop))))
+    (clojure.pprint/pprint {:generation            generation
+                            :best-plushy           (:plushy best)
+                            :best-program          (genome/plushy->push (:plushy best) argmap)
+                            :best-total-error      (:total-error best)
+                            :best-errors           (:errors best)
+                            :best-behaviors        (:behaviors best)
+                            :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+                            :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+                            :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+                            :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
     (println)))
 
 (defn gp
@@ -39,7 +34,8 @@
            max-initial-plushy-size]
     :as   argmap}]
   ;;
-  (println "Starting GP with args: " argmap)
+  (println {:starting-args argmap})
+  (println)
   ;;
   (loop [generation 0
          population (repeatedly
@@ -56,12 +52,12 @@
       (cond
         ;; Success on training cases is verified on testing cases
         (zero? (:total-error best-individual))
-        (do (println "SUCCESS at generation" generation)
-            (print "Checking program on test cases... ")
+        (do (println {:success-generation generation})
+            ;(print "Checking program on test cases... ")
             (if (zero? (:total-error (error-function argmap best-individual :test)))
-              (println "Test cases passed.")
-              (println "Test cases failed."))
-            ;(#?(:clj shutdown-agents))
+              (println {:test-cases-pass-fail 1})
+              (println {:test-cases-pass-fail 0}))
+            (#?(:clj shutdown-agents))
             )
         ;;
         (>= generation max-generations)
