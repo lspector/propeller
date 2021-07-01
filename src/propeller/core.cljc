@@ -3,6 +3,7 @@
   (:require [propeller.gp :as gp]
             [propeller.problems.simple-regression :as regression]
             [propeller.problems.string-classification :as string-classif]
+            [clojure.string :as string]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn eval-problem-var
@@ -19,14 +20,11 @@
     (println "   lein run software.smallest")
     (System/exit 1))
 
-  ;; Setting the path for PSB2
-  (when (= (first args) "PSB2-set-path")
-    (spit "PSB2_path.txt" (second args))
-    (println (str "Set path to PSB2 as " (second args)))
-    (System/exit 1))
-
   ;; Creates problems
   (require (symbol (str "propeller.problems." (first args))))
+  (when (string/includes? (first args) "PSB2")
+    (spit "PSB2_path.txt" (second args))
+    (println (str "Set path to PSB2 as " (second args))))
   (gp/gp
     (update-in
       (merge
@@ -42,7 +40,10 @@
          :variation               {:umad 0.5 :crossover 0.5}
          :elitism                 false}
         (apply hash-map
-               (map #(if (string? %) (read-string %) %)
-                    (rest args))))
+               (if (string/includes? (first args) "PSB2")
+                 (map #(if (string? %) (read-string %) %)
+                      (rest (remove #(= % (second args)) args)))
+                 (map #(if (string? %) (read-string %) %)
+                      (rest args)))))
       [:error-function]
       identity)))
