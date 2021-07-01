@@ -8,7 +8,7 @@
                       :float          '()
                       :input          {}
                       :integer        '()
-                      :output         '()
+                      :output         '("")
                       :string         '()
                       :vector_boolean '()
                       :vector_float   '()

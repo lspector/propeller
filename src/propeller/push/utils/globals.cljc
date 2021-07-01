@@ -18,7 +18,7 @@
 ;; =============================================================================
 
 ;; Used by keep-number-reasonable as the maximum magnitude of any integer/float
-(def max-number-magnitude 1.0E12)
+(def max-number-magnitude 1.0E8)
 
 ;; Used by keep-number-reasonable as the minimum magnitude of any float
 (def min-number-magnitude 1.0E-10)
