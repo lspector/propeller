@@ -54,8 +54,7 @@
         (zero? (:total-error best-individual))
         (do (println {:success-generation generation})
             (println {:total-test-error (:total-error (error-function argmap best-individual :test))})
-            (#?(:clj shutdown-agents))
-            )
+            (#?(:clj shutdown-agents)))
         ;;
         (>= generation max-generations)
         nil

@@ -12,11 +12,20 @@
 (defn -main
   "Runs propel-gp, giving it a map of arguments."
   [& args]
+  ;; Exception for when no args were passed
   (when (empty? args)
     (println "You must specify a problem to run.")
     (println "Try, for example:")
     (println "   lein run software.smallest")
     (System/exit 1))
+
+  ;; Setting the path for PSB2
+  (when (= (first args) "PSB2-set-path")
+    (spit "PSB2_path.txt" (second args))
+    (println (str "Set path to PSB2 as " (second args)))
+    (System/exit 1))
+
+  ;; Creates problems
   (require (symbol (str "propeller.problems." (first args))))
   (gp/gp
     (update-in
