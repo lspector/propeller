@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Leiningen: org.clojure/spec.alpha:0.2.176">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.m2/repository/org/clojure/spec.alpha/0.2.176/spec.alpha-0.2.176.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/clojure/spec.alpha/0.2.176/spec.alpha-0.2.176.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

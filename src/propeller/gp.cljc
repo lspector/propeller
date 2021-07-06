@@ -34,7 +34,7 @@
            max-initial-plushy-size]
     :as   argmap}]
   ;;
-  (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
+  (println {:starting-args argmap})
   (println)
   ;;
   (loop [generation 0
@@ -52,8 +52,8 @@
       (cond
         ;; Success on training cases is verified on testing cases
         (zero? (:total-error best-individual))
-        (do (prn {:success-generation generation})
-            (prn {:total-test-error (:total-error (error-function argmap best-individual :test))})
+        (do (println {:success-generation generation})
+            (println {:total-test-error (:total-error (error-function argmap best-individual :test))})
             (#?(:clj shutdown-agents))
             )
         ;;
