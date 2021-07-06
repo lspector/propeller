@@ -21,11 +21,7 @@
     (System/exit 1))
 
   ;; Creates problems
-  ;; * default params changed to PSB2 defaults *
   (require (symbol (str "propeller.problems." (first args))))
-  ;(when (string/includes? (first args) "PSB2")
-  ;  (spit "PSB2_path.txt" (second args))
-  ;  (println (str "Set path to PSB2 as " (second args))))
   (gp/gp
     (update-in
       (merge
@@ -40,18 +36,11 @@
          :umad-rate               0.1
          :variation               {:umad 1.0 :crossover 0.0}
          :elitism                 false
-         :PSB2-path               "/Volumes/Samsung_T5/EvolutionaryComputing/PSB2/"}
+         :PSB2-path               "/Volumes/Samsung_T5/EvolutionaryComputing/PSB2/"
+         :PSB2-problem            (clojure.string/replace (first args) #"PSB2." "")}
         (apply hash-map
-               (map #(if (string? %) (read-string %) %)
+               (map #(if (and (string? %) (not (.contains % "/"))) (read-string %) %)
                     (rest args))))
-      ;(apply hash-map
-      ;       (if (string/includes? (first args) "PSB2")
-      ;         ;; Removes PSB2 path as an arg so that it isn't included in parameter changes
-      ;         (map #(if (string? %) (read-string %) %)
-      ;              (rest (remove #(= % (second args)) args)))
-      ;         ;; Regular parameter changes
-      ;         (map #(if (string? %) (read-string %) %)
-      ;              (rest args)))))
       [:error-function]
       identity)))
 

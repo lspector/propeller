@@ -8,9 +8,6 @@
             [propeller.tools.math :as math]
             [propeller.tools.metrics :as metrics]))
 
-;; Get path from text file
-(def PSB2-path (slurp "PSB2_path.txt"))
-
 (defn map-vals-input
   "Returns all the input values of a map (specific helper method for substitution-cipher)"
   [i]
@@ -21,7 +18,7 @@
   [i]
   (vals (select-keys i [:output1])))
 
-(def train-and-test-data (psb2/fetch-examples PSB2-path "substitution-cipher" 200 2000))
+; (def train-and-test-data (psb2/fetch-examples PSB2-path "substitution-cipher" 200 2000))
 
 (def instructions
   (utils/not-lazy
@@ -41,7 +38,7 @@
    (error-function argmap individual :train))
   ([argmap individual subset]
    (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get train-and-test-data subset)
+         data (get (get argmap :train-and-test-data) subset)
          inputs (map (fn [i] (map-vals-input i)) data)
          correct-outputs (map (fn [i] (map-vals-output i)) data)
          outputs (map (fn [input]

@@ -11,9 +11,7 @@
 ; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))
 
-(defn train-and-test-data
-  [PSB2-path]
-  (psb2/fetch-examples PSB2-path "fuel-cost" 200 2000))
+; (def train-and-test-data (psb2/fetch-examples PSB2-path "fuel-cost" 200 2000))
 
 (def instructions
   (utils/not-lazy
@@ -34,7 +32,7 @@
    (error-function argmap individual :train))
   ([argmap individual subset]
    (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get (train-and-test-data (get argmap :PSB2-path)) subset)
+         data (get (get argmap :train-and-test-data) subset)
          inputs (map (fn [i] (get i :input1)) data)
          correct-outputs (map (fn [i] (get i :output1)) data)
          outputs (map (fn [input]
