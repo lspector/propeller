@@ -42,7 +42,8 @@
   ;;
   (let [PSB2-data (if (= PSB2-path "")
                     #{}
-                    (psb2/fetch-examples PSB2-path PSB2-problem 200 2000))]
+                    (psb2/fetch-examples PSB2-path PSB2-problem 200 2000))
+        enhanced-argmap (assoc argmap :train-and-test-data PSB2-data)]
 
     (loop [generation 0
            population (repeatedly
@@ -53,7 +54,7 @@
       (let [evaluated-pop (sort-by :total-error
                                    (#?(:clj  pmap
                                        :cljs map)
-                                     (partial error-function (assoc argmap :train-and-test-data PSB2-data)) population))
+                                     (partial error-function enhanced-argmap) population))
             best-individual (first evaluated-pop)]
         (report evaluated-pop generation argmap)
         (cond

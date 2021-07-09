@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.fuel-cost
+(ns propeller.problems.PSB2.bouncing-balls
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -8,30 +8,38 @@
             [clojure.pprint :as pprint]
             [propeller.tools.math :as math]))
 
-; ===========  PROBLEM DESCRIPTION  =========================
-; FUEL COST from PSB2
-; Given a vector of positive integers, divide
-; each by 3, round the result down to the nearest integer, and
-; subtract 2. Return the sum of all of the new integers in the
-; vector
+; ===========  PROBLEM DESCRIPTION  ===============================
+; BOUNCING BALLS from PSB2
+; Given a starting height and a height after the first bounce of a
+; dropped ball, calculate the bounciness index
+; (height of first bounce / starting height). Then, given a number
+; of bounces, use the bounciness index to calculate the total
+; distance that the ball travels across those bounces.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ============================================================
+; ==================================================================
 
-; Random integer between -100 and 100 (from smallest)
-(defn random-int [] (- (rand-int 201) 100))
+(defn map-vals-input
+  "Returns all the input values of a map (specific helper method for bouncing-balls)"
+  [i]
+  (vals (select-keys i [:input1 :input2 :input3])))
+
+(defn map-vals-output
+  "Returns the output values of a map (specific helper method for bouncing-balls)"
+  [i]
+  (get i :output1))
 
 (def instructions
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
-      (get-stack-instructions #{:exec :integer :boolean :vector_integer :print})
+      (get-stack-instructions #{:exec :integer :float :boolean :print})
       ;;; input instructions
-      (list :in1)
+      (list :in1 :in2 :in3)
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list random-int 0 1 2 3))))
+      (list 0.0 1.0 2.0))))
 
 (defn error-function
   ([argmap individual]
@@ -39,19 +47,21 @@
   ([argmap individual subset]
    (let [program (genome/plushy->push (:plushy individual) argmap)
          data (get (get argmap :train-and-test-data) subset)
-         inputs (map (fn [i] (get i :input1)) data)
-         correct-outputs (map (fn [i] (get i :output1)) data)
+         inputs (map (fn [i] (map-vals-input i)) data)
+         correct-outputs (map (fn [i] (map-vals-output i)) data)
          outputs (map (fn [input]
                         (state/peek-stack
                           (interpreter/interpret-program
                             program
-                            (assoc state/empty-state :input {:in1 input})
+                            (assoc state/empty-state :input {:in1 (nth input 0)
+                                                             :in2 (nth input 1)
+                                                             :in3 (nth input 2)})
                             (:step-limit argmap))
-                          :integer))
+                          :float))
                       inputs)
          errors (map (fn [correct-output output]
                        (if (= output :no-stack-item)
-                         1000000
+                         1000000.0
                          (min 1000.0 (math/abs (- correct-output output)))))
                      correct-outputs
                      outputs)]
@@ -60,4 +70,3 @@
        :errors errors
        :total-error #?(:clj  (apply +' errors)
                        :cljs (apply + errors))))))
-

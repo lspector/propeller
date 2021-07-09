@@ -8,6 +8,17 @@
             [propeller.tools.math :as math]
             [propeller.tools.metrics :as metrics]))
 
+; ===========  PROBLEM DESCRIPTION  =========================
+; SUBSTITUTION CIPHER from PSB2
+;This problem gives 3 strings.
+;The first two represent a cipher, mapping each character in
+;one string to the one at the same index in the other string.
+;The program must apply this cipher to the third string and
+;return the deciphered message.
+;
+; Source: https://arxiv.org/pdf/2106.06086.pdf
+; ============================================================
+
 (defn map-vals-input
   "Returns all the input values of a map (specific helper method for substitution-cipher)"
   [i]
@@ -17,8 +28,6 @@
   "Returns the output values of a map (specific helper method for substitution-cipher)"
   [i]
   (vals (select-keys i [:output1])))
-
-; (def train-and-test-data (psb2/fetch-examples PSB2-path "substitution-cipher" 200 2000))
 
 (def instructions
   (utils/not-lazy

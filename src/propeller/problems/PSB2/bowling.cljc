@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.fuel-cost
+(ns propeller.problems.PSB2.bowling
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -8,30 +8,28 @@
             [clojure.pprint :as pprint]
             [propeller.tools.math :as math]))
 
-; ===========  PROBLEM DESCRIPTION  =========================
-; FUEL COST from PSB2
-; Given a vector of positive integers, divide
-; each by 3, round the result down to the nearest integer, and
-; subtract 2. Return the sum of all of the new integers in the
-; vector
+; ===========  PROBLEM DESCRIPTION  ======================
+; BOWLING from PSB2
+; Given a string representing the individual
+; bowls in a 10-frame round of 10 pin bowling, return the
+; score of that round.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ============================================================
+; =========================================================
 
-; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))
 
 (def instructions
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
-      (get-stack-instructions #{:exec :integer :boolean :vector_integer :print})
+      (get-stack-instructions #{:exec :integer :boolean :char :string :print})
       ;;; input instructions
       (list :in1)
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list random-int 0 1 2 3))))
+      (list \- \X \/ \1 \2 \3 \4 \5 \6 \7 \8 \9 random-int))))
 
 (defn error-function
   ([argmap individual]
@@ -60,4 +58,3 @@
        :errors errors
        :total-error #?(:clj  (apply +' errors)
                        :cljs (apply + errors))))))
-

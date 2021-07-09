@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.fuel-cost
+(ns propeller.problems.PSB2.basement
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -8,15 +8,15 @@
             [clojure.pprint :as pprint]
             [propeller.tools.math :as math]))
 
-; ===========  PROBLEM DESCRIPTION  =========================
-; FUEL COST from PSB2
-; Given a vector of positive integers, divide
-; each by 3, round the result down to the nearest integer, and
-; subtract 2. Return the sum of all of the new integers in the
-; vector
+; ===========  PROBLEM DESCRIPTION  ============================
+; BASEMENT from PSB2
+; Given a vector of integers, return the first
+; index such that the sum of all integers from the start of the
+; vector to that index (inclusive) is negative.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ============================================================
+; ===============================================================
+
 
 ; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))
@@ -31,7 +31,7 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list random-int 0 1 2 3))))
+      (list random-int -1 0 1 []))))
 
 (defn error-function
   ([argmap individual]
@@ -60,4 +60,6 @@
        :errors errors
        :total-error #?(:clj  (apply +' errors)
                        :cljs (apply + errors))))))
+
+
 

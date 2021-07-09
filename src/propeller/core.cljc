@@ -36,7 +36,7 @@
          :umad-rate               0.1
          :variation               {:umad 1.0 :crossover 0.0}
          :elitism                 false
-         :PSB2-path               "/Volumes/Samsung_T5/EvolutionaryComputing/PSB2/"
+         :PSB2-path               ""
          :PSB2-problem            (clojure.string/replace (first args) #"PSB2." "")}
         (apply hash-map
                (map #(if (and (string? %) (not (.contains % "/"))) (read-string %) %)
