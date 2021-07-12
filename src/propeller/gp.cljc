@@ -37,7 +37,7 @@
            max-initial-plushy-size PSB2-path PSB2-problem]
     :as   argmap}]
   ;;
-  (println {:starting-args argmap})
+  (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
   (println)
   ;;
   (let [PSB2-data (if (= PSB2-path "")
@@ -60,9 +60,10 @@
         (cond
           ;; Success on training cases is verified on testing cases
           (zero? (:total-error best-individual))
-          (do (println {:success-generation generation})
-              (println {:total-test-error (:total-error (error-function argmap best-individual :test))})
-              (#?(:clj shutdown-agents)))
+          (do (prn {:success-generation generation})
+              (prn {:total-test-error (:total-error (error-function argmap best-individual :test))})
+              (#?(:clj shutdown-agents))
+              )
           ;;
           (>= generation max-generations)
           nil
