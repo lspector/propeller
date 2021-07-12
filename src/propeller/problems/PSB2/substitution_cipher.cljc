@@ -10,11 +10,11 @@
 
 ; ===========  PROBLEM DESCRIPTION  =========================
 ; SUBSTITUTION CIPHER from PSB2
-;This problem gives 3 strings.
-;The first two represent a cipher, mapping each character in
-;one string to the one at the same index in the other string.
-;The program must apply this cipher to the third string and
-;return the deciphered message.
+; This problem gives 3 strings.
+; The first two represent a cipher, mapping each character in
+; one string to the one at the same index in the other string.
+; The program must apply this cipher to the third string and
+; return the deciphered message.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ============================================================

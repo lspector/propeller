@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.bowling
+(ns propeller.problems.PSB2.dice-game
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -8,28 +8,36 @@
             [clojure.pprint :as pprint]
             [propeller.tools.math :as math]))
 
-; ===========  PROBLEM DESCRIPTION  ======================
-; BOWLING from PSB2
-; Given a string representing the individual
-; bowls in a 10-frame round of 10 pin bowling, return the
-; score of that round.
+; ===========  PROBLEM DESCRIPTION  ===============================
+; DICE GAME from PSB2
+; Peter has an n sided die and Colin has an m
+; sided die. If they both roll their dice at the same time, return
+; the probability that Peter rolls strictly higher than Colin.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; =========================================================
+; ==================================================================
 
-(defn random-int [] (- (rand-int 201) 100))
+(defn map-vals-input
+  "Returns all the input values of a map (specific helper method for bouncing-balls)"
+  [i]
+  (vals (select-keys i [:input1 :input2])))
+
+(defn map-vals-output
+  "Returns the output values of a map (specific helper method for bouncing-balls)"
+  [i]
+  (get i :output1))
 
 (def instructions
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
-      (get-stack-instructions #{:exec :integer :boolean :char :string :print})
+      (get-stack-instructions #{:exec :integer :float :boolean :print})
       ;;; input instructions
-      (list :in1)
+      (list :in1 :in2)
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list \- \X \/ \1 \2 \3 \4 \5 \6 \7 \8 \9 10 random-int))))
+      (list 0.0 1.0))))
 
 (defn error-function
   ([argmap individual]
@@ -37,19 +45,20 @@
   ([argmap individual subset]
    (let [program (genome/plushy->push (:plushy individual) argmap)
          data (get (get argmap :train-and-test-data) subset)
-         inputs (map (fn [i] (get i :input1)) data)
-         correct-outputs (map (fn [i] (get i :output1)) data)
+         inputs (map (fn [i] (map-vals-input i)) data)
+         correct-outputs (map (fn [i] (map-vals-output i)) data)
          outputs (map (fn [input]
                         (state/peek-stack
                           (interpreter/interpret-program
                             program
-                            (assoc state/empty-state :input {:in1 input})
+                            (assoc state/empty-state :input {:in1 (nth input 0)
+                                                             :in2 (nth input 1)})
                             (:step-limit argmap))
-                          :integer))
+                          :float))
                       inputs)
          errors (map (fn [correct-output output]
                        (if (= output :no-stack-item)
-                         1000000
+                         1000000.0
                          (min 1000.0 (math/abs (- correct-output output)))))
                      correct-outputs
                      outputs)]

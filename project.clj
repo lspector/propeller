@@ -6,6 +6,6 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/test.check "1.1.0"]
-                 [net.clojars.schneau/psb2 "1.0.0"]]
+                 [net.clojars.schneau/psb2 "1.1.0"]]
   :main ^:skip-aot propeller.core
   :repl-options {:init-ns propeller.core})
