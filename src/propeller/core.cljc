@@ -43,5 +43,3 @@
                     (rest args))))
       [:error-function]
       identity)))
-
-;;keyword path as a separate argument lol

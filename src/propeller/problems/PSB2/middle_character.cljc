@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.substitution-cipher
+(ns propeller.problems.PSB2.middle-character
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -8,26 +8,16 @@
             [propeller.tools.math :as math]
             [propeller.tools.metrics :as metrics]))
 
-; ===========  PROBLEM DESCRIPTION  =========================
-; SUBSTITUTION CIPHER from PSB2
-; This problem gives 3 strings.
-; The first two represent a cipher, mapping each character in
-; one string to the one at the same index in the other string.
-; The program must apply this cipher to the third string and
-; return the deciphered message.
+; ===========  PROBLEM DESCRIPTION  =============================
+; MIDDLE CHARACTER from PSB2
+; Given a string, return the middle
+; character as a string if it is odd length; return the two middle
+; characters as a string if it is even length.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ============================================================
+; ===============================================================
 
-(defn map-vals-input
-  "Returns all the input values of a map (specific helper method for substitution-cipher)"
-  [i]
-  (vals (select-keys i [:input1 :input2 :input3])))
-
-(defn map-vals-output
-  "Returns the output values of a map (specific helper method for substitution-cipher)"
-  [i]
-  (vals (select-keys i [:output1])))
+(defn random-int [] (- (rand-int 201) 100))
 
 (def instructions
   (utils/not-lazy
@@ -35,11 +25,11 @@
       ;;; stack-specific instructions
       (get-stack-instructions #{:exec :integer :boolean :char :string :print})
       ;;; input instructions
-      (list :in1 :in2 :in3)
+      (list :in1)
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list 0 ""))))
+      (list "" 0 1 2 random-int))))
 
 (defn error-function
   ([argmap individual]
@@ -47,15 +37,13 @@
   ([argmap individual subset]
    (let [program (genome/plushy->push (:plushy individual) argmap)
          data (get (get argmap :train-and-test-data) subset)
-         inputs (map (fn [i] (map-vals-input i)) data)
-         correct-outputs (map (fn [i] (map-vals-output i)) data)
+         inputs (map (fn [i] (get i :input1)) data)
+         correct-outputs (map (fn [i] (get i :output1)) data)
          outputs (map (fn [input]
                         (state/peek-stack
                           (interpreter/interpret-program
                             program
-                            (assoc state/empty-state :input {:in1 (nth input 0)
-                                                             :in2 (nth input 1)
-                                                             :in3 (nth input 2)})
+                            (assoc state/empty-state :input {:in1 input})
                             (:step-limit argmap))
                           :string))
                       inputs)
@@ -75,3 +63,5 @@
        :errors errors
        :total-error #?(:clj  (apply +' errors)
                        :cljs (apply + errors))))))
+
+

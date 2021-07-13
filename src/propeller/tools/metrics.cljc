@@ -75,7 +75,7 @@
               ;; we need to initialize the prev-row with the edit distance
               ;; between the various prefixes of b and the empty string
               (range (inc (count (str b))))
-              (str a))))
+              (str a)))))
 
 (defn sequence-similarity
   "Returns a number between 0 and 1, indicating how similar the sequences are
