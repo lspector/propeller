@@ -9,3 +9,5 @@
                  [net.clojars.schneau/psb2 "1.1.0"]]
   :main ^:skip-aot propeller.core
   :repl-options {:init-ns propeller.core})
+  ;:jvm-opts ^:replace [])
+

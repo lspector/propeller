@@ -28,8 +28,6 @@
                             :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
                             :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
     (println)))
-;  (clojure.pprint/pprint
-
 
 (defn gp
   "Main GP loop."
