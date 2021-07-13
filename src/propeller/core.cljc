@@ -3,6 +3,7 @@
   (:require [propeller.gp :as gp]
             [propeller.problems.simple-regression :as regression]
             [propeller.problems.string-classification :as string-classif]
+            [clojure.string :as string]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn eval-problem-var
@@ -12,11 +13,14 @@
 (defn -main
   "Runs propel-gp, giving it a map of arguments."
   [& args]
+  ;; Exception for when no args were passed
   (when (empty? args)
     (println "You must specify a problem to run.")
     (println "Try, for example:")
     (println "   lein run software.smallest")
     (System/exit 1))
+
+  ;; Creates problems
   (require (symbol (str "propeller.problems." (first args))))
   (gp/gp
     (update-in
@@ -31,9 +35,11 @@
          :tournament-size         5
          :umad-rate               0.1
          :variation               {:umad 0.5 :crossover 0.5}
-         :elitism                 false}
+         :elitism                 false
+         :PSB2-path               ""
+         :PSB2-problem            (clojure.string/replace (first args) #"PSB2." "")}
         (apply hash-map
-               (map #(if (string? %) (read-string %) %)
+               (map #(if (and (string? %) (not (.contains % "/"))) (read-string %) %)
                     (rest args))))
       [:error-function]
       identity)))

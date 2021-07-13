@@ -18,7 +18,7 @@
   [x]
   (+ (* x x x) x 3))
 
-;; Set of original propel instructions
+; Set of original propel instructions
 (def instructions
   (list :in1
         :integer_add
