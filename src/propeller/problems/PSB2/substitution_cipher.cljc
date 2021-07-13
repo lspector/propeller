@@ -68,7 +68,7 @@
          errors (map (fn [correct-output output]
                        (if (= output :no-stack-item)
                          10000
-                         (metrics/levenshtein-distance correct-output output)))
+                         (metrics/levenshtein-distance (str correct-output) (str output))))
                      correct-outputs
                      parsed-outputs)]
      (assoc individual

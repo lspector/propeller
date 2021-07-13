@@ -17,16 +17,16 @@
   "Reports information each generation."
   [pop generation argmap]
   (let [best (first pop)]
-    (println {:generation            generation
-              :best-plushy           (:plushy best)
-              :best-program          (genome/plushy->push (:plushy best) argmap)
-              :best-total-error      (:total-error best)
-              :best-errors           (:errors best)
-              :best-behaviors        (:behaviors best)
-              :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
-              :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
-              :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-              :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
+    (clojure.pprint/pprint {:generation            generation
+                            :best-plushy           (:plushy best)
+                            :best-program          (genome/plushy->push (:plushy best) argmap)
+                            :best-total-error      (:total-error best)
+                            :best-errors           (:errors best)
+                            :best-behaviors        (:behaviors best)
+                            :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+                            :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+                            :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+                            :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
     (println)))
 ;  (clojure.pprint/pprint
 
@@ -43,7 +43,7 @@
   (let [PSB2-data (if (= PSB2-path "")
                     #{}
                     (psb2/fetch-examples PSB2-path PSB2-problem 200 2000))
-        enhanced-argmap (assoc argmap :train-and-test-data PSB2-data)]
+        argmap (assoc argmap :train-and-test-data PSB2-data)]
 
     (loop [generation 0
            population (repeatedly
@@ -54,7 +54,7 @@
       (let [evaluated-pop (sort-by :total-error
                                    (#?(:clj  pmap
                                        :cljs map)
-                                     (partial error-function enhanced-argmap) population))
+                                     (partial error-function argmap) population))
             best-individual (first evaluated-pop)]
         (report evaluated-pop generation argmap)
         (cond
