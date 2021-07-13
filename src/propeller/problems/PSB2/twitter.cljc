@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.middle-character
+(ns propeller.problems.PSB2.twitter
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -9,10 +9,13 @@
             [propeller.tools.metrics :as metrics]))
 
 ; ===========  PROBLEM DESCRIPTION  =============================
-; MIDDLE CHARACTER from PSB2
-; Given a string, return the middle
-; character as a string if it is odd length; return the two middle
-; characters as a string if it is even length.
+; TWITTER from PSB2
+; Given a string representing a tweet, validate whether the tweet
+; meets Twitter’s original character requirements. If the tweet
+; has more than 140 characters, return the string "Too many characters".
+; If the tweet is empty, return the string "You didn’t type anything".
+; Otherwise, return "Your tweet has X characters", where
+; the X is the number of characters in the tweet.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ===============================================================
@@ -29,7 +32,7 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list "" 0 1 2 random-int))))
+      (list 0 140 "Too many characters" "You didn't type anything" "your tweet has " " characters"))))
 
 (defn error-function
   ([argmap individual]
