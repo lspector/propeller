@@ -72,3 +72,7 @@
        :errors errors
        :total-error #?(:clj  (apply +' errors)
                        :cljs (apply + errors))))))
+
+(def arglist
+  {:instructions instructions
+   :error-function error-function})

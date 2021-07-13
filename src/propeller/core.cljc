@@ -19,14 +19,10 @@
     (println "Try, for example:")
     (println "   lein run software.smallest")
     (System/exit 1))
-
-  ;; Creates problems
   (require (symbol (str "propeller.problems." (first args))))
   (gp/gp
     (merge
-      {:instructions            (eval-problem-var (first args) "instructions")
-       :error-function          (eval-problem-var (first args) "error-function")
-       :max-generations         500
+      {:max-generations         500
        :population-size         500
        :max-initial-plushy-size 100
        :step-limit              200
@@ -37,6 +33,7 @@
        :elitism                 false
        :PSB2-path               ""
        :PSB2-problem            (clojure.string/replace (first args) #"PSB2." "")}
+      (eval-problem-var (first args) "arglist")
       (apply hash-map
              (map #(if (and (string? %) (not (.contains % "/"))) (read-string %) %)
                   (rest args))))))
