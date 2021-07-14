@@ -6,7 +6,8 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
             [clojure.pprint :as pprint]
-            [propeller.tools.math :as math]))
+            [propeller.tools.math :as math]
+            [psb2.core :as psb2]))
 
 ; ===========  PROBLEM DESCRIPTION  ===============================
 ; BOUNCING BALLS from PSB2
@@ -18,6 +19,8 @@
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ==================================================================
+
+(def train-and-test-data (psb2/fetch-examples "data" "bouncing-balls" 200 2000))
 
 (defn map-vals-input
   "Returns all the input values of a map (specific helper method for bouncing-balls)"
@@ -42,31 +45,34 @@
       (list 0.0 1.0 2.0))))
 
 (defn error-function
-  ([argmap individual]
-   (error-function argmap individual :train))
-  ([argmap individual subset]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get (get argmap :train-and-test-data) subset)
-         inputs (map (fn [i] (map-vals-input i)) data)
-         correct-outputs (map (fn [i] (map-vals-output i)) data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state :input {:in1 (nth input 0)
-                                                             :in2 (nth input 1)
-                                                             :in3 (nth input 2)})
-                            (:step-limit argmap))
-                          :float))
-                      inputs)
-         errors (map (fn [correct-output output]
-                       (if (= output :no-stack-item)
-                         1000000.0
-                         (min 1000.0 (math/abs (- correct-output output)))))
-                     correct-outputs
-                     outputs)]
-     (assoc individual
-       :behaviors outputs
-       :errors errors
-       :total-error #?(:clj  (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (map (fn [i] (map-vals-input i)) data)
+        correct-outputs (map (fn [i] (map-vals-output i)) data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state :input {:in1 (nth input 0)
+                                                            :in2 (nth input 1)
+                                                            :in3 (nth input 2)})
+                           (:step-limit argmap))
+                         :float))
+                     inputs)
+        errors (map (fn [correct-output output]
+                      (if (= output :no-stack-item)
+                        1000000.0
+                        (min 1000.0 (math/abs (- correct-output output)))))
+                    correct-outputs
+                    outputs)]
+    (assoc individual
+      :behaviors outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
+
+(def arglist
+  {:instructions   instructions
+   :error-function error-function
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})

@@ -36,33 +36,33 @@
       (list random-int -1 0 1 []))))
 
 (defn error-function
-  ([argmap data individual]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         inputs (map (fn [i] (get i :input1)) data)
-         correct-outputs (map (fn [i] (get i :output1)) data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state :input {:in1 input})
-                            (:step-limit argmap))
-                          :integer))
-                      inputs)
-         errors (map (fn [correct-output output]
-                       (if (= output :no-stack-item)
-                         1000000
-                         (min 1000.0 (math/abs (- correct-output output)))))
-                     correct-outputs
-                     outputs)]
-     (assoc individual
-       :behaviors outputs
-       :errors errors
-       :total-error #?(:clj  (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (map (fn [i] (get i :input1)) data)
+        correct-outputs (map (fn [i] (get i :output1)) data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state :input {:in1 input})
+                           (:step-limit argmap))
+                         :integer))
+                     inputs)
+        errors (map (fn [correct-output output]
+                      (if (= output :no-stack-item)
+                        1000000
+                        (min 1000.0 (math/abs (- correct-output output)))))
+                    correct-outputs
+                    outputs)]
+    (assoc individual
+      :behaviors outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
 
 (def arglist
-  {:instructions instructions
+  {:instructions   instructions
    :error-function error-function
-   :training-data (:train train-and-test-data)
-   :testing-data (:test train-and-test-data)})
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})
 
