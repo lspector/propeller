@@ -27,9 +27,7 @@
        :tournament-size         5
        :umad-rate               0.1
        :variation               {:umad 0.5 :crossover 0.5}
-       :elitism                 false
-       :PSB2-path               ""
-       :PSB2-problem            (clojure.string/replace (first args) #"PSB2." "")}
+       :elitism                 false}
       (eval-problem-var (first args) "arglist")
       (apply hash-map
              (map #(if (and (string? %) (not (.contains % "/"))) (read-string %) %)

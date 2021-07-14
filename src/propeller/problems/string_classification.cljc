@@ -40,8 +40,7 @@
         "G"
         "T"))
 
-(defn train-and-test-data
-  []
+(def train-and-test-data
   (let [train-inputs ["GCG" "GACAG" "AGAAG" "CCCA" "GATTACA" "TAGG" "GACT"]
         test-inputs ["GCGT" "GACTTAG" "AGTAAG" "TCCTCA" "GAACA" "AGG" "GAC"]]
     {:train {:inputs  train-inputs
@@ -54,31 +53,34 @@
   the program's selected behavior match, or 1 if they differ, or 1000000 if no
   behavior is produced. The behavior is here defined as the final top item on
   the BOOLEAN stack."
-  ([argmap individual]
-   (error-function argmap individual :train))
-  ([argmap individual subset]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get (train-and-test-data) subset)
-         inputs (:inputs data)
-         correct-outputs (:outputs data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state :input {:in1 input})
-                            (:step-limit argmap))
-                          :boolean))
-                      inputs)
-         errors (map (fn [correct-output output]
-                       (if (= output :no-stack-item)
-                         1000000
-                         (if (= correct-output output)
-                           0
-                           1)))
-                     correct-outputs
-                     outputs)]
-     (assoc individual
-       :behaviors outputs
-       :errors errors
-       :total-error #?(:clj  (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (:inputs data)
+        correct-outputs (:outputs data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state :input {:in1 input})
+                           (:step-limit argmap))
+                         :boolean))
+                     inputs)
+        errors (map (fn [correct-output output]
+                      (if (= output :no-stack-item)
+                        1000000
+                        (if (= correct-output output)
+                          0
+                          1)))
+                    correct-outputs
+                    outputs)]
+    (assoc individual
+      :behaviors outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
+
+(def arglist
+  {:instructions   instructions
+   :error-function error-function
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})
