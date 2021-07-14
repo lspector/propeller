@@ -9,15 +9,13 @@
   [x]
   (+ (* x x x) x 3))
 
-(def training-data
-  (let [training-inputs (range -10 11)]
-    {:inputs  training-inputs
-     :outputs (map target-function training-inputs)}))
-
-(def testing-data
-  (let [testing-inputs (concat (range -20 -10) (range 11 21))]
-    {:inputs  testing-inputs
-     :outputs (map target-function testing-inputs)}))
+(def train-and-test-data
+  (let [train-inputs (range -10 11)
+        test-inputs (concat (range -20 -10) (range 11 21))]
+    {:train {:inputs  train-inputs
+             :outputs (map target-function train-inputs)}
+     :test  {:inputs  test-inputs
+             :outputs (map target-function test-inputs)}}))
 
 (def instructions
   (list :in1
@@ -62,7 +60,7 @@
                        :cljs (apply + errors))))))
 
 (def arglist
-  {:instructions instructions
+  {:instructions   instructions
    :error-function error-function
-   :training-data training-data
-   :testing-data testing-data})
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})
