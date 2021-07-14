@@ -4,16 +4,62 @@ Yet another Push-based genetic programming system in Clojure.
 
 ## Usage
 
-To run PushGP from a REPL, load propel.core into your REPL (i.e. `lein repl`), 
-and run `-main` with arguments including, first, the problem name, for example:
-`(-main 'simple-regression)` or `(-main 'simple-regression :population-size 100)`.
+If you have installed [leiningen](https://leiningen.org), which is a tool
+for running Clojure programs, then you can run Propeller on a genetic
+programming problem that is defined within this project from the command
+line with the command `lein run -m <namespace>`, replacing `<namespace>` 
+with the actual namespace that you will find at the top of the problem file. 
 
-To run PushGP on the genetic programming problem p from the 
-command line, execute `lein run p`. For example `lein run simple-regression`. Additional command-line arguments may 
-be provided to override the default key/value pairs specified in `-main`, for 
-example, `lein run simple-regression :population-size 100`. You can use something 
-like `lein run simple-regression | tee outfile` to send output both to the terminal 
-and to `outfile`.
+For example, you can run the simple-regression genetic programming problem with:
+
+```
+lein run -m propeller.problems.simple-regression
+```
+
+Additional command-line arguments may
+be provided to override the default key/value pairs specified in the 
+problem file, for example:
+
+
+```
+lein run -m propeller.problems.simple-regression :population-size 100
+```
+
+On Unix operating systems, including MacOS, you can use something
+like the following to send output both to the terminal
+and to a text file (called `outfile` in this example):
+
+```
+lein run -m propeller.problems.simple-regression | tee outfile
+```
+
+If you want to provide command line arguments that include
+characters that may be interpreted by your command line shell
+before they get to Clojure, then enclose those in double
+quotes, like in this example that provides a non-default
+value for the `:variation` argument, which is a clojure map
+containing curly brackets that may confuse your shell:
+
+```
+lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
+```
+
+To run a genetic programming problem from a REPL, start
+your REPL for the project (e.g. with `lein repl` at the
+command line when in the project directory, or through your
+IDE) and then do something like the following (which in
+this case runs the simple-regression problem with 
+`:population-size` 100):
+
+```
+(require 'propeller.problems.simple-regression)
+(in-ns 'propeller.problems.simple-regression)
+(-main :population-size 100 :variation {:umad 1.0})
+```
+
+If you want to run the problem with the default parameters,
+then you should call `-main` without arguments, as `(-main)`.
+
 
 ## CLJS Usage
 
