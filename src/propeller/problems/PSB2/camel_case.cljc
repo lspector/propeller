@@ -65,34 +65,34 @@
 
 
 (defn error-function
-  ([argmap data individual]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         inputs (map (fn [i] (get i :input1)) data)
-         correct-outputs (map (fn [i] (get i :output1)) data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state :input {:in1 input})
-                            (:step-limit argmap))
-                          :string))
-                      inputs)
-         parsed-outputs (map (fn [output]
-                               (try (read-string output)
-                                    #?(:clj (catch Exception e 1000.0)
-                                       :cljs (catch js/Error. e 1000.0))))
-                             outputs)
-         errors (map (fn [correct-output output]
-                       (if (= output :no-stack-item)
-                         10000
-                         (metrics/levenshtein-distance correct-output output)))
-                     correct-outputs
-                     parsed-outputs)]
-     (assoc individual
-       :behaviors parsed-outputs
-       :errors errors
-       :total-error #?(:clj  (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (map (fn [i] (get i :input1)) data)
+        correct-outputs (map (fn [i] (get i :output1)) data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state :input {:in1 input})
+                           (:step-limit argmap))
+                         :string))
+                     inputs)
+        parsed-outputs (map (fn [output]
+                              (try (read-string output)
+                                   #?(:clj  (catch Exception e 1000.0)
+                                      :cljs (catch js/Error. e 1000.0))))
+                            outputs)
+        errors (map (fn [correct-output output]
+                      (if (= output :no-stack-item)
+                        10000
+                        (metrics/levenshtein-distance correct-output output)))
+                    correct-outputs
+                    parsed-outputs)]
+    (assoc individual
+      :behaviors parsed-outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
 
 (def arglist
   {:instructions   instructions
