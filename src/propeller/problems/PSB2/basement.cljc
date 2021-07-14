@@ -6,7 +6,8 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
             [clojure.pprint :as pprint]
-            [propeller.tools.math :as math]))
+            [propeller.tools.math :as math]
+            [psb2.core :as psb2]))
 
 ; ===========  PROBLEM DESCRIPTION  ============================
 ; BASEMENT from PSB2
@@ -17,6 +18,7 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ===============================================================
 
+(def train-and-test-data (psb2/fetch-examples "data" "basement" 200 2000))
 
 ; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))
@@ -34,11 +36,8 @@
       (list random-int -1 0 1 []))))
 
 (defn error-function
-  ([argmap individual]
-   (error-function argmap individual :train))
-  ([argmap individual subset]
+  ([argmap data individual]
    (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get (get argmap :train-and-test-data) subset)
          inputs (map (fn [i] (get i :input1)) data)
          correct-outputs (map (fn [i] (get i :output1)) data)
          outputs (map (fn [input]
@@ -61,5 +60,9 @@
        :total-error #?(:clj  (apply +' errors)
                        :cljs (apply + errors))))))
 
-
+(def arglist
+  {:instructions instructions
+   :error-function error-function
+   :training-data (:train train-and-test-data)
+   :testing-data (:test train-and-test-data)})
 

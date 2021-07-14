@@ -10,8 +10,7 @@
             [propeller.push.instructions.numeric]
             [propeller.push.instructions.polymorphic]
             [propeller.push.instructions.string]
-            [propeller.push.instructions.vector]
-            [psb2.core :as psb2]))
+            [propeller.push.instructions.vector]))
 
 (defn report
   "Reports information each generation."
@@ -32,46 +31,40 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size PSB2-path PSB2-problem]
+           max-initial-plushy-size]
     :as   argmap}]
   ;;
   (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
   (println)
   ;;
-  (let [PSB2-data (if (= PSB2-path "")
-                    #{}
-                    (psb2/fetch-examples PSB2-path PSB2-problem 200 2000))
-        argmap (assoc argmap :train-and-test-data PSB2-data)]
-
-    (loop [generation 0
-           population (repeatedly
-                        population-size
-                        #(hash-map :plushy (genome/make-random-plushy
-                                             instructions
-                                             max-initial-plushy-size)))]
-      (let [evaluated-pop (sort-by :total-error
-                                   (#?(:clj  pmap
-                                       :cljs map)
-                                     (partial error-function argmap (:training-data argmap))
-                                     population))
-            best-individual (first evaluated-pop)]
-        (report evaluated-pop generation argmap)
-        (cond
-          ;; Success on training cases is verified on testing cases
-          (zero? (:total-error best-individual))
-          (do (prn {:success-generation generation})
-              (prn {:total-test-error (:total-error (error-function argmap
-                                                                    (:testing-data argmap)
-                                                                    best-individual))})
-              (#?(:clj shutdown-agents)))
-          ;;
-          (>= generation max-generations)
-          nil
-          ;;
-          :else (recur (inc generation)
-                       (if (:elitism argmap)
-                         (conj (repeatedly (dec population-size)
-                                           #(variation/new-individual evaluated-pop argmap))
-                               (first evaluated-pop))
-                         (repeatedly population-size
-                                     #(variation/new-individual evaluated-pop argmap)))))))))
+  (loop [generation 0
+         population (repeatedly
+                      population-size
+                      #(hash-map :plushy (genome/make-random-plushy
+                                           instructions
+                                           max-initial-plushy-size)))]
+    (let [evaluated-pop (sort-by :total-error
+                                 (#?(:clj  pmap
+                                     :cljs map)
+                                   (partial error-function argmap (:training-data argmap))
+                                   population))
+          best-individual (first evaluated-pop)]
+      (report evaluated-pop generation argmap)
+      (cond
+        ;; Success on training cases is verified on testing cases
+        (zero? (:total-error best-individual))
+        (do (prn {:success-generation generation})
+            (prn {:total-test-error
+                  (:total-error (error-function argmap (:testing-data argmap) best-individual))})
+            (#?(:clj shutdown-agents)))
+        ;;
+        (>= generation max-generations)
+        nil
+        ;;
+        :else (recur (inc generation)
+                     (if (:elitism argmap)
+                       (conj (repeatedly (dec population-size)
+                                         #(variation/new-individual evaluated-pop argmap))
+                             (first evaluated-pop))
+                       (repeatedly population-size
+                                   #(variation/new-individual evaluated-pop argmap))))))))
