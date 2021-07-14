@@ -20,6 +20,8 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ===============================================================
 
+(def train-and-test-data (psb2/fetch-examples "data" "twitter" 200 2000))
+
 (defn random-int [] (- (rand-int 201) 100))
 
 (def instructions
@@ -35,36 +37,37 @@
       (list 0 140 "Too many characters" "You didn't type anything" "your tweet has " " characters"))))
 
 (defn error-function
-  ([argmap individual]
-   (error-function argmap individual :train))
-  ([argmap individual subset]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get (get argmap :train-and-test-data) subset)
-         inputs (map (fn [i] (get i :input1)) data)
-         correct-outputs (map (fn [i] (get i :output1)) data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state :input {:in1 input})
-                            (:step-limit argmap))
-                          :string))
-                      inputs)
-         parsed-outputs (map (fn [output]
-                               (try (read-string output)
-                                    #?(:clj (catch Exception e 1000.0)
-                                       :cljs (catch js/Error. e 1000.0))))
-                             outputs)
-         errors (map (fn [correct-output output]
-                       (if (= output :no-stack-item)
-                         10000
-                         (metrics/levenshtein-distance (str correct-output) (str output))))
-                     correct-outputs
-                     parsed-outputs)]
-     (assoc individual
-       :behaviors parsed-outputs
-       :errors errors
-       :total-error #?(:clj  (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (map (fn [i] (get i :input1)) data)
+        correct-outputs (map (fn [i] (get i :output1)) data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state :input {:in1 input})
+                           (:step-limit argmap))
+                         :string))
+                     inputs)
+        parsed-outputs (map (fn [output]
+                              (try (read-string output)
+                                   #?(:clj  (catch Exception e 1000.0)
+                                      :cljs (catch js/Error. e 1000.0))))
+                            outputs)
+        errors (map (fn [correct-output output]
+                      (if (= output :no-stack-item)
+                        10000
+                        (metrics/levenshtein-distance (str correct-output) (str output))))
+                    correct-outputs
+                    parsed-outputs)]
+    (assoc individual
+      :behaviors parsed-outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
 
-
+(def arglist
+  {:instructions   instructions
+   :error-function error-function
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})
