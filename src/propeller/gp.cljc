@@ -16,17 +16,19 @@
   "Reports information each generation."
   [pop generation argmap]
   (let [best (first pop)]
-    (clojure.pprint/pprint {:generation            generation
-                            :best-plushy           (:plushy best)
-                            :best-program          (genome/plushy->push (:plushy best) argmap)
-                            :best-total-error      (:total-error best)
-                            :best-errors           (:errors best)
-                            :best-behaviors        (:behaviors best)
-                            :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
-                            :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
-                            :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-                            :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
+    (println {:generation            generation
+              :best-plushy           (:plushy best)
+              :best-program          (genome/plushy->push (:plushy best) argmap)
+              :best-total-error      (:total-error best)
+              :best-errors           (:errors best)
+              :best-behaviors        (:behaviors best)
+              :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+              :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+              :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+              :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
     (println)))
+
+;; clojure.pprint/pprint
 
 (defn gp
   "Main GP loop."
