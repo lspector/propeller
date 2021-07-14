@@ -6,6 +6,7 @@
             [propeller.utils :as utils]
             [propeller.push.state :as state]
             [propeller.tools.math :as math]
+            [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
 ;; =============================================================================
@@ -60,34 +61,51 @@
      :test  test-set}))
 
 (defn error-function
-  ([argmap individual]
-   (error-function argmap individual :train))
-  ([argmap individual subset]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get train-and-test-data subset)
-         inputs (:inputs data)
-         correct-outputs (:outputs data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state :input {:in1 (first input)
-                                                             :in2 (last input)}
-                                                     :output '(""))
-                            (:step-limit argmap))
-                          :output))
-                      inputs)
-         parsed-outputs (map (fn [output]
-                               (try (read-string output)
-                                    #?(:clj (catch Exception e 1000.0)
-                                       :cljs (catch js/Error. e 1000.0))))
-                             outputs)
-         errors (map (fn [correct-output output]
-                       (min 1000.0 (math/abs (- correct-output output))))
-                     correct-outputs
-                     parsed-outputs)]
-     (assoc individual
-       :behaviors parsed-outputs
-       :errors errors
-       :total-error #?(:clj (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (:inputs data)
+        correct-outputs (:outputs data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state :input {:in1 (first input)
+                                                            :in2 (last input)}
+                                                    :output '(""))
+                           (:step-limit argmap))
+                         :output))
+                     inputs)
+        parsed-outputs (map (fn [output]
+                              (try (read-string output)
+                                   #?(:clj  (catch Exception e 1000.0)
+                                      :cljs (catch js/Error. e 1000.0))))
+                            outputs)
+        errors (map (fn [correct-output output]
+                      (min 1000.0 (math/abs (- correct-output output))))
+                    correct-outputs
+                    parsed-outputs)]
+    (assoc individual
+      :behaviors parsed-outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
+
+(defn -main
+  "Runs propel-gp, giving it a map of arguments."
+  [& args]
+  (gp/gp
+    (merge
+      {:instructions            instructions
+       :error-function          error-function
+       :training-data           (:train train-and-test-data)
+       :testing-data            (:test train-and-test-data)
+       :max-generations         500
+       :population-size         500
+       :max-initial-plushy-size 100
+       :step-limit              200
+       :parent-selection        :lexicase
+       :tournament-size         5
+       :umad-rate               0.1
+       :variation               {:umad 0.5 :crossover 0.5}
+       :elitism                 false}
+      (apply hash-map (map read-string (rest args))))))
