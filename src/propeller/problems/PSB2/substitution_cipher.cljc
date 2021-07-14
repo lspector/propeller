@@ -19,6 +19,8 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ============================================================
 
+(def train-and-test-data (psb2/fetch-examples "data" "substitution-cipher" 200 2000))
+
 (defn map-vals-input
   "Returns all the input values of a map (specific helper method for substitution-cipher)"
   [i]
@@ -42,36 +44,39 @@
       (list 0 ""))))
 
 (defn error-function
-  ([argmap individual]
-   (error-function argmap individual :train))
-  ([argmap individual subset]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get (get argmap :train-and-test-data) subset)
-         inputs (map (fn [i] (map-vals-input i)) data)
-         correct-outputs (map (fn [i] (map-vals-output i)) data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state :input {:in1 (nth input 0)
-                                                             :in2 (nth input 1)
-                                                             :in3 (nth input 2)})
-                            (:step-limit argmap))
-                          :string))
-                      inputs)
-         parsed-outputs (map (fn [output]
-                               (try (read-string output)
-                                    #?(:clj (catch Exception e 1000.0)
-                                       :cljs (catch js/Error. e 1000.0))))
-                             outputs)
-         errors (map (fn [correct-output output]
-                       (if (= output :no-stack-item)
-                         10000
-                         (metrics/levenshtein-distance (str correct-output) (str output))))
-                     correct-outputs
-                     parsed-outputs)]
-     (assoc individual
-       :behaviors parsed-outputs
-       :errors errors
-       :total-error #?(:clj  (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (map (fn [i] (map-vals-input i)) data)
+        correct-outputs (map (fn [i] (map-vals-output i)) data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state :input {:in1 (nth input 0)
+                                                            :in2 (nth input 1)
+                                                            :in3 (nth input 2)})
+                           (:step-limit argmap))
+                         :string))
+                     inputs)
+        parsed-outputs (map (fn [output]
+                              (try (read-string output)
+                                   #?(:clj  (catch Exception e 1000.0)
+                                      :cljs (catch js/Error. e 1000.0))))
+                            outputs)
+        errors (map (fn [correct-output output]
+                      (if (= output :no-stack-item)
+                        10000
+                        (metrics/levenshtein-distance (str correct-output) (str output))))
+                    correct-outputs
+                    parsed-outputs)]
+    (assoc individual
+      :behaviors parsed-outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
+
+(def arglist
+  {:instructions   instructions
+   :error-function error-function
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})
