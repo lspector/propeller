@@ -1,9 +1,6 @@
 (ns propeller.core
   #?(:clj (:gen-class))
   (:require [propeller.gp :as gp]
-            [propeller.problems.simple-regression :as regression]
-            [propeller.problems.string-classification :as string-classif]
-            [clojure.string :as string]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn eval-problem-var
