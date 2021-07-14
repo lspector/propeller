@@ -52,16 +52,18 @@
       (let [evaluated-pop (sort-by :total-error
                                    (#?(:clj  pmap
                                        :cljs map)
-                                     (partial error-function argmap) population))
+                                     (partial error-function argmap (:training-data argmap))
+                                     population))
             best-individual (first evaluated-pop)]
         (report evaluated-pop generation argmap)
         (cond
           ;; Success on training cases is verified on testing cases
           (zero? (:total-error best-individual))
           (do (prn {:success-generation generation})
-              (prn {:total-test-error (:total-error (error-function argmap best-individual :test))})
-              (#?(:clj shutdown-agents))
-              )
+              (prn {:total-test-error (:total-error (error-function argmap
+                                                                    (:testing-data argmap)
+                                                                    best-individual))})
+              (#?(:clj shutdown-agents)))
           ;;
           (>= generation max-generations)
           nil
