@@ -6,8 +6,7 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
             [clojure.pprint :as pprint]
-            [propeller.tools.math :as math]
-            [psb2.core :as psb2]))
+            [propeller.tools.math :as math]))
 
 ; ===========  PROBLEM DESCRIPTION  ======================
 ; BOWLING from PSB2

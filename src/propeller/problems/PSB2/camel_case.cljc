@@ -6,8 +6,7 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
             [propeller.tools.math :as math]
-            [propeller.tools.metrics :as metrics]
-            [psb2.core :as psb2]))
+            [propeller.tools.metrics :as metrics]))
 
 ; ===========  PROBLEM DESCRIPTION  =====================================
 ; CAMEL CASE from PSB2
