@@ -5,7 +5,6 @@
             [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
-            [clojure.pprint :as pprint]
             [propeller.tools.math :as math]
             [propeller.gp :as gp]))
 
