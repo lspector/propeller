@@ -3,8 +3,8 @@
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]))
 
-(def num-vars 100) ;10) ;100)                                          ;1000)
-(def num-inputs 50) ;5) ; 50)                                         ;500)
+(def num-vars 100)                                          ;10) ;100)                                          ;1000)
+(def num-inputs 50)                                         ;5) ; 50)                                         ;500)
 (def num-train 500)                                         ;5000)
 (def num-test 200)
 
@@ -34,29 +34,32 @@
                              ])))))
 
 (defn error-function
-  ([argmap individual]
-   (error-function argmap individual :train))
-  ([argmap individual subset]
-   (let [program (genome/plushy->push (:plushy individual) argmap)
-         data (get train-and-test-data subset)
-         inputs (:inputs data)
-         correct-outputs (:outputs data)
-         outputs (map (fn [input]
-                        (state/peek-stack
-                          (interpreter/interpret-program
-                            program
-                            (assoc state/empty-state
-                              :input (zipmap (for [i (range (count input))]
-                                               (keyword (str "in" i)))
-                                             input))
-                            (:step-limit argmap))
-                          :boolean))
-                      inputs)
-         errors (map #(if (= %1 %2) 0 1)
-                     correct-outputs
-                     outputs)]
-     (assoc individual
-       :behaviors outputs
-       :errors errors
-       :total-error #?(:clj  (apply +' errors)
-                       :cljs (apply + errors))))))
+  [argmap data individual]
+  (let [program (genome/plushy->push (:plushy individual) argmap)
+        inputs (:inputs data)
+        correct-outputs (:outputs data)
+        outputs (map (fn [input]
+                       (state/peek-stack
+                         (interpreter/interpret-program
+                           program
+                           (assoc state/empty-state
+                             :input (zipmap (for [i (range (count input))]
+                                              (keyword (str "in" i)))
+                                            input))
+                           (:step-limit argmap))
+                         :boolean))
+                     inputs)
+        errors (map #(if (= %1 %2) 0 1)
+                    correct-outputs
+                    outputs)]
+    (assoc individual
+      :behaviors outputs
+      :errors errors
+      :total-error #?(:clj  (apply +' errors)
+                      :cljs (apply + errors)))))
+
+(def arglist
+  {:instructions   instructions
+   :error-function error-function
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})
