@@ -5,7 +5,8 @@
             [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
-            [propeller.gp :as gp]))
+            [propeller.gp :as gp]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 ; ===========  PROBLEM DESCRIPTION  ================================
 ; SOLVE BOOLEAN from PSB2
