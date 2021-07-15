@@ -1,26 +1,22 @@
-(ns propeller.problems.PSB2.bowling
+(ns propeller.problems.PSB2.solve-boolean
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
-            [propeller.tools.math :as math]
-            [propeller.gp :as gp]
-            #?(:cljs [cljs.reader :refer [read-string]])))
+            [propeller.gp :as gp]))
 
-; ===========  PROBLEM DESCRIPTION  ======================
-; BOWLING from PSB2
-; Given a string representing the individual
-; bowls in a 10-frame round of 10 pin bowling, return the
-; score of that round.
+; ===========  PROBLEM DESCRIPTION  ================================
+; SOLVE BOOLEAN from PSB2
+; Given a string representing a Boolean
+; expression consisting of T, F, |, and &, evaluate it and return
+; the resulting Boolean.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; =========================================================
+; ==================================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "bowling" 200 2000))
-
-(defn random-int [] (- (rand-int 201) 100))
+(def train-and-test-data (psb2/fetch-examples "data" "solve-boolean" 200 2000))
 
 (def instructions
   (utils/not-lazy
@@ -32,7 +28,7 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list \- \X \/ \1 \2 \3 \4 \5 \6 \7 \8 \9 10 random-int))))
+      (list true false \t \f \& \|))))
 
 (defn error-function
   [argmap data individual]
@@ -45,16 +41,23 @@
                            program
                            (assoc state/empty-state :input {:in1 input})
                            (:step-limit argmap))
-                         :integer))
+                         :boolean))
                      inputs)
+        parsed-outputs (map (fn [output]
+                              (try (read-string output)
+                                   #?(:clj  (catch Exception e 1000.0)
+                                      :cljs (catch js/Error. e 1000.0))))
+                            outputs)
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
-                        1000000
-                        (min 1000.0 (math/abs (- correct-output output)))))
+                        10000
+                        (if (= correct-output output)
+                           0
+                           1)))
                     correct-outputs
-                    outputs)]
+                    parsed-outputs)]
     (assoc individual
-      :behaviors outputs
+      :behaviors parsed-outputs
       :errors errors
       :total-error #?(:clj  (apply +' errors)
                       :cljs (apply + errors)))))

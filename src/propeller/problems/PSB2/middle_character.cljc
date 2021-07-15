@@ -5,7 +5,6 @@
             [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
-            [propeller.tools.math :as math]
             [propeller.tools.metrics :as metrics]
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
@@ -74,13 +73,13 @@
        :error-function          error-function
        :training-data           (:train train-and-test-data)
        :testing-data            (:test train-and-test-data)
-       :max-generations         500
-       :population-size         500
-       :max-initial-plushy-size 100
-       :step-limit              200
+       :max-generations         300
+       :population-size         1000
+       :max-initial-plushy-size 250
+       :step-limit              2000
        :parent-selection        :lexicase
        :tournament-size         5
        :umad-rate               0.1
-       :variation               {:umad 0.5 :crossover 0.5}
+       :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
       (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

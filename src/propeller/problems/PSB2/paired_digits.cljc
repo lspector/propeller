@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.bowling
+(ns propeller.problems.PSB2.paired-digits
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -6,21 +6,21 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
             [propeller.tools.math :as math]
-            [propeller.gp :as gp]
-            #?(:cljs [cljs.reader :refer [read-string]])))
+            [propeller.gp :as gp]))
 
-; ===========  PROBLEM DESCRIPTION  ======================
-; BOWLING from PSB2
-; Given a string representing the individual
-; bowls in a 10-frame round of 10 pin bowling, return the
-; score of that round.
+; ===========  PROBLEM DESCRIPTION  =============================
+; PAIRED DIGITS from PSB2
+; Given a string of digits, return the sum
+; of the digits whose following digit is the same.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; =========================================================
+; ===============================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "bowling" 200 2000))
+(def train-and-test-data (psb2/fetch-examples "data" "paired-digits" 200 2000))
 
 (defn random-int [] (- (rand-int 201) 100))
+
+(defn random-char [] (rand-nth '(\0 \1 \2 \3 \4 \5 \6 \7 \8 \9)))
 
 (def instructions
   (utils/not-lazy
@@ -32,7 +32,7 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list \- \X \/ \1 \2 \3 \4 \5 \6 \7 \8 \9 10 random-int))))
+      (list 0 random-int random-char))))
 
 (defn error-function
   [argmap data individual]
@@ -78,3 +78,4 @@
        :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
       (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
+

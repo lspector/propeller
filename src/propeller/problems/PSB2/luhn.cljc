@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.bowling
+(ns propeller.problems.PSB2.luhn
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -6,33 +6,35 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
             [propeller.tools.math :as math]
-            [propeller.gp :as gp]
-            #?(:cljs [cljs.reader :refer [read-string]])))
+            [propeller.gp :as gp]))
 
-; ===========  PROBLEM DESCRIPTION  ======================
-; BOWLING from PSB2
-; Given a string representing the individual
-; bowls in a 10-frame round of 10 pin bowling, return the
-; score of that round.
+; ===========  PROBLEM DESCRIPTION  ============================
+; LUHN from PSB2
+; Given a vector of 16 digits, implement Luhn’s
+; algorithm to verify a credit card number, such that it follows
+; the following rules: double every other digit starting with
+; the second digit. If any of the results are over 9, subtract 9
+; from them. Return the sum of all of the new digits.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; =========================================================
+; ===============================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "bowling" 200 2000))
+(def train-and-test-data (psb2/fetch-examples "data" "luhn" 200 2000))
 
+; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))
 
 (def instructions
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
-      (get-stack-instructions #{:exec :integer :boolean :char :string :print})
+      (get-stack-instructions #{:exec :integer :boolean :vector_integer :print})
       ;;; input instructions
       (list :in1)
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list \- \X \/ \1 \2 \3 \4 \5 \6 \7 \8 \9 10 random-int))))
+      (list 0 2 9 10 random-int))))
 
 (defn error-function
   [argmap data individual]
@@ -78,3 +80,5 @@
        :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
       (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
+
+
