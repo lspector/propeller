@@ -7,7 +7,8 @@
             [propeller.push.state :as state]
             [propeller.tools.math :as math]
             [propeller.tools.metrics :as metrics]
-            [propeller.gp :as gp]))
+            [propeller.gp :as gp]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 ; ===========  PROBLEM DESCRIPTION  =============================
 ; MIDDLE CHARACTER from PSB2

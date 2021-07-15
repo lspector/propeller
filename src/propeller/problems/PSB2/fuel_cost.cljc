@@ -7,7 +7,8 @@
             [propeller.push.state :as state]
             [clojure.pprint :as pprint]
             [propeller.tools.math :as math]
-            [propeller.gp :as gp]))
+            [propeller.gp :as gp]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 ; ===========  PROBLEM DESCRIPTION  =========================
 ; FUEL COST from PSB2
