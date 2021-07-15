@@ -5,7 +5,8 @@
             [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
-            [propeller.tools.metrics :as metrics]))
+            [propeller.tools.metrics :as metrics]
+            [propeller.gp :as gp]))
 
 ; ===========  PROBLEM DESCRIPTION  ==============================
 ; SPIN WORDS from PSB2
@@ -23,8 +24,29 @@
   []
   (rand-nth (map char (range 97 122))))
 
-;; WORK ON THIS TOMORROW;
-;; SPIN WORDS STRING ERC; 
+; random word generator for ERC
+; from https://github.com/thelmuth/Clojush/blob/psb2/src/clojush/problems/psb2/spin_words.clj
+(defn word-generator
+  []
+  (let [word-len (inc (rand-int (if (< (rand) 0.8)
+                                  8
+                                  16)))]
+    (apply str (repeatedly word-len #(random-char)))))
+
+; String ERC; random word
+; from https://github.com/thelmuth/Clojush/blob/psb2/src/clojush/problems/psb2/spin_words.clj
+(defn random-input
+  "Makes a Spin Words input of length len, which is just a string of words, where the
+   words that are length 5 or greater are reversed"
+  [len]
+  (let [words (apply str
+                     (take len           ; This looks weird because str isn't lazy, so you
+                           (apply str    ; need to take len twice here.
+                                  (take len
+                                        (interpose " " (repeatedly word-generator))))))]
+    (if (not= (last words) \space)
+      words
+      (apply str (butlast words)))))
 
 (def instructions
   (utils/not-lazy
@@ -36,8 +58,7 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list 4 5 \space random-char ))))
-
+      (list 4 5 \space random-char (fn [] (random-input (rand-int 21)))))))
 
 (defn error-function
   [argmap data individual]
@@ -69,9 +90,23 @@
       :total-error #?(:clj  (apply +' errors)
                       :cljs (apply + errors)))))
 
-(def arglist
-  {:instructions   instructions
-   :error-function error-function
-   :training-data  (:train train-and-test-data)
-   :testing-data   (:test train-and-test-data)})
+(defn -main
+  "Runs propel-gp, giving it a map of arguments."
+  [& args]
+  (gp/gp
+    (merge
+      {:instructions            instructions
+       :error-function          error-function
+       :training-data           (:train train-and-test-data)
+       :testing-data            (:test train-and-test-data)
+       :max-generations         300
+       :population-size         1000
+       :max-initial-plushy-size 250
+       :step-limit              2000
+       :parent-selection        :lexicase
+       :tournament-size         5
+       :umad-rate               0.1
+       :variation               {:umad 1.0 :crossover 0.0}
+       :elitism                 false}
+      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
 
