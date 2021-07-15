@@ -1,26 +1,30 @@
-(ns propeller.problems.PSB2.middle-character
+(ns propeller.problems.PSB2.spin-words
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.utils :as utils]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
-            [propeller.tools.math :as math]
-            [propeller.tools.metrics :as metrics]
-            [propeller.gp :as gp]))
+            [propeller.tools.metrics :as metrics]))
 
-; ===========  PROBLEM DESCRIPTION  =============================
-; MIDDLE CHARACTER from PSB2
-; Given a string, return the middle
-; character as a string if it is odd length; return the two middle
-; characters as a string if it is even length.
+; ===========  PROBLEM DESCRIPTION  ==============================
+; SPIN WORDS from PSB2
+; Given a string of one or more words
+; (separated by spaces), reverse all of the words that are five
+; or more letters long and return the resulting string.
 ;
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ===============================================================
+; ================================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "middle-character" 200 2000))
+(def train-and-test-data (psb2/fetch-examples "data" "spin-words" 200 2000))
 
-(defn random-int [] (- (rand-int 201) 100))
+; Visible character ERC
+(defn random-char
+  []
+  (rand-nth (map char (range 97 122))))
+
+;; WORK ON THIS TOMORROW;
+;; SPIN WORDS STRING ERC; 
 
 (def instructions
   (utils/not-lazy
@@ -32,7 +36,8 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list "" 0 1 2 random-int))))
+      (list 4 5 \space random-char ))))
+
 
 (defn error-function
   [argmap data individual]
@@ -55,7 +60,7 @@
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
                         10000
-                        (metrics/levenshtein-distance (str correct-output) (str output))))
+                        (metrics/levenshtein-distance correct-output output)))
                     correct-outputs
                     parsed-outputs)]
     (assoc individual
@@ -64,22 +69,9 @@
       :total-error #?(:clj  (apply +' errors)
                       :cljs (apply + errors)))))
 
-(defn -main
-  "Runs propel-gp, giving it a map of arguments."
-  [& args]
-  (gp/gp
-    (merge
-      {:instructions            instructions
-       :error-function          error-function
-       :training-data           (:train train-and-test-data)
-       :testing-data            (:test train-and-test-data)
-       :max-generations         500
-       :population-size         500
-       :max-initial-plushy-size 100
-       :step-limit              200
-       :parent-selection        :lexicase
-       :tournament-size         5
-       :umad-rate               0.1
-       :variation               {:umad 0.5 :crossover 0.5}
-       :elitism                 false}
-      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
+(def arglist
+  {:instructions   instructions
+   :error-function error-function
+   :training-data  (:train train-and-test-data)
+   :testing-data   (:test train-and-test-data)})
+
