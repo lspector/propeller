@@ -113,21 +113,21 @@
 ;; :integer. Otherwise, return nil"
 (defn get-literal-type
   [data]
-  (let [literals {:boolean        (fn [thing] (or (true? thing) (false? thing)))
-                  :char           char?
-                  :float          float?
-                  :integer        integer?
-                  :string         string?
-                  :vector_boolean (fn [thing] (and (vector? thing)
+  (let [literals [[:boolean        (fn [thing] (or (true? thing) (false? thing)))]
+                  [:integer        integer?]
+                  [:float          float?]
+                  [:string         string?]
+                  [:char           char?]
+                  [:vector_boolean (fn [thing] (and (vector? thing)
                                                    (or (true? (first thing))
-                                                       (false? (first thing)))))
-                  :vector_float   (fn [thing] (and (vector? thing)
-                                                   (float? (first thing))))
-                  :vector_integer (fn [thing] (and (vector? thing)
-                                                   (integer? (first thing))))
-                  :vector_string  (fn [thing] (and (vector? thing)
-                                                   (string? (first thing))))
-                  :generic-vector (fn [thing] (= [] thing))}]
+                                                       (false? (first thing)))))]
+                  [:vector_float   (fn [thing] (and (vector? thing)
+                                                   (float? (first thing))))]
+                  [:vector_integer (fn [thing] (and (vector? thing)
+                                                   (integer? (first thing))))]
+                  [:vector_string  (fn [thing] (and (vector? thing)
+                                                   (string? (first thing))))]
+                  [:generic-vector (fn [thing] (= [] thing))]]]
     (first (for [[stack function] literals
                  :when (function data)]
              stack))))

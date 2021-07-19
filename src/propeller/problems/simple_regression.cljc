@@ -3,7 +3,8 @@
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
             [propeller.tools.math :as math]
-            [propeller.gp :as gp]))
+            [propeller.gp :as gp]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn- target-function
   "Target function: f(x) = x^3 + x + 3"

@@ -6,7 +6,8 @@
             [propeller.push.utils.helpers :refer [get-stack-instructions]]
             [propeller.push.state :as state]
             [propeller.tools.metrics :as metrics]
-            [propeller.gp :as gp]))
+            [propeller.gp :as gp]
+            #?(:cljs [cljs.reader :refer [read-string]])))
 
 ; ===========  PROBLEM DESCRIPTION  =============================
 ; MIDDLE CHARACTER from PSB2
