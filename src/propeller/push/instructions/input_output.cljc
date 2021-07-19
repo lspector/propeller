@@ -31,9 +31,9 @@
   :print_newline
   ^{:stacks [:print]}
   (fn [state]
-    (let [current-output (state/peek-stack state :output)
-          popped-state (state/pop-stack state :output)]
-      (state/push-to-stack popped-state :output (str current-output \newline)))))
+    (let [current-output (state/peek-stack state :print)
+          popped-state (state/pop-stack state :print)]
+      (state/push-to-stack popped-state :print (str current-output \newline)))))
 
 (def _print
   ^{:stacks [:print]
@@ -46,10 +46,10 @@
                                  (char? top-item))
                            top-item
                            (pr-str top-item))
-            current-output (state/peek-stack state :output)
-            popped-state (state/pop-stack (state/pop-stack state stack) :output)]
+            current-output (state/peek-stack state :print)
+            popped-state (state/pop-stack (state/pop-stack state stack) :print)]
         (state/push-to-stack popped-state
-                             :output
+                             :print
                              (str current-output top-item-str))))))
 
 (generate-instructions
