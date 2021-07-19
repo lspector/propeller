@@ -71,9 +71,9 @@
                            program
                            (assoc state/empty-state :input {:in1 (first input)
                                                             :in2 (last input)}
-                                                    :output '(""))
+                                                    :print '(""))
                            (:step-limit argmap))
-                         :output))
+                         :print))
                      inputs)
         parsed-outputs (map (fn [output]
                               (try (read-string output)

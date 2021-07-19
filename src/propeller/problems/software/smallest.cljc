@@ -75,9 +75,9 @@
                                                             :in2 (get input 1)
                                                             :in3 (get input 2)
                                                             :in4 (get input 3)}
-                                                    :output '(""))
+                                                    :print '(""))
                            (:step-limit argmap))
-                         :output))
+                         :print))
                      inputs)
         errors (map (fn [correct-output output]
                       (let [parsed-output (try (read-string output)
