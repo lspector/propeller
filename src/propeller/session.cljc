@@ -10,9 +10,12 @@
             [propeller.push.state :as state]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]))
 
-;#_(interpreter/interpret-program
-;    '(1 2 :integer_add) state/empty-state 1000)
-;
+#_(interpreter/interpret-program
+    '(1 2 :integer_add) state/empty-state 1000)
+
+#_(interpreter/interpret-program
+    '(1 2 :integer_add) (assoc state/empty-state :keep-history true) 1000)
+
 ;#_(interpreter/interpret-program
 ;    '(3 3 :integer_eq :exec_if (1 "yes") (2 "no"))
 ;    state/empty-state

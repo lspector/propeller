@@ -37,10 +37,17 @@
                                       (name instruction))))))))
 
 (defn interpret-program
-  "Runs the given problem starting with the stacks in start-state."
+  "Runs the given problem starting with the stacks in start-state. If the
+  start-state includes the key :keep-history with a truthy value, then
+  the returned state will include the key :history with a value that is a
+  vector containing all states prior to the final state."
   [program start-state step-limit]
-  (loop [state (assoc start-state :exec program :step 1)]
+  (loop [state (assoc start-state :exec program :step 1)
+         history []]
     (if (or (empty? (:exec state))
             (> (:step state) step-limit))
-      state
-      (recur (update (interpret-one-step state) :step inc)))))
+      (if (:keep-history state)
+        (assoc state :history history)
+        state)
+      (recur (update (interpret-one-step state) :step inc)
+             (when (:keep-history state) (conj history state))))))
