@@ -21,6 +21,8 @@ notes
 /.idea/
 /results
 /temp
+*~
+q
 
 # Don't commit the data directory that we'll
 # use to hold the data from

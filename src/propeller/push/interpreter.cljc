@@ -42,7 +42,7 @@
   the returned state will include the key :history with a value that is a
   vector containing all states prior to the final state."
   [program start-state step-limit]
-  (loop [state (assoc start-state :exec program :step 1)
+  (loop [state (assoc start-state :exec (list program) :step 1)
          history []]
     (if (or (empty? (:exec state))
             (> (:step state) step-limit))
