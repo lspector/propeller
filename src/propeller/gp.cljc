@@ -31,7 +31,7 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size custom-report]
+           max-initial-plushy-size]
     :as   argmap}]
   ;;
   (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
@@ -49,8 +49,8 @@
                                    (partial error-function argmap (:training-data argmap))
                                    population))
           best-individual (first evaluated-pop)]
-      (if (custom-report argmap)
-        ((custom-report argmap) evaluated-pop generation argmap)
+      (if (:custom-report argmap)
+        ((:custom-report argmap) evaluated-pop generation argmap)
         (report evaluated-pop generation argmap))
       (cond
         ;; Success on training cases is verified on testing cases
