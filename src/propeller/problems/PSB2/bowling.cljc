@@ -50,7 +50,7 @@
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
                         1000000
-                        (min 1000.0 (math/abs (- correct-output output)))))
+                        (math/abs (- correct-output output))))
                     correct-outputs
                     outputs)]
     (assoc individual
