@@ -1,5 +1,5 @@
 (ns propeller.push.state
-  (:require [propeller.push.utils.limits :as l]
+  (:require [propeller.push.limits :as l]
             #?(:cljs [goog.string :as gstring])))
 
 ;; Empty push state - all available stacks are empty
