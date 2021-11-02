@@ -1,6 +1,6 @@
-(ns propeller.push.utils.limits-test
+(ns propeller.push.limits-test
   (:require [clojure.test :as t]
-            [propeller.push.utils.limits :as l]))
+            [propeller.push.limits :as l]))
 
 (t/deftest limit-number-test
   (t/is (= (l/limit-number (inc l/max-number-magnitude))

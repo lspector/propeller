@@ -1,6 +1,6 @@
-(ns propeller.push.utils.helpers-test
+(ns propeller.push.instructions-test
   (:require [clojure.test :as t]
-            [propeller.push.utils.helpers :as h]))
+            [propeller.push.instructions :as h]))
 
 (t/deftest get-literal-type-test
   (t/is (= (h/get-literal-type "abc") :string))
