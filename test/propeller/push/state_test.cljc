@@ -1,7 +1,7 @@
 (ns propeller.push.state-test
   (:require [clojure.test :as t]
             [propeller.push.state :as state]
-            [propeller.push.utils.limits :as l]))
+            [propeller.push.limits :as l]))
 
 (t/deftest push-to-stack-test
   (t/is (= (state/push-to-stack {:integer '()} :integer 1)
