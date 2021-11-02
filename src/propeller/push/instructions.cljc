@@ -1,4 +1,4 @@
-(ns propeller.push.core)
+(ns propeller.push.instructions)
 
 ;; PushGP instructions are represented as keywords, and stored in an atom. They
 ;; can be either constant literals or functions that take and return a Push state

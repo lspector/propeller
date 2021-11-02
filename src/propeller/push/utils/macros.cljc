@@ -1,12 +1,12 @@
 (ns propeller.push.utils.macros
-  (:require [propeller.push.core :as push]
+  (:require [propeller.push.instructions :as instructions]
             [propeller.push.utils.helpers :refer [get-vector-literal-type]]))
 
 (defn def-instruction
   "Defines a Push instruction as a keyword-function pair, and adds it to the
    instruction table"
   [instruction function]
-  (swap! push/instruction-table assoc instruction function))
+  (swap! instructions/instruction-table assoc instruction function))
 
 (defn make-metadata
   "Given a generic function, e.g. _dup, and a stack type to instantiate it for,

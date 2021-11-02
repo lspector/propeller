@@ -1,6 +1,6 @@
 (ns propeller.push.utils.helpers
   (:require [clojure.set]
-            [propeller.push.core :as push]
+            [propeller.push.instructions :as instructions]
             [propeller.push.state :as state]
             [propeller.utils :as u]
             #?(:cljs [goog.string :as gstring])
@@ -29,7 +29,7 @@
 ;; only. Won't include random instructions unless :random is in the set as well
 (defn get-stack-instructions
   [stacks]
-  (doseq [[instruction-name function] @push/instruction-table]
+  (doseq [[instruction-name function] @instructions/instruction-table]
     (assert
       (:stacks (meta function))
       #?(:clj  (format
@@ -38,7 +38,7 @@
          :cljs (gstring/format
                  "ERROR: Instruction %s does not have :stacks defined in metadata."
                  (name instruction-name)))))
-  (for [[instruction-name function] @push/instruction-table
+  (for [[instruction-name function] @instructions/instruction-table
         :when (clojure.set/subset? (:stacks (meta function)) stacks)]
     instruction-name))
 

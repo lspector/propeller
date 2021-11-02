@@ -5,7 +5,7 @@
             [propeller.variation :as variation]
             [propeller.problems.simple-regression :as regression]
             [propeller.problems.string-classification :as string-classif]
-            [propeller.push.core :as push]
+            [propeller.push.instructions :as instructions]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
             [propeller.push.utils.helpers :refer [get-stack-instructions]]))

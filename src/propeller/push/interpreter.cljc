@@ -1,5 +1,5 @@
 (ns propeller.push.interpreter
-  (:require [propeller.push.core :as push]
+  (:require [propeller.push.instructions :as instructions]
             [propeller.push.state :as state]
             [propeller.push.instructions.input-output :as io]
             [propeller.push.utils.helpers :refer [get-literal-type]]))
@@ -14,7 +14,7 @@
       ;;
       ;; Recognize functional instruction or input instruction
       (keyword? instruction)
-      (if-let [function (instruction @push/instruction-table)]
+      (if-let [function (instruction @instructions/instruction-table)]
         (function popped-state)
         (io/handle-input-instruction popped-state instruction))
       ;;
