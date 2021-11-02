@@ -33,5 +33,4 @@
     (let [instruction-name (keyword (str (name stack) (:name (meta func))))
           metadata (make-metadata func stack)
           new-func (with-meta (partial func stack) metadata)]
-      (println [instruction-name new-func (meta new-func)])
       (def-instruction instruction-name new-func))))
