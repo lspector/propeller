@@ -7,7 +7,7 @@
                  [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/test.check "1.1.0"]
                  [net.clojars.schneau/psb2 "1.1.0"]]
+  :profiles {:profiling {:dependencies [[com.clojure-goes-fast/clj-async-profiler "0.5.1"]]}}
   :main ^:skip-aot propeller.core
   :repl-options {:init-ns propeller.core}
   :jvm-opts ^:replace [])
-

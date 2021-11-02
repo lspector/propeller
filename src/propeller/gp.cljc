@@ -31,21 +31,22 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size]
+           max-initial-plushy-size solution-error-threshold mapper]
+    :or   {solution-error-threshold 0.0
+           ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
+           ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
+           mapper #?(:clj pmap :cljs map)}
     :as   argmap}]
   ;;
   (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
   (println)
   ;;
   (loop [generation 0
-         population (repeatedly
-                      population-size
-                      #(hash-map :plushy (genome/make-random-plushy
-                                           instructions
-                                           max-initial-plushy-size)))]
+         population (mapper
+                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
+                      (range population-size))]
     (let [evaluated-pop (sort-by :total-error
-                                 (#?(:clj  pmap
-                                     :cljs map)
+                                 (mapper
                                    (partial error-function argmap (:training-data argmap))
                                    population))
           best-individual (first evaluated-pop)]
@@ -54,11 +55,10 @@
         (report evaluated-pop generation argmap))
       (cond
         ;; Success on training cases is verified on testing cases
-        (zero? (:total-error best-individual))
+        (<= (:total-error best-individual) solution-error-threshold)
         (do (prn {:success-generation generation})
             (prn {:total-test-error
-                  (:total-error (error-function argmap (:testing-data argmap) best-individual))})
-            (#?(:clj shutdown-agents)))
+                  (:total-error (error-function argmap (:testing-data argmap) best-individual))}))
         ;;
         (>= generation max-generations)
         nil

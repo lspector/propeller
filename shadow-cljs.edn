@@ -1,7 +1,10 @@
-{:source-paths ["src"]
+{:source-paths ["src" "test"]
  :dependencies []
- :dev-http {8080 "target/"}
- :builds {:app {:output-dir "target/"
-                :asset-path "."
-                :target :browser
-                :modules {:main {:init-fn propeller.main/main!}}}}}
+ :dev-http     {8080 "target/"}
+ :builds       {:app  {:output-dir "target/"
+                       :asset-path "."
+                       :target     :browser
+                       :modules    {:main {:init-fn propeller.main/main!}}}
+                :test {:extra-paths ["src"]
+                       :target    :node-test
+                       :output-to "out/node-tests.js"}}}
