@@ -16,7 +16,12 @@
    (let [plushy (if (:diploid argmap) (map first (partition 2 plushy)) plushy)
          opener? #(and (vector? %) (= (first %) 'open))]    ;; [open <n>] marks opens
      (loop [push ()                                         ;; iteratively build the Push program from the plushy
-            plushy (mapcat #(if-let [n (get instructions/opens %)] [% ['open n]] [%]) plushy)]
+            plushy (mapcat #(let [n (get instructions/opens %)]
+                              (if (and n
+                                       (> n 0))
+                                [% ['open n]]
+                                [%]))
+                           plushy)]
        (if (empty? plushy)                                  ;; maybe we're done?
          (if (some opener? push)                            ;; done with plushy, but unclosed open
            (recur push '(close))                            ;; recur with one more close

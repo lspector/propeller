@@ -36,14 +36,9 @@
             :vector_boolean_iterate 1
             :vector_string_iterate 1
             :vector_integer_iterate 1
-            :vector_float_iterate 1})
+            :vector_float_iterate 1
+            })
 
-
-#_(generate-instructions
- [:boolean :char :code :exec :float :integer :string
-  :vector_boolean :vector_float :vector_integer :vector_string]
- [_dup _dup_times _dup_items _empty _eq _flush _pop _rot _shove
-  _stack_depth _swap _yank _yank_dup _deep_dup])
 
 #?(:clj
    (def cls->type
