@@ -80,10 +80,7 @@
                          :print))
                      inputs)
         errors (map (fn [correct-output output]
-                      (let [parsed-output (try (read-string output)
-                                               #?(:clj  (catch Exception e 1000.0)
-                                                  :cljs (catch js/Error. e 1000.0)))]
-                        (if (= correct-output parsed-output) 0 1)))
+                      (if (= (str correct-output) output) 0 1))
                     correct-outputs
                     outputs)]
     (assoc individual
