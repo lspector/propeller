@@ -1,11 +1,10 @@
 (ns propeller.push.instructions.vector
-  #?(:cljs (:require-macros [propeller.push.utils.macros :refer [generate-instructions]]))
   (:require [clojure.string]
             [propeller.utils :as utils]
             [propeller.push.state :as state]
-            [propeller.push.utils.helpers :refer [get-vector-literal-type
-                                                  make-instruction]]
-            #?(:clj [propeller.push.utils.macros :refer [generate-instructions]])))
+            [propeller.push.instructions :refer [generate-instructions
+                                                 make-instruction
+                                                 get-vector-literal-type]]))
 
 ;; =============================================================================
 ;; VECTOR Instructions

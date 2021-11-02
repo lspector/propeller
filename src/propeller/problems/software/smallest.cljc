@@ -2,9 +2,8 @@
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
-            [propeller.push.utils.helpers :refer [get-stack-instructions]]
+            [propeller.push.instructions :refer [get-stack-instructions]]
             [propeller.utils :as utils]
-            [propeller.push.state :as state]
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
