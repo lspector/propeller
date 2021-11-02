@@ -97,8 +97,8 @@
        :error-function          error-function
        :training-data           (:train train-and-test-data)
        :testing-data            (:test train-and-test-data)
-       :max-generations         500
-       :population-size         500
+       :max-generations         300
+       :population-size         1000
        :max-initial-plushy-size 100
        :step-limit              200
        :parent-selection        :lexicase
