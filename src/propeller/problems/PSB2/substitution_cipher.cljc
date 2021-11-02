@@ -3,9 +3,8 @@
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.utils :as utils]
-            [propeller.push.utils.helpers :refer [get-stack-instructions]]
+            [propeller.push.instructions :refer [get-stack-instructions]]
             [propeller.push.state :as state]
-            [propeller.tools.math :as math]
             [propeller.tools.metrics :as metrics]
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))

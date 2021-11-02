@@ -1,20 +1,19 @@
 (ns propeller.push.interpreter
-  (:require [propeller.push.core :as push]
+  (:require [propeller.push.instructions :as instructions]
             [propeller.push.state :as state]
-            [propeller.push.instructions.input-output :as io]
-            [propeller.push.utils.helpers :refer [get-literal-type]]))
+            [propeller.push.instructions.input-output :as io]))
 
 (defn interpret-one-step
   "Takes a Push state and executes the next instruction on the exec stack."
   [state]
   (let [popped-state (state/pop-stack state :exec)
         instruction (first (:exec state))
-        literal-type (get-literal-type instruction)]     ; nil for non-literals
+        literal-type (instructions/get-literal-type instruction)]     ; nil for non-literals
     (cond
       ;;
       ;; Recognize functional instruction or input instruction
       (keyword? instruction)
-      (if-let [function (instruction @push/instruction-table)]
+      (if-let [function (instruction @instructions/instruction-table)]
         (function popped-state)
         (io/handle-input-instruction popped-state instruction))
       ;;

@@ -2,9 +2,8 @@
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
-            [propeller.push.utils.helpers :refer [get-stack-instructions]]
+            [propeller.push.instructions :refer [get-stack-instructions]]
             [propeller.utils :as utils]
-            [propeller.push.state :as state]
             [propeller.tools.math :as math]
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
@@ -99,8 +98,8 @@
        :error-function          error-function
        :training-data           (:train train-and-test-data)
        :testing-data            (:test train-and-test-data)
-       :max-generations         500
-       :population-size         500
+       :max-generations         300
+       :population-size         1000
        :max-initial-plushy-size 100
        :step-limit              200
        :parent-selection        :lexicase

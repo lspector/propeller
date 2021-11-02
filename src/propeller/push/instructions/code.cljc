@@ -1,9 +1,8 @@
 (ns propeller.push.instructions.code
-  #?(:cljs (:require-macros [propeller.push.utils.macros :refer [def-instruction]]))
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
-            [propeller.push.utils.helpers :refer [make-instruction]]
-            #?(:clj [propeller.push.utils.macros :refer [def-instruction]])))
+            [propeller.push.instructions :refer [def-instruction
+                                                 make-instruction]]))
 
 ;; =============================================================================
 ;; CODE Instructions

@@ -5,10 +5,9 @@
             [propeller.variation :as variation]
             [propeller.problems.simple-regression :as regression]
             [propeller.problems.string-classification :as string-classif]
-            [propeller.push.core :as push]
+            [propeller.push.instructions :as instructions]
             [propeller.push.interpreter :as interpreter]
-            [propeller.push.state :as state]
-            [propeller.push.utils.helpers :refer [get-stack-instructions]]))
+            [propeller.push.state :as state]))
 
 #_(interpreter/interpret-program
     '(1 2 :integer_add) state/empty-state 1000)
@@ -36,7 +35,7 @@
 ;    1000)
 ;
 ;#_(genome/plushy->push
-;    (genome/make-random-plushy (get-stack-instructions #{:float :integer :exec :boolean}) 20))
+;    (genome/make-random-plushy (instructions/get-stack-instructions #{:float :integer :exec :boolean}) 20))
 ;
 ;#_(gp/gp {:instructions            propeller.problems.software.number-io/instructions
 ;          :error-function          propeller.problems.software.number-io/error-function

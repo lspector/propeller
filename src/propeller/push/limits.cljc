@@ -1,4 +1,4 @@
-(ns propeller.push.utils.limits
+(ns propeller.push.limits
   (:require [propeller.utils :as u]))
 
 ;; =============================================================================
