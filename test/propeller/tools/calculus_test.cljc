@@ -1,0 +1,8 @@
+(ns propeller.tools.calculus-test
+  (:require [clojure.test :as t]
+            [propeller.tools.calculus :as c]))
+(t/deftest deriv_test
+  (t/is (letfn [(cubic [x] (let [a (double x)] (* a a a)))]
+         (=  (c/deriv (cubic 2)) 2.0))
+        )
+  )
