@@ -5,9 +5,7 @@
   (t/is (= 97 (c/get-ascii (first "abc")))))
 
 (t/deftest is-letter-test
-  (t/is  (c/is-letter (first "abc")))
-  ;(t/is (= false (c/is-letter 97)))
-  )
+  (t/is  (c/is-letter (first "abc"))))
 
 (t/deftest is-digit-test
   (t/is (c/is-digit (first "545")))
