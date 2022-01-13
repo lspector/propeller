@@ -1,6 +1,8 @@
 (ns propeller.utils-test
   (:require [clojure.test :as t]
-            [propeller.utils :as u]))
+            [propeller.utils :as u]
+            [propeller.simplification :as s]))
+
 (t/deftest first-non-nil-test
   (t/is (= 1 (u/first-non-nil '(1 2 3))))
   (t/is (= nil (u/first-non-nil [])))
@@ -26,20 +28,11 @@
               true
               (= 2 test))))))
 
-
 (t/deftest count-points-test
   (t/is (= 6 (u/count-points '(:a :b (:c :d)))))
   (t/is (= 1 (u/count-points '())))
   (t/is (= 2 (u/count-points '(:a)))))
 
-<<<<<<< Updated upstream
-;(t/deftest seq-zip-test
-;  (t/is ))
-
-;(t/deftest depth-test
-;  (t/is (= 3 (u/depth ()))))
-
-=======
 (t/testing "choose-random-k"
   (t/testing "should return indices that are a member of the original array"
     (t/is (every? identity (map #(contains? (set (range 10)) %) (s/choose-random-k 3 (range 10))))))
@@ -83,4 +76,3 @@
         (t/testing "should decrease size of plushy that always has perfect scores"
               (t/is (< (count (s/auto-simplify-plushy {} plushy 5 (fn [argmap data plushy] 0) {} 3 false)) (count plushy)))
               (t/is (< (count (s/auto-simplify-plushy {} plushy 1 (fn [argmap data plushy] 0) {} 10 false)) (count plushy))))))
->>>>>>> Stashed changes
