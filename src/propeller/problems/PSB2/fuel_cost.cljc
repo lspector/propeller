@@ -1,6 +1,7 @@
 (ns propeller.problems.PSB2.fuel-cost
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
+            [propeller.simplification :as simplification]
             [propeller.push.interpreter :as interpreter]
             [propeller.utils :as utils]
             [propeller.push.instructions :refer [get-stack-instructions]]
@@ -81,3 +82,16 @@
        :elitism                 false}
       (apply hash-map (map #(if (string? %) (read-string %) %) args))))
   (#?(:clj shutdown-agents)))
+
+
+(defn fuel-cost-autosimplify
+  [plushy]
+  (simplification/auto-simplify-plushy {:instructions            instructions
+                                        :error-function          error-function
+                                        :training-data           (:train train-and-test-data)
+                                        :testing-data            (:test train-and-test-data)
+                                        :max-generations         300
+                                        :population-size         1000
+                                        :max-initial-plushy-size 250
+                                        :step-limit              2000} plushy 5000 error-function (:train train-and-test-data) 5 true))
+

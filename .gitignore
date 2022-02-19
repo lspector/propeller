@@ -33,3 +33,4 @@ node_modules/
 # https://github.com/thelmuth/program-synthesis-benchmark-datasets
 /data
 **/.DS_Store
+.shadow-cljs/classpath.edn
