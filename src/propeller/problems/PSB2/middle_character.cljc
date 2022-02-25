@@ -48,9 +48,9 @@
                          :string))
                      inputs)
         parsed-outputs (map (fn [output]
-                              (try (read-string output)
-                                   #?(:clj  (catch Exception e 1000.0)
-                                      :cljs (catch js/Error. e 1000.0))))
+                              (if (= output :no-stack-item)
+                                1000.0
+                                output))
                             outputs)
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
