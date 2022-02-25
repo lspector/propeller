@@ -47,19 +47,14 @@
                            (:step-limit argmap))
                          :string))
                      inputs)
-        parsed-outputs (map (fn [output]
-                              (if (= output :no-stack-item)
-                                1000.0
-                                output))
-                            outputs)
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
                         10000
-                        (metrics/levenshtein-distance (str correct-output) (str output))))
+                        (metrics/levenshtein-distance correct-output output)))
                     correct-outputs
-                    parsed-outputs)]
+                    outputs)]
     (assoc individual
-      :behaviors parsed-outputs
+      :behaviors outputs
       :errors errors
       :total-error #?(:clj  (apply +' errors)
                       :cljs (apply + errors)))))
