@@ -19,10 +19,8 @@
                                                   input-indices)))))
         train-inputs (repeatedly num-train rand-vars)
         test-inputs (repeatedly num-test rand-vars)]
-    {:train {:inputs  train-inputs
-             :outputs (map even-parity? train-inputs)}
-     :test  {:inputs  test-inputs
-             :outputs (map even-parity? test-inputs)}}))
+    {:train (map (fn [x] {:input1 x :output1 (vector (even-parity? x))}) train-inputs)
+     :test (map (fn [x] {:input1 x :output1 (vector (even-parity? x))}) test-inputs)}))
 
 (def instructions
   (vec (concat (for [i (range num-vars)] (keyword (str "in" i)))
@@ -38,8 +36,8 @@
 (defn error-function
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
-        inputs (:inputs data)
-        correct-outputs (:outputs data)
+        inputs (map (fn [x] (:input1 x)) data)
+        correct-outputs (map (fn [x] (first (:output1 x))) data)
         outputs (map (fn [input]
                        (state/peek-stack
                          (interpreter/interpret-program
