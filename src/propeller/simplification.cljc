@@ -13,7 +13,7 @@
   "deletes the values at given set of indices"
   [indices plushy]
   (let [sorted-indices (sort > indices)]
-    (keep-indexed #(if (not (some #{%1} sorted-indices)) %2) plushy)))
+    (keep-indexed #(when (not (some #{%1} sorted-indices)) %2) plushy)))
 
 (defn delete-k-random
   [k plushy]
@@ -21,13 +21,13 @@
 
 (defn auto-simplify-plushy
   "naive auto-simplification"
-  [argmap plushy steps error-function training-data k verbose?]
-  (if verbose? (prn {:start-plushy-length (count plushy) :k k}))
+  [plushy error-function {:keys [simplification-steps training-data simplification-k simplification-verbose?] :as argmap}]
+  (when simplification-verbose? (prn {:start-plushy-length (count plushy) :k simplification-k}))
   (let [initial-errors (:errors (error-function argmap training-data {:plushy plushy}))]
     (loop [step 0 curr-plushy plushy]
-      (if (< steps step)
-        (do (if verbose? (prn {:final-plushy-length (count curr-plushy) :final-plushy curr-plushy})) curr-plushy)
-        (let [new-plushy (delete-k-random (rand-int k) curr-plushy)
+      (if (< simplification-steps step)
+        (do (when simplification-verbose? (prn {:final-plushy-length (count curr-plushy) :final-plushy curr-plushy})) curr-plushy)
+        (let [new-plushy (delete-k-random (rand-int simplification-k) curr-plushy)
               new-plushy-errors (:errors (error-function argmap training-data {:plushy new-plushy}))
               new-equal? (= new-plushy-errors initial-errors)]
           (recur (inc step)
