@@ -121,9 +121,13 @@
     :name "_from_string"}
   (fn [stack state]
     (make-instruction state
-                      #(try ((if (= stack :integer) int float) (read-string %))
-                            #?(:clj (catch Exception e)
-                               :cljs (catch js/Error. e)))
+                      #(try (if (= stack :integer)
+                             #?(:clj (Integer/parseInt %)
+                                :cljs (js/parseInt %)) 
+                             #?(:clj (Float/parseFloat %) 
+                                :cljs (js/parseFloat %)))
+                            #?(:clj (catch Exception e :ignore-instruction)
+                               :cljs (catch js/Error e :ignore-instruction)))
                       [:string]
                       stack)))
 
