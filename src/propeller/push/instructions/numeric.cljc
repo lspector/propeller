@@ -8,7 +8,7 @@
 ;; FLOAT and INTEGER Instructions (polymorphic)
 ;; =============================================================================
 
-;; Pushes TRUE onto the BOOLEAN stack if the second item is greater than the top
+;; Pushes TRUE onto the BOOLEAN stack if the first item is greater than the second
 ;; item, and FALSE otherwise
 (def _gt
   ^{:stacks #{:boolean}
@@ -65,15 +65,15 @@
     #?(:clj (make-instruction state *' [stack stack] stack)
        :cljs (make-instruction state * [stack stack] stack))))
 
-;; Pushes the quotient of the top two items (i.e. the second item divided by the
-;; top item) onto the same stack. If the top item is zero, pushes 1
+;; Pushes the quotient of the top two items (i.e. the first item divided by the
+;; second item) onto the same stack. If the second item is zero, pushes 1
 (def _quot
   ^{:stacks #{}
     :name "_quot"}
   (fn [stack state]
     (make-instruction state #(if (zero? %2) 1 (quot %1 %2)) [stack stack] stack)))
 
-;; Pushes the second item modulo the top item onto the same stack. If the top
+;; Pushes the top item modulo the second item onto the same stack. If the second
 ;; item is zero, pushes 1. The modulus is computed as the remainder of the
 ;; quotient, where the quotient has first been truncated towards negative
 ;; infinity.

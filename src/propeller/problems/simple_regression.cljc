@@ -14,10 +14,8 @@
 (def train-and-test-data
   (let [train-inputs (range -10 11)
         test-inputs (concat (range -20 -10) (range 11 21))]
-    {:train {:inputs  train-inputs
-             :outputs (map target-function train-inputs)}
-     :test  {:inputs  test-inputs
-             :outputs (map target-function test-inputs)}}))
+    {:train (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) train-inputs)
+     :test (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) test-inputs)}))
 
 (def instructions
   (list :in1
@@ -39,8 +37,8 @@
   final top item on the INTEGER stack."
   ([argmap data individual]
    (let [program (genome/plushy->push (:plushy individual) argmap)
-         inputs (:inputs data)
-         correct-outputs (:outputs data)
+         inputs (map (fn [x] (first (:input1 x))) data)
+         correct-outputs (map (fn [x] (first (:output1 x))) data)
          outputs (map (fn [input]
                         (state/peek-stack
                           (interpreter/interpret-program

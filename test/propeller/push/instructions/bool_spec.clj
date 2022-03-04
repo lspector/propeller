@@ -6,7 +6,7 @@
     [clojure.test.check.clojure-test :as ct :refer [defspec]]
     [propeller.push.state :as state]
     [propeller.push.instructions :as instructions]
-    [propeller.push.instructions.string :as string-instructions]
+    [propeller.push.instructions.bool :as boolean-instructions]
     [propeller.push.interpreter :as interpreter]))
 
 ;;boolean/and

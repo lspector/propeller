@@ -43,7 +43,7 @@
   :boolean_invert_first_then_and
   ^{:stacks #{:boolean}}
   (fn [state]
-    (make-instruction state #(and %1 (not %2)) [:boolean :boolean] :boolean)))
+    (make-instruction state #(and (not %1)  %2) [:boolean :boolean] :boolean)))
 
 ;; Pushes the logical AND of the top two BOOLEANs, after applying NOT to the
 ;; second one
@@ -51,7 +51,7 @@
   :boolean_invert_second_then_and
   ^{:stacks #{:boolean}}
   (fn [state]
-    (make-instruction state #(and (not %1) %2) [:boolean :boolean] :boolean)))
+    (make-instruction state #(and  %1 (not %2)) [:boolean :boolean] :boolean)))
 
 ;; Pushes FALSE if the top FLOAT is 0.0, and TRUE otherwise
 (def-instruction
