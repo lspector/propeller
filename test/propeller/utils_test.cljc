@@ -77,11 +77,11 @@
 (t/deftest auto-simplify-plushy-test
   (t/testing "auto-simplify-plushy"
     (t/testing "should handle having an empty plushy"
-      (t/is (= (s/auto-simplify-plushy {} '() 100 (fn [argmap data plushy] 0) {} 3 false) '())))
+      (t/is (= (s/auto-simplify-plushy '() (fn [argmap data plushy] 0) {:simplification-steps 100 :simplification-k 4 :simplification-verbose? false}) '())))
     (let [plushy '(:exec_dup 1 :integer_add close :in1 :integer_add 0 :in1 :in1 :integer_mult :integer_add)]
       (t/testing "should decrease size of plushy that always has perfect scores"
-        (t/is (< (count (s/auto-simplify-plushy {} plushy 5 (fn [argmap data plushy] 0) {} 3 false)) (count plushy)))
-        (t/is (< (count (s/auto-simplify-plushy {} plushy 1 (fn [argmap data plushy] 0) {} 10 false)) (count plushy)))))))
+        (t/is (< (count (s/auto-simplify-plushy plushy (fn [argmap data plushy] 0) {:simplification-steps 100 :simplification-k 4 :simplification-verbose? false})) (count plushy)))
+        (t/is (< (count (s/auto-simplify-plushy plushy (fn [argmap data plushy] 0) {:simplification-steps 100 :simplification-k 10 :simplification-verbose? false})) (count plushy)))))))
 
 (t/deftest assign-indices-to-data-test
   (t/testing "assign-indices-to-data"
