@@ -2,8 +2,7 @@
   (:require [propeller.genome :as genome]
              [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
-            [propeller.tools.math :as math]
-            ))
+            [propeller.tools.math :as math]))
 
 (defn choose-random-k
   [k indices]
