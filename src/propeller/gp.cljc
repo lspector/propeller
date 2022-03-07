@@ -4,6 +4,7 @@
             [propeller.genome :as genome]
             [propeller.simplification :as simplification]
             [propeller.variation :as variation]
+            [propeller.downsample :as downsample]
             [propeller.push.instructions.bool]
             [propeller.push.instructions.character]
             [propeller.push.instructions.code]
@@ -44,12 +45,16 @@
   ;;
   (loop [generation 0
          population (mapper
-                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
-                      (range population-size))]
-    (let [evaluated-pop (sort-by :total-error
+                     (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
+                     (range population-size))
+         indexed-training-data (downsample/assign-indices-to-data argmap)]
+    (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
+                          (downsample/select-downsample-random indexed-training-data argmap)
+                          indexed-training-data)
+          evaluated-pop (sort-by :total-error
                                  (mapper
-                                   (partial error-function argmap (:training-data argmap))
-                                   population))
+                                  (partial error-function argmap training-data)
+                                  population))
           best-individual (first evaluated-pop)]
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)
@@ -61,7 +66,7 @@
             (prn {:total-test-error
                   (:total-error (error-function argmap (:testing-data argmap) best-individual))})
             (if (:simplification? argmap)
-              (let [simplified-plushy (simplification/auto-simplify-plushy argmap (:plushy best-individual) (:simplification-steps argmap) error-function (:training-data argmap) (:simplification-k argmap) (:simplification-verbose? argmap))]
+              (let [simplified-plushy (simplification/auto-simplify-plushy argmap (:plushy best-individual) (:simplification-steps argmap) error-function (:testing-data argmap) (:simplification-k argmap) (:simplification-verbose? argmap))]
                 (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))}))))
         ;;
         (>= generation max-generations)
@@ -73,4 +78,5 @@
                                          #(variation/new-individual evaluated-pop argmap))
                              (first evaluated-pop))
                        (repeatedly population-size
-                                   #(variation/new-individual evaluated-pop argmap))))))))
+                                   #(variation/new-individual evaluated-pop argmap)))
+                     (update-case-metadata evaluated-pop))))))

@@ -10,7 +10,7 @@
 
 (defn select-downsample-random
   "Selects a downsample from the training cases and returns it"
-  [{:keys [downsample-rate training-data]}]
+  [training-data {:keys [downsample-rate]}]
   (take (int (* downsample-rate (count training-data))) (shuffle training-data)))
 
 (defn update-case-data

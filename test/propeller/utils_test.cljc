@@ -96,16 +96,16 @@
 (t/deftest select-downsample-random-test
   (t/testing "select-downsample-random"
     (t/testing "should select the correct amount of elements"
-      (t/is (= (count (ds/select-downsample-random {:training-data (range 10) :downsample-rate 0.1})) 1))
-      (t/is (= (count (ds/select-downsample-random {:training-data (range 10) :downsample-rate 0.2})) 2))
-      (t/is (= (count (ds/select-downsample-random {:training-data (range 10) :downsample-rate 0.5})) 5)))
+      (t/is (= (count (ds/select-downsample-random (range 10) {:downsample-rate 0.1})) 1))
+      (t/is (= (count (ds/select-downsample-random (range 10) {:downsample-rate 0.2})) 2))
+      (t/is (= (count (ds/select-downsample-random (range 10) {:downsample-rate 0.5})) 5)))
     (t/testing "should not return duplicate items (when called with set of numbers)"
-      (t/is (= (count (set (ds/select-downsample-random {:training-data (range 10) :downsample-rate 0.1}))) 1))
-      (t/is (= (count (set (ds/select-downsample-random {:training-data (range 10) :downsample-rate 0.2}))) 2))
-      (t/is (= (count (set (ds/select-downsample-random {:training-data (range 10) :downsample-rate 0.5}))) 5)))
+      (t/is (= (count (set (ds/select-downsample-random (range 10) {:downsample-rate 0.1}))) 1))
+      (t/is (= (count (set (ds/select-downsample-random (range 10) {:downsample-rate 0.2}))) 2))
+      (t/is (= (count (set (ds/select-downsample-random (range 10) {:downsample-rate 0.5}))) 5)))
     (t/testing "should round down the number of elements selected if not whole"
-      (t/is (= (count (ds/select-downsample-random {:training-data (range 3) :downsample-rate 0.5})) 1))
-      (t/is (= (count (ds/select-downsample-random {:training-data (range 1) :downsample-rate 0.5})) 0)))
+      (t/is (= (count (ds/select-downsample-random (range 3) {:downsample-rate 0.5})) 1))
+      (t/is (= (count (ds/select-downsample-random (range 1) {:downsample-rate 0.5})) 0)))
     (t/testing "should not return more elements than available"
-      (t/is (= (count (ds/select-downsample-random {:training-data (range 10) :downsample-rate 2})) 10))
-      (t/is (= (count (ds/select-downsample-random {:training-data (range 10) :downsample-rate 1.5})) 10)))))
+      (t/is (= (count (ds/select-downsample-random (range 10) {:downsample-rate 2})) 10))
+      (t/is (= (count (ds/select-downsample-random (range 10) {:downsample-rate 1.5})) 10)))))
