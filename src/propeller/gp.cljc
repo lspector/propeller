@@ -65,8 +65,8 @@
         (do (prn {:success-generation generation})
             (prn {:total-test-error
                   (:total-error (error-function argmap (:testing-data argmap) best-individual))})
-            (if (:simplification? argmap)
-              (let [simplified-plushy (simplification/auto-simplify-plushy argmap (:plushy best-individual) (:simplification-steps argmap) error-function (:testing-data argmap) (:simplification-k argmap) (:simplification-verbose? argmap))]
+            (when (:simplification? argmap)
+              (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
                 (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))}))))
         ;;
         (>= generation max-generations)

@@ -47,19 +47,14 @@
                            (:step-limit argmap))
                          :string))
                      inputs)
-        parsed-outputs (map (fn [output]
-                              (try (read-string output)
-                                   #?(:clj  (catch Exception e 1000.0)
-                                      :cljs (catch js/Error. e 1000.0))))
-                            outputs)
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
                         10000
-                        (metrics/levenshtein-distance (str correct-output) (str output))))
+                        (metrics/levenshtein-distance correct-output output)))
                     correct-outputs
-                    parsed-outputs)]
+                    outputs)]
     (assoc individual
-      :behaviors parsed-outputs
+      :behaviors outputs
       :errors errors
       :total-error #?(:clj  (apply +' errors)
                       :cljs (apply + errors)))))
