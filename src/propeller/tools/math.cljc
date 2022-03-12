@@ -6,6 +6,11 @@
 (defonce E #?(:clj  Math/E
               :cljs js/Math.PI))
 
+(defn step
+  "returns 1 if number is nonzero, 0 otherwise"
+  [x]
+  (if (zero? x) 0 1))
+
 (defn abs
   "Returns the absolute value of a number."
   [x]
