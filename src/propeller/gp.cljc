@@ -47,7 +47,7 @@
          population (mapper
                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
                      (range population-size))
-         indexed-training-data (downsample/assign-indices-to-data argmap)]
+         indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
                           (downsample/select-downsample-random indexed-training-data argmap)
                           indexed-training-data)
@@ -55,18 +55,32 @@
                                  (mapper
                                   (partial error-function argmap training-data)
                                   population))
-          best-individual (first evaluated-pop)]
+          best-individual (first evaluated-pop)
+          best-individual-passes-ds (and (= (:parent-selection argmap) :ds-lexicase) (<= (:total-error best-individual) solution-error-threshold))
+          tot-evaluated-pop (when best-individual-passes-ds ;evaluate the whole pop on all training data
+                              (sort-by :total-error
+                                       (mapper
+                                        (partial error-function argmap (:training-data argmap))
+                                        population)))
+          ;;best individual on all training-cases
+          tot-best-individual (if best-individual-passes-ds (first tot-evaluated-pop) best-individual)]
+      (prn (first training-data))
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)
         (report evaluated-pop generation argmap))
+      ;;did the indvidual pass all cases in ds?
+      (when best-individual-passes-ds
+        (prn {:semi-success-generation generation}))
       (cond
         ;; Success on training cases is verified on testing cases
-        (<= (:total-error best-individual) solution-error-threshold)
+        (or (and best-individual-passes-ds (<= (:total-error tot-best-individual) solution-error-threshold))
+            (and (not= (:parent-selection argmap) :ds-lexicase)
+                 (<= (:total-error best-individual) solution-error-threshold)))
         (do (prn {:success-generation generation})
             (prn {:total-test-error
-                  (:total-error (error-function argmap (:testing-data argmap) best-individual))})
+                  (:total-error (error-function argmap (:testing-data argmap) tot-best-individual))})
             (when (:simplification? argmap)
-              (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
+              (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy tot-best-individual) error-function argmap)]
                 (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))}))))
         ;;
         (>= generation max-generations)
@@ -79,4 +93,4 @@
                              (first evaluated-pop))
                        (repeatedly population-size
                                    #(variation/new-individual evaluated-pop argmap)))
-                     (update-case-metadata evaluated-pop))))))
+                     (downsample/update-case-distances evaluated-pop training-data indexed-training-data))))))
