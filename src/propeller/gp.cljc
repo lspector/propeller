@@ -93,4 +93,4 @@
                              (first evaluated-pop))
                        (repeatedly population-size
                                    #(variation/new-individual evaluated-pop argmap)))
-                     (downsample/update-case-distances evaluated-pop training-data indexed-training-data))))))
+                     (if (= (:parent-selection argmap) :ds-lexicase) (downsample/update-case-distances evaluated-pop training-data indexed-training-data) indexed-training-data))))))
