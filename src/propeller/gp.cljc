@@ -49,7 +49,9 @@
                      (range population-size))
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
-                          (downsample/select-downsample-random indexed-training-data argmap)
+                          (case (:ds-function argmap)
+                            :case-tournament (downsample/select-downsample-tournament indexed-training-data argmap)
+                            (downsample/select-downsample-random indexed-training-data argmap)) ;defaults to random
                           indexed-training-data)
           evaluated-pop (sort-by :total-error
                                  (mapper
@@ -93,4 +95,6 @@
                              (first evaluated-pop))
                        (repeatedly population-size
                                    #(variation/new-individual evaluated-pop argmap)))
-                     (if (= (:parent-selection argmap) :ds-lexicase) (downsample/update-case-distances evaluated-pop training-data indexed-training-data) indexed-training-data))))))
+                     (if (= (:parent-selection argmap) :ds-lexicase)
+                       (downsample/update-case-distances evaluated-pop training-data indexed-training-data)
+                       indexed-training-data))))))

@@ -1,5 +1,7 @@
 (ns propeller.downsample
-  (:require [propeller.tools.math :as math]))
+  (:require [propeller.tools.math :as math]
+            [propeller.tools.metrics :as metrics]
+            [propeller.utils :as utils]))
 
 (defn assign-indices-to-data
   "assigns an index to each training case in order to differentiate them when downsampling"
@@ -17,6 +19,32 @@
   "Selects a downsample from the training cases and returns it"
   [training-data {:keys [downsample-rate]}]
   (take (int (* downsample-rate (count training-data))) (shuffle training-data)))
+
+(defn select-downsample-tournament
+  "uses case-tournament selection to select a downsample that is biased to being spread out"
+  [training-data {:keys [downsample-rate case-t-size]}]
+  (let [shuffled-cases (shuffle training-data)
+        goal-size (int (* downsample-rate (count training-data)))]
+    (loop [new-downsample (conj [] (first shuffled-cases))
+           cases-to-pick-from (rest shuffled-cases)]
+      ;(prn {:new-downsample new-downsample :cases-to-pick-from cases-to-pick-from})
+      (if (>= (count new-downsample) goal-size)
+        new-downsample
+        (let [tournament (take case-t-size cases-to-pick-from)
+              rest-of-cases (drop case-t-size cases-to-pick-from)
+              case-distances (metrics/mean-of-colls
+                              (map (fn [distance-list]
+                                     (utils/filter-by-index distance-list (map #(:index %) tournament)))
+                                   (map #(:distances %) new-downsample)))
+              selected-case-index (metrics/argmax case-distances)]
+          (prn {:avg-case-distances case-distances :selected-case-index selected-case-index})
+          (recur (conj new-downsample (nth tournament selected-case-index))
+                 (shuffle (concat (utils/drop-nth selected-case-index tournament)
+                                  rest-of-cases))))))))
+
+(defn select-downsample-metalex
+  "uses meta-lexicase selection to select a downsample that is biased to being spread out"
+  [training-data {:keys [downsample-rate]}])
 
 (defn get-distance-between-cases
   "returns the distance between two cases given a list of individual error vectors, and the index these
@@ -52,9 +80,11 @@
   "updates the case distance field of training-data list, should be called after evaluation of individuals
    evaluated-pop should be a list of individuals that all have the :errors field with a list of this 
    individuals performance on the each case in the ds-data, in order"
-    [evaluated-pop ds-data training-data]
-    (let [ds-indices (map #(:index %) ds-data) errors (map #(:errors %) evaluated-pop)]
-      (merge-map-lists-at-index training-data 
-        (map-indexed (fn [idx d-case] 
-              (update-in d-case [:distances] #(update-at-indices %
-                    (map (fn [other] (get-distance-between-cases errors idx other)) (range (count ds-indices))) ds-indices))) ds-data))))
+  [evaluated-pop ds-data training-data]
+  (let [ds-indices (map #(:index %) ds-data) errors (map #(:errors %) evaluated-pop)]
+    (merge-map-lists-at-index
+     training-data (map-indexed
+                    (fn [idx d-case] (update-in d-case
+                             [:distances] #(update-at-indices
+                                            % (map (fn [other] (get-distance-between-cases errors idx other))
+                                                  (range (count ds-indices))) ds-indices))) ds-data))))
