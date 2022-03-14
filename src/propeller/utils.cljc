@@ -1,6 +1,21 @@
 (ns propeller.utils
   (:require [clojure.zip :as zip]))
 
+(defn filter-by-index
+  "filters a collection by a list of indices"
+  [coll idxs]
+  ;(prn {:func :filter-by-index :coll coll :idxs idxs})
+  (keep-indexed #(when ((set idxs) %1) %2)
+                coll))
+
+(defn drop-nth
+  "drops the nth element from a collection"
+  [n coll]
+  ;(prn {:func :drop-nth :n n :coll coll})
+  (concat
+   (take n coll)
+   (nthrest coll (inc n))))
+
 (defn first-non-nil
   "Returns the first non-nil values from the collection, or returns `nil` if
   the collection is empty or only contains `nil`."

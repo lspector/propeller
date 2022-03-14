@@ -107,3 +107,8 @@
   [x]
   #?(:clj  (Math/tan x)
      :cljs (js/Math.tan x)))
+
+(defn transpose
+  "returns a vector containing the transpose of a coll of colls"
+  [x]
+  (apply map vector x))

@@ -1,10 +1,25 @@
 (ns propeller.tools.metrics
   (:require [propeller.tools.math :as math]))
 
+(defn argmax
+  "returns the index of the maximum value in a list"
+  [coll]
+  ;(prn {:func :argmax :coll coll})
+  (->> coll
+       (map-indexed vector)
+       (apply max-key second)
+       first))
+
 (defn mean
   "Returns the mean of a collection."
   [coll]
   (if (empty? coll) 0 (math/div (apply + coll) (count coll))))
+
+(defn mean-of-colls
+  "returns the mean of multiple colls"
+  [coll]
+  ;(prn {:func :mean-of-colls :coll coll})
+  (map mean (math/transpose coll)))
 
 (defn median
   "Returns the median of a collection."
