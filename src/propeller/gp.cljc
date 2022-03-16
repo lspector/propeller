@@ -48,10 +48,14 @@
                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
                      (range population-size))
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
+    ;;TODO: REMOVE THIS IT IS JUST FOR TESTING
+    (prn {:data (some #(when (zero? (:index %)) %) indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
-                          (case (:ds-function argmap)
-                            :case-tournament (downsample/select-downsample-tournament indexed-training-data argmap)
-                            (downsample/select-downsample-random indexed-training-data argmap)) ;defaults to random
+                          (if (zero? (mod generation (:case-k argmap))) ;every k generations, we eval on the entire training set
+                            indexed-training-data
+                            (case (:ds-function argmap)
+                               :case-tournament (downsample/select-downsample-tournament indexed-training-data argmap)
+                               (downsample/select-downsample-random indexed-training-data argmap))) ;defaults to random
                           indexed-training-data)
           evaluated-pop (sort-by :total-error
                                  (mapper
@@ -96,5 +100,7 @@
                        (repeatedly population-size
                                    #(variation/new-individual evaluated-pop argmap)))
                      (if (= (:parent-selection argmap) :ds-lexicase)
-                       (downsample/update-case-distances evaluated-pop training-data indexed-training-data)
+                       (if (zero? (mod generation (:case-k argmap)))
+                         (downsample/update-case-distances evaluated-pop training-data indexed-training-data) ; update distances every k generations
+                         indexed-training-data)
                        indexed-training-data))))))
