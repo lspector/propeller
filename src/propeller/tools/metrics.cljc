@@ -18,8 +18,12 @@
 (defn mean-of-colls
   "returns the mean of multiple colls"
   [coll]
-  ;(prn {:func :mean-of-colls :coll coll})
   (map mean (math/transpose coll)))
+
+(defn min-of-colls
+  "returns the smallest value of multiple colls"
+  [coll]
+  (map #(apply min %) (math/transpose coll)))
 
 (defn median
   "Returns the median of a collection."

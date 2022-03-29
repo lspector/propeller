@@ -14,6 +14,11 @@
   (t/is (= (m/mean-of-colls '((1 2 3) (4 3 2 1))) '(2.5 2.5 2.5)))
   (t/is (= (m/mean-of-colls '((1))) '(1.0))))
 
+(t/deftest min-of-colls-test
+  (t/is (= (m/min-of-colls '((1 2 3 4) (4 3 2 1))) '(1 2 2 1)))
+  (t/is (= (m/min-of-colls '((1 2 3) (4 3 2 1))) '(1 2 2)))
+  (t/is (= (m/min-of-colls '((1))) '(1))))
+
 (t/deftest mean-test
   (t/is (= (m/mean '(1 2 3 4)) 2.5))
   (t/is (= (m/mean '()) 0)))

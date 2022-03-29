@@ -20,7 +20,7 @@
   [training-data {:keys [downsample-rate]}]
   (take (int (* downsample-rate (count training-data))) (shuffle training-data)))
 
-(defn select-downsample-tournament
+(defn select-downsample-avg
   "uses case-tournament selection to select a downsample that is biased to being spread out"
   [training-data {:keys [downsample-rate case-t-size]}]
   (let [shuffled-cases (shuffle training-data)
@@ -38,6 +38,27 @@
                                    (map #(:distances %) new-downsample)))
               selected-case-index (metrics/argmax case-distances)]
           (prn {:avg-case-distances case-distances :selected-case-index selected-case-index})
+          (recur (conj new-downsample (nth tournament selected-case-index))
+                 (shuffle (concat (utils/drop-nth selected-case-index tournament)
+                                  rest-of-cases))))))))
+
+(defn select-downsample-maxmin
+  "uses tournament selection to select a downsample that has it's cases maximally far away"
+  [training-data {:keys [downsample-rate case-t-size]}]
+  (let [shuffled-cases (shuffle training-data)
+        goal-size (int (* downsample-rate (count training-data)))]
+    (loop [new-downsample (conj [] (first shuffled-cases))
+           cases-to-pick-from (rest shuffled-cases)]
+      (if (>= (count new-downsample) goal-size)
+        new-downsample
+        (let [tournament (take case-t-size cases-to-pick-from)
+              rest-of-cases (drop case-t-size cases-to-pick-from)
+              min-case-distances (metrics/min-of-colls
+                              (map (fn [distance-list]
+                                     (utils/filter-by-index distance-list (map #(:index %) tournament)))
+                                   (map #(:distances %) new-downsample)))
+              selected-case-index (metrics/argmax min-case-distances)]
+          (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
                  (shuffle (concat (utils/drop-nth selected-case-index tournament)
                                   rest-of-cases))))))))

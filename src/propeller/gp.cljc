@@ -52,7 +52,8 @@
     (prn {:data (some #(when (zero? (:index %)) %) indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
                             (case (:ds-function argmap)
-                               :case-tournament (downsample/select-downsample-tournament indexed-training-data argmap)
+                               :case-avg (downsample/select-downsample-avg indexed-training-data argmap)
+                               :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
                                (downsample/select-downsample-random indexed-training-data argmap))
                           indexed-training-data) ;defaults to random
           full-evaluated-pop (sort-by :total-error
@@ -65,13 +66,8 @@
                                      population))
           best-individual (first ds-evaluated-pop)
           best-individual-passes-ds (and (= (:parent-selection argmap) :ds-lexicase) (<= (:total-error best-individual) solution-error-threshold))
-          tot-evaluated-pop (when best-individual-passes-ds ;evaluate the whole pop on all training data
-                              (sort-by :total-error
-                                       (mapper
-                                        (partial error-function argmap (:training-data argmap))
-                                        population)))
           ;;best individual on all training-cases
-          tot-best-individual (if best-individual-passes-ds (first tot-evaluated-pop) best-individual)]
+          tot-best-individual (if best-individual-passes-ds (first full-evaluated-pop) best-individual)]
       (prn (first training-data))
       (if (:custom-report argmap)
         ((:custom-report argmap) ds-evaluated-pop generation argmap)
