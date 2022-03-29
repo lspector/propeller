@@ -51,17 +51,19 @@
     ;;TODO: REMOVE THIS IT IS JUST FOR TESTING
     (prn {:data (some #(when (zero? (:index %)) %) indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
-                          (if (zero? (mod generation (:case-k argmap))) ;every k generations, we eval on the entire training set
-                            indexed-training-data
                             (case (:ds-function argmap)
                                :case-tournament (downsample/select-downsample-tournament indexed-training-data argmap)
-                               (downsample/select-downsample-random indexed-training-data argmap))) ;defaults to random
-                          indexed-training-data)
-          evaluated-pop (sort-by :total-error
+                               (downsample/select-downsample-random indexed-training-data argmap))
+                          indexed-training-data) ;defaults to random
+          full-evaluated-pop (sort-by :total-error
                                  (mapper
-                                  (partial error-function argmap training-data)
+                                  (partial error-function argmap indexed-training-data)
                                   population))
-          best-individual (first evaluated-pop)
+          ds-evaluated-pop (sort-by :total-error
+                                    (mapper
+                                     (partial error-function argmap training-data)
+                                     population))
+          best-individual (first ds-evaluated-pop)
           best-individual-passes-ds (and (= (:parent-selection argmap) :ds-lexicase) (<= (:total-error best-individual) solution-error-threshold))
           tot-evaluated-pop (when best-individual-passes-ds ;evaluate the whole pop on all training data
                               (sort-by :total-error
@@ -72,8 +74,8 @@
           tot-best-individual (if best-individual-passes-ds (first tot-evaluated-pop) best-individual)]
       (prn (first training-data))
       (if (:custom-report argmap)
-        ((:custom-report argmap) evaluated-pop generation argmap)
-        (report evaluated-pop generation argmap))
+        ((:custom-report argmap) ds-evaluated-pop generation argmap)
+        (report ds-evaluated-pop generation argmap))
       ;;did the indvidual pass all cases in ds?
       (when best-individual-passes-ds
         (prn {:semi-success-generation generation}))
@@ -95,12 +97,10 @@
         :else (recur (inc generation)
                      (if (:elitism argmap)
                        (conj (repeatedly (dec population-size)
-                                         #(variation/new-individual evaluated-pop argmap))
-                             (first evaluated-pop))
+                                         #(variation/new-individual ds-evaluated-pop argmap))
+                             (first ds-evaluated-pop))
                        (repeatedly population-size
-                                   #(variation/new-individual evaluated-pop argmap)))
+                                   #(variation/new-individual ds-evaluated-pop argmap)))
                      (if (= (:parent-selection argmap) :ds-lexicase)
-                       (if (zero? (mod generation (:case-k argmap)))
-                         (downsample/update-case-distances evaluated-pop training-data indexed-training-data) ; update distances every k generations
-                         indexed-training-data)
+                         (downsample/update-case-distances full-evaluated-pop indexed-training-data indexed-training-data) ; update distances every generation
                        indexed-training-data))))))
