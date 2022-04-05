@@ -7,14 +7,14 @@
             #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn- target-function
-  "Target function: f(x) = (x^3 + 1)^2 + 1"
+  "Target function: f(x) = (x^3 + 1)^3 + 1"
   [x]
   (let [x-new (+ (* x x x) 1)]
-    (+ (* x-new x-new) 1)))
+    (+ (* x-new x-new x-new) 1)))
 
 (def train-and-test-data
-  (let [train-inputs (range -5.0 5.0 0.5)
-        test-inputs (range -5.25 5.75 0.5)]
+  (let [train-inputs (range -4.0 4.0 0.25)
+        test-inputs (range -4.125 4.125 0.25)]
     {:train (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) train-inputs)
      :test (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) test-inputs)}))
 
