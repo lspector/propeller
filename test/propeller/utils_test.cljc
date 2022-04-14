@@ -156,3 +156,13 @@
                                          '({:index 0 :distances [2 2 2 2 2]} {:index 1 :distances [2 2 2 2 2]} {:index 2 :distances [2 2 2 2 2]} {:index 3 :distances [2 2 2 2 2]} {:index 4 :distances [2 2 2 2 2]}))
                '({:index 0 :distances [2 2 2 2 2]} {:index 1 :distances [2 2 2 2 2]} {:index 2 :distances [2 2 2 2 2]}
                                                    {:index 3 :distances [2 2 2 0 0]} {:index 4 :distances [2 2 2 0 0]}))))))
+
+(t/deftest case-maxmin-test
+  (t/testing "case-maxmin selects correct downsample"
+    (t/is (let [selected (ds/select-downsample-maxmin '({:input1 [0] :output1 [10] :index 0 :distances [0 5 0 0 0]}
+                                                        {:input1 [1] :output1 [11] :index 1 :distances [0 5 0 0 0]}
+                                                        {:input1 [2] :output1 [12] :index 2 :distances [5 5 5 5 5]}
+                                                        {:input1 [3] :output1 [13] :index 3 :distances [0 5 0 0 0]}
+                                                        {:input1 [4] :output1 [14] :index 4 :distances [0 5 0 0 0]})
+                                                      {:downsample-rate 0.4 :case-t-size 5})]
+            (or (= (:index (first selected)) 1) (= (:index (second selected)) 1))))))

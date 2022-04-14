@@ -23,9 +23,12 @@
         :boolean_invert_first_then_and
         :boolean_invert_second_then_and
         :boolean_from_integer
+        true
+        false
         'close
         0
-        1))
+        1
+        3))
 
 (defn- target-function
   "If number is divisible by 3 but not 7, leave TRUE on the BOOLEAN stack else leave FALSE on the BOOLEAN stack"

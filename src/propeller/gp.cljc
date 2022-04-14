@@ -48,8 +48,7 @@
                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
                      (range population-size))
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
-    ;;TODO: REMOVE THIS IT IS JUST FOR TESTING
-    (prn {:data (some #(when (zero? (:index %)) %) indexed-training-data)})
+    (prn {:first-data (some #(when (zero? (:index %)) %) indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
                             (case (:ds-function argmap)
                                :case-avg (downsample/select-downsample-avg indexed-training-data argmap)
@@ -68,7 +67,7 @@
           best-individual-passes-ds (and (= (:parent-selection argmap) :ds-lexicase) (<= (:total-error best-individual) solution-error-threshold))
           ;;best individual on all training-cases
           tot-best-individual (if best-individual-passes-ds (first full-evaluated-pop) best-individual)]
-      (prn (first training-data))
+      (prn {:ds-inputs (map #(first (:input1 %)) training-data)})
       (if (:custom-report argmap)
         ((:custom-report argmap) ds-evaluated-pop generation argmap)
         (report ds-evaluated-pop generation argmap))

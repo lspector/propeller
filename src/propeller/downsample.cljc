@@ -58,6 +58,7 @@
                                      (utils/filter-by-index distance-list (map #(:index %) tournament)))
                                    (map #(:distances %) new-downsample)))
               selected-case-index (metrics/argmax min-case-distances)]
+          (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
           (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
                  (shuffle (concat (utils/drop-nth selected-case-index tournament)

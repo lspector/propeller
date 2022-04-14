@@ -5,8 +5,7 @@
   "filters a collection by a list of indices"
   [coll idxs]
   ;(prn {:func :filter-by-index :coll coll :idxs idxs})
-  (keep-indexed #(when ((set idxs) %1) %2)
-                coll))
+  (map (partial nth coll) idxs))
 
 (defn drop-nth
   "drops the nth element from a collection"
