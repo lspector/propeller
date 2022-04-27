@@ -33,7 +33,7 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold mapper]
+           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate]
     :or   {solution-error-threshold 0.0
            ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
            ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
@@ -55,19 +55,20 @@
                                :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
                                (downsample/select-downsample-random indexed-training-data argmap))
                           indexed-training-data) ;defaults to random
-          full-evaluated-pop (sort-by :total-error
+          parent-reps (take (* ds-parent-rate (count population)) (shuffle population)) 
+          rep-evaluated-pop (sort-by :total-error
                                  (mapper
                                   (partial error-function argmap indexed-training-data)
-                                  population))
+                                  parent-reps))
           ds-evaluated-pop (sort-by :total-error
                                     (mapper
                                      (partial error-function argmap training-data)
                                      population))
           best-individual (first ds-evaluated-pop)
-          best-individual-passes-ds (and (= (:parent-selection argmap) :ds-lexicase) (<= (:total-error best-individual) solution-error-threshold))
-          ;;best individual on all training-cases
-          tot-best-individual (if best-individual-passes-ds (first full-evaluated-pop) best-individual)]
-      (prn {:ds-inputs (map #(first (:input1 %)) training-data)})
+          best-individual-passes-ds (and (= (:parent-selection argmap) :ds-lexicase) (<= (:total-error best-individual) solution-error-threshold))]
+      (if (sequential? (:input1 (first training-data)))
+        (prn {:ds-inputs (map #(first (:input1 %)) training-data)})
+        (prn {:ds-inputs (map #(:input1 %) training-data)}))
       (if (:custom-report argmap)
         ((:custom-report argmap) ds-evaluated-pop generation argmap)
         (report ds-evaluated-pop generation argmap))
@@ -76,14 +77,14 @@
         (prn {:semi-success-generation generation}))
       (cond
         ;; Success on training cases is verified on testing cases
-        (or (and best-individual-passes-ds (<= (:total-error tot-best-individual) solution-error-threshold))
+        (or (and best-individual-passes-ds (<= (:total-error (error-function argmap indexed-training-data best-individual)) solution-error-threshold))
             (and (not= (:parent-selection argmap) :ds-lexicase)
                  (<= (:total-error best-individual) solution-error-threshold)))
         (do (prn {:success-generation generation})
             (prn {:total-test-error
-                  (:total-error (error-function argmap (:testing-data argmap) tot-best-individual))})
+                  (:total-error (error-function argmap (:testing-data argmap) best-individual))})
             (when (:simplification? argmap)
-              (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy tot-best-individual) error-function argmap)]
+              (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
                 (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))}))))
         ;;
         (>= generation max-generations)
@@ -97,5 +98,5 @@
                        (repeatedly population-size
                                    #(variation/new-individual ds-evaluated-pop argmap)))
                      (if (= (:parent-selection argmap) :ds-lexicase)
-                         (downsample/update-case-distances full-evaluated-pop indexed-training-data indexed-training-data) ; update distances every generation
+                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data) ; update distances every generation
                        indexed-training-data))))))
