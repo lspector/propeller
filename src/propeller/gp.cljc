@@ -48,7 +48,6 @@
                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
                      (range population-size))
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
-    (prn {:first-data (some #(when (zero? (:index %)) %) indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
                             (case (:ds-function argmap)
                                :case-avg (downsample/select-downsample-avg indexed-training-data argmap)

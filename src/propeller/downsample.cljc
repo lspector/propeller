@@ -43,7 +43,8 @@
                                   rest-of-cases))))))))
 
 (defn select-downsample-maxmin
-  "uses tournament selection to select a downsample that has it's cases maximally far away"
+  "selects a downsample that has it's cases maximally far away by sequentially 
+   adding cases to the downsample that have their closest case maximally far away"
   [training-data {:keys [downsample-rate case-t-size]}]
   (let [shuffled-cases (shuffle training-data)
         goal-size (int (* downsample-rate (count training-data)))]
@@ -58,7 +59,9 @@
                                      (utils/filter-by-index distance-list (map #(:index %) tournament)))
                                    (map #(:distances %) new-downsample)))
               selected-case-index (metrics/argmax min-case-distances)]
-          (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
+          (if (sequential? (:input1 (first new-downsample)))
+            (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
+            (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)}))
           (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
                  (shuffle (concat (utils/drop-nth selected-case-index tournament)
