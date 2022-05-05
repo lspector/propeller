@@ -4,11 +4,10 @@
 (defn argmax
   "returns the index of the maximum value in a list"
   [coll]
-  ;(prn {:func :argmax :coll coll})
   (->> coll
        (map-indexed vector)
        (apply max-key second)
-       first))
+       rand-nth))
 
 (defn mean
   "Returns the mean of a collection."
