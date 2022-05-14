@@ -68,6 +68,9 @@
        :error-function          error-function
        :training-data           (:train train-and-test-data)
        :testing-data            (:test train-and-test-data)
+       :case-t-size             (count (:train train-and-test-data))
+       :case-parent-rate        0
+       :case-parent-gens        1
        :max-generations         300
        :population-size         1000
        :max-initial-plushy-size 250

@@ -33,7 +33,7 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate]
+           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens]
     :or   {solution-error-threshold 0.0
            ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
            ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
@@ -48,13 +48,16 @@
                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
                      (range population-size))
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
+    (prn {:ind-training-data (first indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
                             (case (:ds-function argmap)
                                :case-avg (downsample/select-downsample-avg indexed-training-data argmap)
                                :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
                                (downsample/select-downsample-random indexed-training-data argmap))
                           indexed-training-data) ;defaults to random
-          parent-reps (take (* ds-parent-rate (count population)) (shuffle population)) 
+          parent-reps (if (zero? (mod generation ds-parent-gens)) ;every ds-parent-gens generations
+                        (take (* ds-parent-rate (count population)) (shuffle population))
+                        '()) ;else just empty list
           rep-evaluated-pop (sort-by :total-error
                                  (mapper
                                   (partial error-function argmap indexed-training-data)
@@ -97,5 +100,7 @@
                        (repeatedly population-size
                                    #(variation/new-individual ds-evaluated-pop argmap)))
                      (if (= (:parent-selection argmap) :ds-lexicase)
-                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data) ; update distances every generation
+                       (if (zero? (mod generation ds-parent-gens))
+                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data) ; update distances every ds-parent-gens generations
+                         indexed-training-data)
                        indexed-training-data))))))
