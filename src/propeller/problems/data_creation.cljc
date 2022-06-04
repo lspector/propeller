@@ -3,11 +3,10 @@
             [clojure.data.csv :as csv]
             [clojure.java.io :as io]))
 
-(def problem "fizz-buzz")
-
 (defn generate-data [problem train-or-test]
   (let [train-and-test-data (psb2/fetch-examples "data" problem 200 1000)
-        cleaned-data (map #(vector (:input1 %) (:output1 %)) ((keyword train-or-test) train-and-test-data))]
+        cleaned-data (cons (vector "input1" "output1") (map #(vector (:input1 %) (:output1 %)) ((keyword train-or-test) train-and-test-data)))]
+    (prn cleaned-data)
     (with-open [writer (io/writer (str problem "-" train-or-test ".csv"))]
       (csv/write-csv writer
                      (doall cleaned-data)))))
@@ -17,12 +16,46 @@
 
 (defn generate-data-for-all-problems []
   (map (partial generate-data-for-problem) '["fuel-cost"
-                                 "fizz-buzz"
-                                 "gcd"
-                                 "find-pair"
-                                 "small-or-large"
-                                 "scrabble-score"
-                                 "grade"
-                                 "count-odds"]))
+                                             "fizz-buzz"
+                                             "gcd"
+                                             "find-pair"]))
 
 (generate-data-for-all-problems)
+
+;--------PSB1
+
+(defn read-data [problem qual]
+  (with-open [reader (io/reader (str "src/propeller/problems/PSB1/" problem "-" qual ".csv"))]
+    (doall
+     (csv/read-csv reader))))
+
+(defn edge-cases-for-problem [problem]
+  (read-data problem  "edge"))
+
+(defn training-cases-for-problem [shuffled-data problem]
+  (let [edge-cases (edge-cases-for-problem problem)
+        left (- 201 (count edge-cases)) ;because labels is first
+        random-cases (take left shuffled-data)]
+    (concat edge-cases random-cases)))
+
+(defn testing-cases-for-problem [shuffled-data problem]
+  (take 1000 (drop 500 shuffled-data)))
+
+(defn save-train-test-data [shuffled-data problem train-or-test]
+  (with-open [writer (io/writer (str problem "-" train-or-test ".csv"))]
+    (csv/write-csv writer
+                   (if (= train-or-test "train") 
+                     (training-cases-for-problem shuffled-data problem)
+                     (testing-cases-for-problem shuffled-data problem)))))
+
+(defn save-data-for-problem [problem]
+  (let [shuffled-data (shuffle (rest (read-data problem  "random")))]
+  (map (partial save-train-test-data shuffled-data problem) '["test" "train"])))
+
+(defn save-data-for-all-problems []
+  (map (partial save-data-for-problem) '["small-or-large"
+                                             "scrabble-score"
+                                             "grade"
+                                             "count-odds"]))
+
+(save-data-for-all-problems)
