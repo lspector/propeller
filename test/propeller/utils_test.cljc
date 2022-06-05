@@ -167,7 +167,7 @@
                             {:input1 [3] :output1 [13] :index 3 :distances [0 5 0 0 0]}
                             {:input1 [4] :output1 [14] :index 4 :distances [0 5 0 0 0]})
                             {:downsample-rate 0.4 :case-t-size 5})]
-            (or (= (:index (first selected)) 1) (= (:index (second selected)) 1))))))
+            (or (= (:index (first selected)) 2) (= (:index (second selected)) 2))))))
 
 
 (t/deftest hyperselection-test

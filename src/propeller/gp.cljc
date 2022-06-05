@@ -49,7 +49,6 @@
                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
                      (range population-size))
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
-    (prn {:ind-training-data (first indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
                           (case (:ds-function argmap)
                             :case-avg (downsample/select-downsample-avg indexed-training-data argmap)
@@ -69,9 +68,10 @@
                                      population))
           best-individual (first ds-evaluated-pop)
           best-individual-passes-ds (and (= (:parent-selection argmap) :ds-lexicase) (<= (:total-error best-individual) solution-error-threshold))]
-      (if (sequential? (:input1 (first training-data)))
-        (prn {:ds-inputs (map #(first (:input1 %)) training-data)})
-        (prn {:ds-inputs (map #(:input1 %) training-data)}))
+      (prn {:ds-indices-list (map #(:index %) training-data)})
+      ;(if (sequential? (:input1 (first training-data)))
+        ;(prn {:ds-inputs (map #(first (:input1 %)) training-data)})
+        ;(prn {:ds-inputs (map #(:input1 %) training-data)}))
       (if (:custom-report argmap)
         ((:custom-report argmap) ds-evaluated-pop generation argmap)
         (report ds-evaluated-pop generation argmap))
@@ -97,10 +97,10 @@
                      (let [reindexed-pop (hyperselection/reindex-pop ds-evaluated-pop)]
                        (if (:elitism argmap)
                          (hyperselection/log-hyperselection-and-ret (conj (repeatedly (dec population-size)
-                                                                                       #(variation/new-individual reindexed-pop argmap))
-                                                                           (first reindexed-pop)))
+                                                                                      #(variation/new-individual reindexed-pop argmap))
+                                                                          (first reindexed-pop)))
                          (hyperselection/log-hyperselection-and-ret (repeatedly population-size ;need to count occurance of each parent, and reset IDs
-                                                                                 #(variation/new-individual reindexed-pop argmap)))))
+                                                                                #(variation/new-individual reindexed-pop argmap)))))
                      (if (= (:parent-selection argmap) :ds-lexicase)
                        (if (zero? (mod generation ds-parent-gens))
                          (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data) ; update distances every ds-parent-gens generations
