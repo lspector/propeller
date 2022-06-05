@@ -5,6 +5,7 @@
             [propeller.simplification :as simplification]
             [propeller.variation :as variation]
             [propeller.downsample :as downsample]
+            [propeller.hyperselection :as hyperselection]
             [propeller.push.instructions.bool]
             [propeller.push.instructions.character]
             [propeller.push.instructions.code]
@@ -50,18 +51,18 @@
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
     (prn {:ind-training-data (first indexed-training-data)})
     (let [training-data (if (= (:parent-selection argmap) :ds-lexicase)
-                            (case (:ds-function argmap)
-                               :case-avg (downsample/select-downsample-avg indexed-training-data argmap)
-                               :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
-                               (downsample/select-downsample-random indexed-training-data argmap))
+                          (case (:ds-function argmap)
+                            :case-avg (downsample/select-downsample-avg indexed-training-data argmap)
+                            :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
+                            (downsample/select-downsample-random indexed-training-data argmap))
                           indexed-training-data) ;defaults to random
           parent-reps (if (zero? (mod generation ds-parent-gens)) ;every ds-parent-gens generations
                         (take (* ds-parent-rate (count population)) (shuffle population))
                         '()) ;else just empty list
           rep-evaluated-pop (sort-by :total-error
-                                 (mapper
-                                  (partial error-function argmap indexed-training-data)
-                                  parent-reps))
+                                     (mapper
+                                      (partial error-function argmap indexed-training-data)
+                                      parent-reps))
           ds-evaluated-pop (sort-by :total-error
                                     (mapper
                                      (partial error-function argmap training-data)
@@ -93,12 +94,13 @@
         nil
         ;;
         :else (recur (inc generation)
-                     (if (:elitism argmap)
-                       (conj (repeatedly (dec population-size)
-                                         #(variation/new-individual ds-evaluated-pop argmap))
-                             (first ds-evaluated-pop))
-                       (repeatedly population-size
-                                   #(variation/new-individual ds-evaluated-pop argmap)))
+                     (let [reindexed-pop (hyperselection/reindex-pop ds-evaluated-pop)]
+                       (if (:elitism argmap)
+                         (hyperselection/log-hyperselection-and-ret (conj (repeatedly (dec population-size)
+                                                                                       #(variation/new-individual reindexed-pop argmap))
+                                                                           (first reindexed-pop)))
+                         (hyperselection/log-hyperselection-and-ret (repeatedly population-size ;need to count occurance of each parent, and reset IDs
+                                                                                 #(variation/new-individual reindexed-pop argmap)))))
                      (if (= (:parent-selection argmap) :ds-lexicase)
                        (if (zero? (mod generation ds-parent-gens))
                          (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data) ; update distances every ds-parent-gens generations

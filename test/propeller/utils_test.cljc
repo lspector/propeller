@@ -2,7 +2,8 @@
   (:require [clojure.test :as t]
             [propeller.utils :as u]
             [propeller.simplification :as s]
-            [propeller.downsample :as ds]))
+            [propeller.downsample :as ds]
+            [propeller.hyperselection :as hs]))
 
 (t/deftest first-non-nil-test
   (t/is (= 1 (u/first-non-nil '(1 2 3))))
@@ -159,10 +160,34 @@
 
 (t/deftest case-maxmin-test
   (t/testing "case-maxmin selects correct downsample"
-    (t/is (let [selected (ds/select-downsample-maxmin '({:input1 [0] :output1 [10] :index 0 :distances [0 5 0 0 0]}
-                                                        {:input1 [1] :output1 [11] :index 1 :distances [0 5 0 0 0]}
-                                                        {:input1 [2] :output1 [12] :index 2 :distances [5 5 5 5 5]}
-                                                        {:input1 [3] :output1 [13] :index 3 :distances [0 5 0 0 0]}
-                                                        {:input1 [4] :output1 [14] :index 4 :distances [0 5 0 0 0]})
-                                                      {:downsample-rate 0.4 :case-t-size 5})]
+    (t/is (let [selected (ds/select-downsample-maxmin 
+                          '({:input1 [0] :output1 [10] :index 0 :distances [0 5 0 0 0]}
+                            {:input1 [1] :output1 [11] :index 1 :distances [0 5 0 0 0]}
+                            {:input1 [2] :output1 [12] :index 2 :distances [5 5 5 5 5]}
+                            {:input1 [3] :output1 [13] :index 3 :distances [0 5 0 0 0]}
+                            {:input1 [4] :output1 [14] :index 4 :distances [0 5 0 0 0]})
+                            {:downsample-rate 0.4 :case-t-size 5})]
             (or (= (:index (first selected)) 1) (= (:index (second selected)) 1))))))
+
+
+(t/deftest hyperselection-test
+  (let [parents1 '({:blah 3 :index 1} {:blah 3 :index 1}
+                   {:blah 3 :index 1} {:blah 3 :index 2})
+        parents2 '({:plushy 2 :index 0} {:blah 3 :index 2}
+                   {:blah 3 :index 3} {:index 4})
+        emptyparents '({:blah 1} {:blah 1} {:blah 1})]
+    (t/testing "sum-list-map-indices function works correctly"
+      (t/is (= {1 3, 2 1} (hs/sum-list-map-indices parents1)))
+      (t/is (= {0 1, 2 1, 3 1, 4 1} (hs/sum-list-map-indices parents2))))
+    (t/testing "ordered-freqs function works correctly"
+      (t/is (= '(3 1) (hs/ordered-freqs (hs/sum-list-map-indices parents1))))
+      (t/is (= '(1 1 1 1) (hs/ordered-freqs (hs/sum-list-map-indices parents2)))))
+    (t/testing "hyperselection-track works correctly"
+      (t/is (= '(0.75 0.25) (hs/hyperselection-track parents1)))
+      (t/is (= '(0.25 0.25 0.25 0.25) (hs/hyperselection-track parents2))))
+    (t/testing "reindex-pop works correctly"
+      (t/is (= '({:blah 3 :index 0} {:blah 3 :index 1}
+                 {:blah 3 :index 2} {:blah 3 :index 3}) (hs/reindex-pop parents1)))
+      (t/is (= '({:plushy 2 :index 0} {:blah 3 :index 1}
+                 {:blah 3 :index 2} {:index 3}) (hs/reindex-pop parents2)))
+      (t/is (= '({:blah 1 :index 0} {:blah 1 :index 1} {:blah 1 :index 2}) (hs/reindex-pop emptyparents))))))
