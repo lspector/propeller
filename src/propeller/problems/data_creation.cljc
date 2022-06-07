@@ -27,13 +27,6 @@
       (csv/write-csv writer
                      (doall cleaned-data)))))
 
-
-(generate-data-find-pair "test")
-(generate-data-find-pair "train")
-(generate-data-gcd "test")
-(generate-data-gcd "train")
-
-
 (defn generate-data-for-problem [problem]
   (map (partial generate-data problem) '["test" "train"]))
 
@@ -41,7 +34,6 @@
   (map (partial generate-data-for-problem) '["gcd"
                                              "find-pair"]))
 
-(generate-data-for-all-problems)
 
 ;--------PSB1
 
@@ -87,5 +79,3 @@
                (map keyword) ;; Drop if you want string keys instead
                repeat)
           (map (fn [elem] (map #(read-string %) elem)) (rest csv-data)))))))
-
-(read-data-that-has-no-strings "fuel-cost" "test")
