@@ -34,8 +34,11 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens]
+           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens dont-end]
     :or   {solution-error-threshold 0.0
+           dont-end false
+           ds-parent-rate 0
+           ds-parent-gens 1
            ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
            ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
            mapper #?(:clj pmap :cljs map)}
@@ -80,15 +83,18 @@
         (prn {:semi-success-generation generation}))
       (cond
         ;; Success on training cases is verified on testing cases
-        (or (and best-individual-passes-ds (<= (:total-error (error-function argmap indexed-training-data best-individual)) solution-error-threshold))
-            (and (not= (:parent-selection argmap) :ds-lexicase)
-                 (<= (:total-error best-individual) solution-error-threshold)))
-        (do (prn {:success-generation generation})
-            (prn {:total-test-error
-                  (:total-error (error-function argmap (:testing-data argmap) best-individual))})
-            (when (:simplification? argmap)
-              (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
-                (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))}))))
+        (if (or (and best-individual-passes-ds (<= (:total-error (error-function argmap indexed-training-data best-individual)) solution-error-threshold))
+                     (and (not= (:parent-selection argmap) :ds-lexicase)
+                          (<= (:total-error best-individual) solution-error-threshold)))
+               (do (prn {:success-generation generation})
+                   (prn {:total-test-error
+                         (:total-error (error-function argmap (:testing-data argmap) best-individual))})
+                   (when (:simplification? argmap)
+                     (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
+                       (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))})))
+                   (if dont-end false true))
+               false)
+        nil
         ;;
         (>= generation max-generations)
         nil
