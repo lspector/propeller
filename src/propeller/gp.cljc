@@ -56,6 +56,7 @@
                           (case (:ds-function argmap)
                             :case-avg (downsample/select-downsample-avg indexed-training-data argmap)
                             :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
+                            :case-maxmin-auto (downsample/select-downsample-maxmin-adaptive indexed-training-data argmap)
                             (downsample/select-downsample-random indexed-training-data argmap))
                           indexed-training-data) ;defaults to random
           parent-reps (if (zero? (mod generation ds-parent-gens)) ;every ds-parent-gens generations
