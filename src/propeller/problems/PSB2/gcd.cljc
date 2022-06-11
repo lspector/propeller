@@ -2,6 +2,7 @@
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
+            [propeller.problems.data-creation :as dc]
             [propeller.utils :as utils]
             [propeller.push.instructions :refer [get-stack-instructions]]
             [propeller.push.state :as state]
@@ -17,7 +18,10 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ==================================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "gcd" 200 2000))
+;(def train-and-test-data (psb2/fetch-examples "data" "gcd" 200 2000))
+
+(def train-data (dc/read-data-formatted "gcd" "train"))
+(def test-data (dc/read-data-formatted "gcd" "test"))
 
 (defn random-int [] (- (rand-int 201) 100))
 
@@ -76,9 +80,9 @@
     (merge
       {:instructions            instructions
        :error-function          error-function
-       :training-data           (:train train-and-test-data)
-       :testing-data            (:test train-and-test-data)
-       :case-t-size             (count (:train train-and-test-data))
+       :training-data           train-data
+       :testing-data            test-data
+       :case-t-size             (count train-data)
        :case-parent-rate        0
        :case-parent-gens        1
        :max-generations         300

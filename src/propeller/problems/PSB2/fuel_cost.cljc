@@ -20,8 +20,8 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ============================================================
 
-(def train-data (dc/read-data-that-has-no-strings "fuel-cost" "train"))
-(def test-data (dc/read-data-that-has-no-strings "fuel-cost" "test"))
+(def train-data (dc/read-data-formatted "fuel-cost" "train"))
+(def test-data (dc/read-data-formatted "fuel-cost" "test"))
 
 ; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))

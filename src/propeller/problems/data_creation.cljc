@@ -77,7 +77,7 @@
       (str before)
       before)))
 
-(defn read-data-that-has-no-strings [problem train-or-test]
+(defn read-data-formatted [problem train-or-test]
   (apply list (with-open [reader (io/reader (str "picked/" problem "-" train-or-test ".csv"))]
     (let [csv-data (csv/read-csv reader)]
      (mapv zipmap
