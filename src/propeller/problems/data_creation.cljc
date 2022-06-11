@@ -71,6 +71,12 @@
                                              "grade"
                                              "count-odds"]))
 
+(defn read-string-and-convert [elem]
+  (let [before (read-string elem)]
+    (if (symbol? before)
+      (str before)
+      before)))
+
 (defn read-data-that-has-no-strings [problem train-or-test]
   (apply list (with-open [reader (io/reader (str "picked/" problem "-" train-or-test ".csv"))]
     (let [csv-data (csv/read-csv reader)]
@@ -78,4 +84,5 @@
           (->> (first csv-data) ;; First row is the header
                (map keyword) ;; Drop if you want string keys instead
                repeat)
-          (map (fn [elem] (map #(read-string %) elem)) (rest csv-data)))))))
+          (map (fn [elem] (map #(read-string-and-convert %) elem)) (rest csv-data)))))))
+
