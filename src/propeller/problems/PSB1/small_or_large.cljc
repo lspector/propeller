@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.fizz-buzz
+(ns propeller.problems.PSB1.small-or-large
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -10,19 +10,12 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  =========================
-; FIZZ BUZZ from PSB2
-; Given an integer x, return "Fizz" if x is
-; divisible by 3, "Buzz" if x is divisible by 5, "FizzBuzz" if x
-; is divisible by 3 and 5, and a string version of x if none of
-; the above hold.
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ============================================================
 
-(def train-data (dc/read-data-formatted "fizz-buzz" "train"))
-(def test-data (dc/read-data-formatted "fizz-buzz" "test"))
+(def train-data (dc/read-data-formatted "small-or-large" "train"))
+(def test-data (dc/read-data-formatted "small-or-large" "test"))
 
+; Random integer between -100 and 100
+(defn random-int [] (- (rand-int 201) 100))
 
 (def instructions
   (utils/not-lazy
@@ -34,7 +27,7 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list "Fizz" "Buzz" "FizzBuzz" 0 3 5))))
+      (list "small" "large" random-int))))
 
 (defn error-function
   [argmap data individual]

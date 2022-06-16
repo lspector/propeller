@@ -72,10 +72,13 @@
                                              "count-odds"]))
 
 (defn read-string-and-convert [elem]
+  (if (= elem "")
+  ""
   (let [before (read-string elem)]
     (if (symbol? before)
-      (str before)
-      before)))
+      elem
+      before))))
+
 
 (defn read-data-formatted [problem train-or-test]
   (apply list (with-open [reader (io/reader (str "picked/" problem "-" train-or-test ".csv"))]
@@ -86,3 +89,13 @@
                repeat)
           (map (fn [elem] (map #(read-string-and-convert %) elem)) (rest csv-data)))))))
 
+
+;scrabble-score doesn't play nice with read-string, hacky solution below
+(defn scrabble-score-read-data-formatted [problem train-or-test]
+  (apply list (with-open [reader (io/reader (str "picked/" problem "-" train-or-test ".csv"))]
+                (let [csv-data (csv/read-csv reader)]
+                  (mapv zipmap
+                        (->> (first csv-data) ;; First row is the header
+                             (map keyword) ;; Drop if you want string keys instead
+                             repeat)
+                        (map (fn [elem] (list (first elem) (read-string (second elem)))) (rest csv-data)))))))
