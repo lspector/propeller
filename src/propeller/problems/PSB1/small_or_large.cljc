@@ -27,7 +27,7 @@
       ;;; close
       (list 'close)
       ;;; ERCs (constants)
-      (list "small" "large" random-int))))
+      (list "" "small" "large" random-int))))
 
 (defn error-function
   [argmap data individual]
