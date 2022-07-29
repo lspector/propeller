@@ -74,7 +74,8 @@
                                                   1000000.0)) correct-output output))))
                     correct-outputs
                     parsed-outputs)
-         null (prn {:output (first outputs) :correct-output (first correct-outputs) :parsed (first parsed-outputs) :error (first errors)})]
+         ;null (prn {:output (first outputs) :correct-output (first correct-outputs) :parsed (first parsed-outputs) :error (first errors)})
+        ]
     (assoc individual
       :behaviors parsed-outputs
       :errors errors
