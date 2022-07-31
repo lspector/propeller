@@ -49,7 +49,7 @@
                                                           :in4 (nth input 3)
                                                           :in5 (nth input 4)})
                          (:step-limit argmap))
-                        :string))
+                        :print))
                      inputs)
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)

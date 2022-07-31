@@ -50,7 +50,7 @@
   (utils/not-lazy
    (concat
       ;;; stack-specific instructions
-    (get-stack-instructions #{:exec :integer :boolean :char :vector_integer :string :print})
+    (get-stack-instructions #{:exec :integer :boolean :char :vector_integer :string})
       ;;; input instructions
     (list :in1)
       ;;; close
