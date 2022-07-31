@@ -10,16 +10,6 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  ===============================
-; GCD [GREATEST COMMON DIVISOR] from PSB2
-; Given two integers, return the largest integer that divides each
-; of the integers evenly
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ==================================================================
-
-;(def train-and-test-data (psb2/fetch-examples "data" "gcd" 200 2000))
-
 (def train-data (dc/read-data-formatted "find-pair" "train"))
 (def test-data (dc/read-data-formatted "find-pair" "test"))
 
@@ -39,7 +29,7 @@
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
-      (get-stack-instructions #{:exec :integer :vector_integer :boolean :string_print :integer_print})
+      (get-stack-instructions #{:exec :integer :vector_integer :boolean :print})
       ;;; input instructions
       (list :in1 :in2)
       ;;; close
