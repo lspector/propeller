@@ -1,7 +1,8 @@
 (ns propeller.problems.data-creation
   (:require [psb2.core :as psb2]
             [clojure.data.csv :as csv]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clojure.string :as s]))
 
 (defn generate-data [problem train-or-test]
   (let [train-and-test-data (psb2/fetch-examples "data" problem 200 1000)
@@ -94,8 +95,9 @@
 (defn scrabble-score-read-data-formatted [problem train-or-test]
   (apply list (with-open [reader (io/reader (str "picked/" problem "-" train-or-test ".csv"))]
                 (let [csv-data (csv/read-csv reader)]
+                  (prn {:csv-data csv-data})
                   (mapv zipmap
                         (->> (first csv-data) ;; First row is the header
                              (map keyword) ;; Drop if you want string keys instead
                              repeat)
-                        (map (fn [elem] (list (first elem) (read-string (second elem)))) (rest csv-data)))))))
+                        (map (fn [elem] (list (s/replace (first elem) "\\n" "\n") (read-string (second elem)))) (rest csv-data)))))))
