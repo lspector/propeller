@@ -46,6 +46,46 @@
     (vec (for [c visible-chars]
            (get scrabble-map (first (string/lower-case c)) 0)))))
 
+;; scrabble-letter-values
+
+;; (def program '(0 :in1 :string_iterate (:integer_from_char [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 3 3 2 1 4 2 4 1 8 5 1 3 1 1 3 10 1 1 1 1 4 4 8 4 10 0 0 0 0 0 0 1 3 3 2 1 4 2 4 1 8 5 1 3 1 1 3 10 1 1 1 1 4 4 8 4 10 0 0 0 0] :vector_integer_nth :integer_add)))
+
+;; (def inputs (map (fn [i] (get i :input1)) test-data))
+;; test-data
+;; (def correct-outputs (map (fn [i] (get i :output1)) test-data))
+
+;; correct-outputs
+;; inputs
+
+;; (def outputs (map (fn [input]
+;;                     (state/peek-stack
+;;                      (interpreter/interpret-program
+;;                       program
+;;                       (assoc state/empty-state :input {:in1 input})
+;;                       200)
+;;                      :integer))
+;;                   inputs))
+
+;; outputs
+;; correct-outputs
+
+;; (def errors (map (fn [correct-output output]
+;;                    (if (= output :no-stack-item)
+;;                      1000000
+;;                      (math/abs (- correct-output output))))
+;;                  correct-outputs
+;;                  outputs))
+
+;; (apply + errors)
+
+;; (defn index-of [item coll]
+;;   (count (take-while (partial not= item) coll)))
+
+;; (index-of 1 errors)
+;; (nth inputs 647)
+;; (nth outputs 647)
+;; (nth correct-outputs 647)
+
 (def instructions
   (utils/not-lazy
    (concat
