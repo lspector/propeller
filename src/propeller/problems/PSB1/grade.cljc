@@ -14,10 +14,19 @@
 (def train-data (dc/read-data-formatted "grade" "train"))
 (def test-data (dc/read-data-formatted "grade" "test"))
 
+(def outputs (map (fn [i] (get i :output1)) train-data))
+
+outputs
+
 (defn map-vals-input
   "Returns all the input values of a map"
   [i]
   (vals (select-keys i [:input1 :input2 :input3 :input4 :input5])))
+
+(defn get-output
+  "returns the outputs of the grade function with JUST the letter grade"
+  [i]
+  (str (nth i 14)))
 
 ; Random integer between -100 and 100
 (defn random-int [] (- (rand-int 201) 100))
@@ -32,13 +41,13 @@
     ;;close
     (list 'close)
       ;; ERCs (constants)
-    (list "Student has a " " grade." "A" "B" "C" "D" "F" random-int))))
+    (list "A" "B" "C" "D" "F" random-int))))
 
 (defn error-function
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (map-vals-input i)) data)
-        correct-outputs (map (fn [i] (get i :output1)) data)
+        correct-outputs (map (fn [i] (get-output (get i :output1))) data)
         outputs (map (fn [input]
                        (state/peek-stack
                         (interpreter/interpret-program
