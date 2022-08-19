@@ -30,16 +30,15 @@
   (fn [state]
     (if (empty? (:integer state))
       state
-      (let [top-int (state/peek-stack state :input)]
+      (let [top-int (state/peek-stack state :integer)]
         (assoc-in state [:output :out1] top-int)))))
-
 
 (def-instruction :output-two
   ^{:stacks #{:integer :output}}
   (fn [state]
     (if (empty? (:integer state))
       state
-      (let [top-int (state/peek-stack state :input)]
+      (let [top-int (state/peek-stack state :integer)]
         (assoc-in state [:output :out2] top-int)))))
 
 (def instructions
@@ -70,7 +69,7 @@
                      inputs)
         outputs-1 (map #(:out1 %) outputs)
         outputs-2 (map #(:out2 %) outputs)
-        _ (prn {:o1 outputs-1 :o2 outputs-2})
+        ;_ (prn {:o1 outputs-1 :o2 outputs-2})
         errors (map (fn [correct-output output-1 output-2]
                       (if (not (and (number? output-2) (number? output-1)))
                         100000
