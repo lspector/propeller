@@ -1,4 +1,4 @@
-(ns propeller.problems.PSB2.fuel-cost
+(ns propeller.problems.PSB1.count-odds
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -10,18 +10,8 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  =========================
-; FUEL COST from PSB2
-; Given a vector of positive integers, divide
-; each by 3, round the result down to the nearest integer, and
-; subtract 2. Return the sum of all of the new integers in the
-; vector
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ============================================================
-
-(def train-data (dc/read-data-formatted "fuel-cost" "train"))
-(def test-data (dc/read-data-formatted "fuel-cost" "test"))
+(def train-data (dc/read-data-formatted "count-odds" "train"))
+(def test-data (dc/read-data-formatted "count-odds" "test"))
 
 ; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))
@@ -36,7 +26,7 @@
       ;;; close
     (list 'close)
       ;;; ERCs (constants)
-    (list random-int 0 1 2 3))))
+    (list random-int 0 1 2))))
 
 (defn error-function
   [argmap data individual]
