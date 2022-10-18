@@ -45,15 +45,14 @@
 (defn select-downsample-maxmin
   "selects a downsample that has it's cases maximally far away by sequentially 
    adding cases to the downsample that have their closest case maximally far away"
-  [training-data {:keys [downsample-rate case-t-size]}]
+  [training-data {:keys [downsample-rate]}]
   (let [shuffled-cases (shuffle training-data)
         goal-size (int (* downsample-rate (count training-data)))]
     (loop [new-downsample (conj [] (first shuffled-cases))
            cases-to-pick-from (rest shuffled-cases)]
       (if (>= (count new-downsample) goal-size)
         new-downsample
-        (let [tournament (take case-t-size cases-to-pick-from)
-              rest-of-cases (drop case-t-size cases-to-pick-from)
+        (let [tournament cases-to-pick-from
               min-case-distances (metrics/min-of-colls
                               (map (fn [distance-list]
                                      (utils/filter-by-index distance-list (map #(:index %) tournament)))
@@ -64,35 +63,31 @@
             (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)}))
           (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
-                 (shuffle (concat (utils/drop-nth selected-case-index tournament)
-                                  rest-of-cases))))))))
+                 (shuffle (utils/drop-nth selected-case-index tournament))))))))
 
 (defn select-downsample-maxmin-adaptive
   "selects a downsample that has it's cases maximally far away by sequentially 
    adding cases to the downsample that have their closest case maximally far away
    automatically stops when the maximum minimum distance is below delta"
-[training-data {:keys [case-t-size case-delta]}]
+[training-data {:keys [case-delta]}]
 (let [shuffled-cases (shuffle training-data)]
   (loop [new-downsample (conj [] (first shuffled-cases))
-         cases-to-pick-from (rest shuffled-cases)
-         end? false]
-    (if (or end? (zero? (count cases-to-pick-from)))
-      new-downsample
-      (let [tournament (take case-t-size cases-to-pick-from)
-            rest-of-cases (drop case-t-size cases-to-pick-from)
+         cases-to-pick-from (rest shuffled-cases)] 
+      (let [tournament cases-to-pick-from
             min-case-distances (metrics/min-of-colls
                                 (map (fn [distance-list]
                                        (utils/filter-by-index distance-list (map #(:index %) tournament)))
                                      (map #(:distances %) new-downsample)))
             selected-case-index (metrics/argmax min-case-distances)]
-        (if (sequential? (:input1 (first new-downsample)))
-          (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
-          (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)}))
-        (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
-        (recur (conj new-downsample (nth tournament selected-case-index))
-               (shuffle (concat (utils/drop-nth selected-case-index tournament)
-                                rest-of-cases))
-               (<= (apply max min-case-distances) case-delta)))))))
+        (if (or (<= (apply max min-case-distances) case-delta) (zero? (count cases-to-pick-from)))
+          new-downsample
+          (do
+            (if (sequential? (:input1 (first new-downsample)))
+              (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
+              (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)}))
+          (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
+          (recur (conj new-downsample (nth tournament selected-case-index))
+                 (shuffle (utils/drop-nth selected-case-index tournament)))))))))
 
 (defn get-distance-between-cases
   "returns the distance between two cases given a list of individual error vectors, and the index these

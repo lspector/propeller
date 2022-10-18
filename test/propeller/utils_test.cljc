@@ -166,9 +166,32 @@
                       {:input1 [2] :output1 [12] :index 2 :distances [0 5 0 0 0]}
                       {:input1 [3] :output1 [13] :index 3 :distances [0 5 0 0 0]}
                       {:input1 [4] :output1 [14] :index 4 :distances [0 5 0 0 0]})
-                    {:downsample-rate 0.4 :case-t-size 5})]
+                    {:downsample-rate 0.4})]
       (prn {:selected selected})
       (t/is (or (= (:index (first selected)) 1) (= (:index (second selected)) 1))))))
+
+(t/deftest case-maxmin-adaptive
+  (t/testing "case-maxmin-adaptive selects correct downsample simple"
+    (let [selected (ds/select-downsample-maxmin-adaptive
+                    '({:input1 [0] :output1 [10] :index 0 :distances [0 5 0 0 0]}
+                      {:input1 [1] :output1 [11] :index 1 :distances [5 0 5 5 5]}
+                      {:input1 [2] :output1 [12] :index 2 :distances [0 5 0 0 0]}
+                      {:input1 [3] :output1 [13] :index 3 :distances [0 5 0 0 0]}
+                      {:input1 [4] :output1 [14] :index 4 :distances [0 5 0 0 0]})
+                    {:case-delta 0})]
+      (prn {:selected selected})
+      (t/is (or (= (:index (first selected)) 1) (= (:index (second selected)) 1)))
+      (t/is (= 2 (count selected))))) 
+  (t/testing "case-maxmin-adaptive selects correct downsample when all identical"
+    (let [selected (ds/select-downsample-maxmin-adaptive
+                    '({:input1 [0] :output1 [10] :index 0 :distances [0 0 0 0 0]}
+                      {:input1 [1] :output1 [11] :index 1 :distances [0 0 0 0 0]}
+                      {:input1 [2] :output1 [12] :index 2 :distances [0 0 0 0 0]}
+                      {:input1 [3] :output1 [13] :index 3 :distances [0 0 0 0 0]}
+                      {:input1 [4] :output1 [14] :index 4 :distances [0 0 0 0 0]})
+                    {:case-delta 0})]
+      (prn {:selected selected})
+      (t/is (= 1 (count selected))))))
 
 
 (t/deftest hyperselection-test
