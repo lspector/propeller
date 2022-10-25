@@ -79,7 +79,7 @@
                                        (utils/filter-by-index distance-list (map #(:index %) tournament)))
                                      (map #(:distances %) new-downsample)))
             selected-case-index (metrics/argmax min-case-distances)]
-        (if (or (<= (apply max min-case-distances) case-delta) (zero? (count cases-to-pick-from)))
+        (if (or (= 0 (count tournament)) (<= (apply max min-case-distances) case-delta))
           new-downsample
           (do
             (if (sequential? (:input1 (first new-downsample)))

@@ -12,11 +12,13 @@
 (defn argmax
   "returns the index of the maximum value in a list, randomly tiebreaking"
   [coll]
-  (->> coll
-       (map-indexed vector)
-       (filter #(= (apply max coll) (second %)))
-       rand-nth
-       first))
+  (if (zero? (count coll))
+    :null
+    (->> coll
+         (map-indexed vector)
+         (filter #(= (apply max coll) (second %)))
+         rand-nth
+         first)))
 
 (defn mean
   "Returns the mean of a collection."
