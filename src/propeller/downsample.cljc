@@ -85,7 +85,7 @@
             (if (sequential? (:input1 (first new-downsample)))
               (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
               (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)}))
-          (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
+          ;(prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
                  (shuffle (utils/drop-nth selected-case-index tournament)))))))))
 

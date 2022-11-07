@@ -17,12 +17,13 @@
 
 (defn report
   "Reports information each generation."
-  [pop generation argmap]
+  [evaluations pop generation argmap]
   (let [best (first pop)]
     (clojure.pprint/pprint {:generation            generation
                             :best-plushy           (:plushy best)
                             :best-program          (genome/plushy->push (:plushy best) argmap)
                             :best-total-error      (:total-error best)
+                            :evaluations           evaluations
                             :best-errors           (:errors best)
                             :best-behaviors        (:behaviors best)
                             :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
@@ -48,6 +49,7 @@
   (println)
   ;;
   (loop [generation 0
+         evaluations 0
          population (mapper
                      (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
                      (range population-size))
@@ -77,8 +79,8 @@
         ;(prn {:ds-inputs (map #(first (:input1 %)) training-data)})
         ;(prn {:ds-inputs (map #(:input1 %) training-data)}))
       (if (:custom-report argmap)
-        ((:custom-report argmap) ds-evaluated-pop generation argmap)
-        (report ds-evaluated-pop generation argmap))
+        ((:custom-report argmap) evaluations ds-evaluated-pop generation argmap)
+        (report evaluations ds-evaluated-pop generation argmap))
       ;;did the indvidual pass all cases in ds?
       (when best-individual-passes-ds
         (prn {:semi-success-generation generation}))
@@ -97,10 +99,16 @@
                false)
         nil
         ;;
-        (>= generation max-generations)
+        (and (not= (:ds-function argmap) :case-maxmin-auto) (>= generation max-generations))
+        nil
+        ;;
+        (and (= (:ds-function argmap) :case-maxmin-auto) (>= evaluations (* max-generations population-size (count indexed-training-data))))
         nil
         ;;
         :else (recur (inc generation)
+                     (+ evaluations (* population-size (count training-data)) ;every member evaluated on the downsample
+                        (* (count parent-reps) (- (count indexed-training-data) (count training-data))) ; the parent-reps not evaluted already on down-sample
+                        (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
                      (let [reindexed-pop (hyperselection/reindex-pop ds-evaluated-pop)]
                        (if (:elitism argmap)
                          (hyperselection/log-hyperselection-and-ret (conj (repeatedly (dec population-size)
