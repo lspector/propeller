@@ -107,7 +107,7 @@
         ;;
         :else (recur (inc generation)
                      (+ evaluations (* population-size (count training-data)) ;every member evaluated on the downsample
-                        (* (count parent-reps) (- (count indexed-training-data) (count training-data))) ; the parent-reps not evaluted already on down-sample
+                        (if (zero? (mod generation ds-parent-gens)) (* (count parent-reps) (- (count indexed-training-data) (count training-data))) 0) ; the parent-reps not evaluted already on down-sample
                         (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
                      (let [reindexed-pop (hyperselection/reindex-pop ds-evaluated-pop)]
                        (if (:elitism argmap)
