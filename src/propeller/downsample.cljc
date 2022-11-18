@@ -84,14 +84,14 @@
           (do
             (if (sequential? (:input1 (first new-downsample)))
               (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
-              (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)}))
-          ;(prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
+              (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)})) 
+            ;(prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
                  (shuffle (utils/drop-nth selected-case-index tournament)))))))))
 
 (defn get-distance-between-cases
   "returns the distance between two cases given a list of individual error vectors, and the index these
-   cases exist in the error vector"
+   cases exist in the error vector. Only makes the distinction between zero and nonzero errors"
   [error-lists case-index-1 case-index-2]
   (if (or (< (count (first error-lists)) case-index-1)
           (< (count (first error-lists)) case-index-2)
@@ -119,15 +119,34 @@
       (if (nil? corresponding-small) % corresponding-small))
    big-list))
 
+(defn replace-mins-with-zero
+  "replaces the minimum value(s) in a list with zero"
+  [coll]
+  (if (empty? coll)
+    '()
+    (let [m (apply min coll)]
+      (map #(if (= m %) 0 %) coll))))
+
+(defn convert-to-elite-error
+  "converts a set of errors into a list where all the elite errors are replaced with 0s so that we can use
+   it in the selection of down-samples with elite/not-elite selection"
+  [errors]
+  (map #(replace-mins-with-zero %) errors))
+
 (defn update-case-distances
   "updates the case distance field of training-data list, should be called after evaluation of individuals
    evaluated-pop should be a list of individuals that all have the :errors field with a list of this 
-   individuals performance on the each case in the ds-data, in order"
-  [evaluated-pop ds-data training-data]
-  (let [ds-indices (map #(:index %) ds-data) errors (map #(:errors %) evaluated-pop)]
-    (merge-map-lists-at-index
+   individuals performance on the each case in the training-data, in order. ids-type is :elite to use elite/not-elite
+   or :solved to use solve/not-solved"
+
+  [evaluated-pop ds-data training-data ids-type]
+  (flush)
+  (let [ds-indices (map #(:index %) ds-data) 
+        errors (map #(:errors %) evaluated-pop)
+        corr-errors (if (= ids-type :elite) (convert-to-elite-error errors) errors)] ;errors, including elite/not-elite distinction
+    (merge-map-lists-at-index 
      training-data (map-indexed
                     (fn [idx d-case] (update-in d-case
                              [:distances] #(update-at-indices
-                                            % (map (fn [other] (get-distance-between-cases errors idx other))
+                                            % (map (fn [other] (get-distance-between-cases corr-errors idx other))
                                                   (range (count ds-indices))) ds-indices))) ds-data))))

@@ -35,11 +35,12 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens dont-end]
+           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens dont-end ids-type]
     :or   {solution-error-threshold 0.0
            dont-end false
            ds-parent-rate 0
            ds-parent-gens 1
+           ids-type :solved ; :solved or :elite
            ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
            ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
            mapper #?(:clj pmap :cljs map)}
@@ -118,6 +119,6 @@
                                                                                 #(variation/new-individual reindexed-pop argmap)))))
                      (if (= (:parent-selection argmap) :ds-lexicase)
                        (if (zero? (mod generation ds-parent-gens))
-                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data) ; update distances every ds-parent-gens generations
+                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type) ; update distances every ds-parent-gens generations
                          indexed-training-data)
                        indexed-training-data))))))
