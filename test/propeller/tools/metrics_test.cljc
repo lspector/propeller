@@ -29,6 +29,15 @@
   ;(t/is (= (m/median '()) 0.0))
   )
 
+(t/deftest argmins-test
+  (t/is (= (m/argmins '(1 2 3 4)) '(0)))
+  (t/is (= (m/argmins '(1 1 3 4)) '(0 1)))
+  (t/is (= (m/argmins '()) '()))
+  (t/is (= (m/argmins '(3 4 5 6 6 6)) '(0)))
+  (t/is (= (m/argmins '(6 4 5 6 6 6)) '(1)))
+  (t/is (= (m/argmins '(0 4 5 0 0 0)) '(0 3 4 5))))
+
+
 (t/deftest levenshtein-distance-test
   (t/is (= (m/levenshtein-distance "kitten" "sipping") 5))
   (t/is (= (m/levenshtein-distance "" "hello") 5)))

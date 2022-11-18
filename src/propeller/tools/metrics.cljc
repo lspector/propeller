@@ -1,6 +1,13 @@
 (ns propeller.tools.metrics
   (:require [propeller.tools.math :as math]))
 
+(defn argmins
+  "returns the indice(s) of the minimum value of a list. Could be more efficient, probably"
+  [coll]
+  (if (empty? coll) '()
+      (let [m (apply min coll)]
+        (keep-indexed #(when (= m %2) %1) coll))))
+
 (defn argmax-last
   "returns the index of the maximum value in a list, tiebreaking last"
   [coll]
