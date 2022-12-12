@@ -20,28 +20,6 @@
   [training-data {:keys [downsample-rate]}]
   (take (int (* downsample-rate (count training-data))) (shuffle training-data)))
 
-(defn select-downsample-avg
-  "uses case-tournament selection to select a downsample that is biased to being spread out"
-  [training-data {:keys [downsample-rate case-t-size]}]
-  (let [shuffled-cases (shuffle training-data)
-        goal-size (int (* downsample-rate (count training-data)))]
-    (loop [new-downsample (conj [] (first shuffled-cases))
-           cases-to-pick-from (rest shuffled-cases)]
-      ;(prn {:new-downsample new-downsample :cases-to-pick-from cases-to-pick-from})
-      (if (>= (count new-downsample) goal-size)
-        new-downsample
-        (let [tournament (take case-t-size cases-to-pick-from)
-              rest-of-cases (drop case-t-size cases-to-pick-from)
-              case-distances (metrics/mean-of-colls
-                              (map (fn [distance-list]
-                                     (utils/filter-by-index distance-list (map #(:index %) tournament)))
-                                   (map #(:distances %) new-downsample)))
-              selected-case-index (metrics/argmax case-distances)]
-          (prn {:avg-case-distances case-distances :selected-case-index selected-case-index})
-          (recur (conj new-downsample (nth tournament selected-case-index))
-                 (shuffle (concat (utils/drop-nth selected-case-index tournament)
-                                  rest-of-cases))))))))
-
 (defn select-downsample-maxmin
   "selects a downsample that has it's cases maximally far away by sequentially 
    adding cases to the downsample that have their closest case maximally far away"
@@ -58,10 +36,6 @@
                                      (utils/filter-by-index distance-list (map #(:index %) tournament)))
                                    (map #(:distances %) new-downsample)))
               selected-case-index (metrics/argmax min-case-distances)]
-          (if (sequential? (:input1 (first new-downsample)))
-            (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
-            (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)}))
-          (prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
                  (shuffle (utils/drop-nth selected-case-index tournament))))))))
 
@@ -81,13 +55,8 @@
             selected-case-index (metrics/argmax min-case-distances)]
         (if (or (= 0 (count tournament)) (<= (apply max min-case-distances) case-delta))
           new-downsample
-          (do
-            (if (sequential? (:input1 (first new-downsample)))
-              (prn {:cases-in-ds (map #(first (:input1 %)) new-downsample) :cases-in-tourn (map #(first (:input1 %)) tournament)})
-              (prn {:cases-in-ds (map #(:input1 %) new-downsample) :cases-in-tourn (map #(:input1 %) tournament)})) 
-            ;(prn {:min-case-distances min-case-distances :selected-case-index selected-case-index})
           (recur (conj new-downsample (nth tournament selected-case-index))
-                 (shuffle (utils/drop-nth selected-case-index tournament)))))))))
+                 (shuffle (utils/drop-nth selected-case-index tournament))))))))
 
 (defn get-distance-between-cases
   "returns the distance between two cases given a list of individual error vectors, and the index these

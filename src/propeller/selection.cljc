@@ -26,5 +26,4 @@
   [pop argmap]
   (case (:parent-selection argmap)
     :tournament (tournament-selection pop argmap)
-    :lexicase (lexicase-selection pop argmap)
-    :ds-lexicase (lexicase-selection pop argmap)))
+    :lexicase (lexicase-selection pop argmap)))
