@@ -63,28 +63,33 @@
                             :case-maxmin-auto (downsample/select-downsample-maxmin-adaptive indexed-training-data argmap)
                             :case-rand (downsample/select-downsample-random indexed-training-data argmap)
                             (do (prn {:error "Invalid Downsample Function"}) (downsample/select-downsample-random indexed-training-data argmap)))
-                          indexed-training-data) ;defaults to random
-          parent-reps (if (zero? (mod generation ds-parent-gens)) ;every ds-parent-gens generations
+                          indexed-training-data) ;defaults to full training set
+          parent-reps (if 
+                       (and downsample? ; if we are down-sampling
+                            (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
                         (take (* ds-parent-rate (count population)) (shuffle population))
                         '()) ;else just empty list
-          rep-evaluated-pop (sort-by :total-error
+          rep-evaluated-pop (if downsample? 
+                              (sort-by :total-error
                                      (mapper
                                       (partial error-function argmap indexed-training-data)
                                       parent-reps))
-          ds-evaluated-pop (sort-by :total-error
+                              '())
+          evaluated-pop (sort-by :total-error
                                     (mapper
                                      (partial error-function argmap training-data)
                                      population))
-          best-individual (first ds-evaluated-pop)
+          best-individual (first evaluated-pop)
           best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))]
       (if (:custom-report argmap)
-        ((:custom-report argmap) evaluations ds-evaluated-pop generation argmap)
-        (report evaluations ds-evaluated-pop generation argmap training-data))
+        ((:custom-report argmap) evaluations evaluated-pop generation argmap)
+        (report evaluations evaluated-pop generation argmap training-data))
       ;;did the indvidual pass all cases in ds?
       (when best-individual-passes-ds
         (prn {:semi-success-generation generation}))
       (cond
-        ;; Success on training cases is verified on testing cases
+        ;; If either the best individual on the ds passes all training cases, or best individual on full sample passes all training cases
+        ;; We verify success on test cases and end evolution
         (if (or (and best-individual-passes-ds (<= (:total-error (error-function argmap indexed-training-data best-individual)) solution-error-threshold))
                      (and (not downsample?)
                           (<= (:total-error best-individual) solution-error-threshold)))
@@ -105,15 +110,15 @@
         nil
         ;;
         :else (recur (inc generation)
-                     (+ evaluations (* population-size (count training-data)) ;every member evaluated on the downsample
+                     (+ evaluations (* population-size (count training-data)) ;every member evaluated on the current sample
                         (if (zero? (mod generation ds-parent-gens)) (* (count parent-reps) (- (count indexed-training-data) (count training-data))) 0) ; the parent-reps not evaluted already on down-sample
                         (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
-                     (let [reindexed-pop (hyperselection/reindex-pop ds-evaluated-pop)]
-                       (if (:elitism argmap)
-                         (hyperselection/log-hyperselection-and-ret (conj (repeatedly (dec population-size)
-                                                                                      #(variation/new-individual reindexed-pop argmap))
-                                                                          (first reindexed-pop)))
-                         (hyperselection/log-hyperselection-and-ret (repeatedly population-size ;need to count occurance of each parent, and reset IDs
+                     (let [reindexed-pop (hyperselection/reindex-pop evaluated-pop)] ; give every individual an index for hyperselection loggin
+                       (hyperselection/log-hyperselection-and-ret
+                        (if (:elitism argmap)
+                         (conj (repeatedly (dec population-size) #(variation/new-individual reindexed-pop argmap))
+                                                                          (first reindexed-pop))
+                         (repeatedly population-size ;need to count occurance of each parent, and reset IDs
                                                                                 #(variation/new-individual reindexed-pop argmap)))))
                      (if downsample?
                       (if (zero? (mod generation ds-parent-gens))
