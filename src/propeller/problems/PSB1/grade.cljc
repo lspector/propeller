@@ -14,10 +14,6 @@
 (def train-data (dc/read-data-formatted "grade" "train"))
 (def test-data (dc/read-data-formatted "grade" "test"))
 
-(def outputs (map (fn [i] (get i :output1)) train-data))
-
-outputs
-
 (defn map-vals-input
   "Returns all the input values of a map"
   [i]
