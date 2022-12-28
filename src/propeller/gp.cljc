@@ -40,10 +40,10 @@
   [pop]
   (let [error-list (map :errors pop)
         length (count (:errors (first pop)))]
-    (loop [epsilons [] i 0]
+    (loop [epsilon [] i 0]
       (if (= i length)
-        epsilons
-        (recur (conj epsilons (median-absolute-deviation (map #(nth % i) error-list))) (inc i))))))
+        epsilon
+        (recur (conj epsilon (median-absolute-deviation (map #(nth % i) error-list))) (inc i))))))
 
 (defn report
   "Reports information each generation."
@@ -84,7 +84,7 @@
                                    population))
           best-individual (first evaluated-pop)
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
-                           (assoc argmap :epsilons (epsilon-list evaluated-pop))
+                           (assoc argmap :epsilon (epsilon-list evaluated-pop))
                            argmap)]
       (prn argmap)
       (if (:custom-report argmap)

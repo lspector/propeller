@@ -24,7 +24,7 @@
 (defn epsilon-lexicase-selection
   "Selects an individual from the population using epsilon-lexicase selection."
   [pop argmap]
-  (let [epsilons (:epsilons argmap)]
+  (let [epsilon (:epsilon argmap)]
     (loop [survivors pop
            cases (shuffle (range (count (:errors (first pop)))))]
       (if (or (empty? cases)
@@ -33,7 +33,7 @@
 
         (let [min-err-for-case (apply min (map #(nth % (first cases))
                                                (map :errors survivors)))
-              epsilon (nth epsilons (first cases))]
+              epsilon (nth epsilon (first cases))]
 
           (recur (filter #(<= (Math/abs (- (nth (:errors %) (first cases)) min-err-for-case)) epsilon)
                          survivors)
