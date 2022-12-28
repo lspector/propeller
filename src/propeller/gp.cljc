@@ -13,6 +13,38 @@
             [propeller.push.instructions.string]
             [propeller.push.instructions.vector]))
 
+(defn mean [coll]
+  (let [sum (apply + coll)
+        count (count coll)]
+    (if (pos? count)
+      (/ sum (float count))
+      0)))
+
+(defn median [coll]
+  (let [sorted (sort coll)
+        cnt (count sorted)
+        halfway (quot cnt 2.0)]
+    (if (odd? cnt)
+      (nth sorted halfway)
+      (let [bottom (dec halfway)
+            bottom-val (nth sorted bottom)
+            top-val (nth sorted halfway)]
+        (mean [bottom-val top-val])))))
+
+(defn median-absolute-deviation
+  [coll]
+  (let [median-val (median coll)]
+    (median (map #(Math/abs (- % median-val)) coll))))
+
+(defn epsilon-list
+  [pop]
+  (let [error-list (map :errors pop)
+        length (count (:errors (first pop)))]
+    (loop [epsilons [] i 0]
+      (if (= i length)
+        epsilons
+        (recur (conj epsilons (median-absolute-deviation (map #(nth % i) error-list))) (inc i))))))
+
 (defn report
   "Reports information each generation."
   [pop generation argmap]
@@ -50,7 +82,11 @@
                                  (mapper
                                    (partial error-function argmap (:training-data argmap))
                                    population))
-          best-individual (first evaluated-pop)]
+          best-individual (first evaluated-pop)
+          argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
+                           (assoc argmap :epsilons (epsilon-list evaluated-pop))
+                           argmap)]
+      (prn argmap)
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)
         (report evaluated-pop generation argmap))
