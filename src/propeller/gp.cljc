@@ -37,6 +37,7 @@
     (median (map #(Math/abs (- % median-val)) coll))))
 
 (defn epsilon-list
+  "Calculates the median absolute deviation of the population."
   [pop]
   (let [error-list (map :errors pop)
         length (count (:errors (first pop)))]
@@ -86,7 +87,6 @@
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
                            (assoc argmap :epsilons (epsilon-list evaluated-pop))
                            argmap)]
-      (prn argmap)
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)
         (report evaluated-pop generation argmap))
