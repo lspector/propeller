@@ -21,9 +21,27 @@
                        survivors)
                (rest cases))))))
 
+(defn fitness-proportionate-selection 
+  "Selects an individual from the population using a fitness proportionate selection."
+  [pop argmap]
+  (let [pop-fits (->> pop ;convert from error to fitness, where fitness (probability) is (1/ (1+ tot_err))
+                      (map #(assoc % :fitness (/ 1 (inc (:total-error %))))))
+        pop-total-fit (->> pop-fits
+                           (map :fitness)
+                           (reduce +))
+        random-num (* (rand) pop-total-fit) 
+        sorted-by-fitness (->> pop-fits
+                               (sort-by :fitness)
+                               (reverse))]
+    (loop [tot (:fitness (first sorted-by-fitness)) individuals sorted-by-fitness]
+      (if (< random-num tot)
+        (first individuals)
+        (recur (+ tot (:fitness (first (rest individuals)))) (rest individuals))))))
+
 (defn select-parent
   "Selects a parent from the population using the specified method."
   [pop argmap]
   (case (:parent-selection argmap)
     :tournament (tournament-selection pop argmap)
-    :lexicase (lexicase-selection pop argmap)))
+    :lexicase (lexicase-selection pop argmap)
+    :roulette (fitness-proportionate-selection pop argmap)))
