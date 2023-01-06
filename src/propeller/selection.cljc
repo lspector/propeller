@@ -1,4 +1,5 @@
-(ns propeller.selection)
+(ns propeller.selection
+  (:require [propeller.tools.math :as math-tools]))
 
 (defn tournament-selection
   "Selects an individual from the population using a tournament."
@@ -20,6 +21,15 @@
         (recur (filter #(= (nth (:errors %) (first cases)) min-err-for-case)
                        survivors)
                (rest cases))))))
+
+(defn epsilon-list
+  [pop]
+  (let [error-list (map :errors pop)
+        length (count (:errors (first pop)))]
+    (loop [epsilons [] i 0]
+      (if (= i length)
+        epsilons
+        (recur (conj epsilons (math-tools/median-absolute-deviation (map #(nth % i) error-list))) (inc i))))))
 
 (defn epsilon-lexicase-selection
   "Selects an individual from the population using epsilon-lexicase selection."

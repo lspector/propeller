@@ -11,40 +11,8 @@
             [propeller.push.instructions.numeric]
             [propeller.push.instructions.polymorphic]
             [propeller.push.instructions.string]
-            [propeller.push.instructions.vector]))
-
-(defn mean [coll]
-  (let [sum (apply + coll)
-        count (count coll)]
-    (if (pos? count)
-      (/ sum (float count))
-      0)))
-
-(defn median [coll]
-  (let [sorted (sort coll)
-        cnt (count sorted)
-        halfway (quot cnt 2.0)]
-    (if (odd? cnt)
-      (nth sorted halfway)
-      (let [bottom (dec halfway)
-            bottom-val (nth sorted bottom)
-            top-val (nth sorted halfway)]
-        (mean [bottom-val top-val])))))
-
-(defn median-absolute-deviation
-  [coll]
-  (let [median-val (median coll)]
-    (median (map #(Math/abs (- % median-val)) coll))))
-
-(defn epsilon-list
-  "Calculates the median absolute deviation of the population."
-  [pop]
-  (let [error-list (map :errors pop)
-        length (count (:errors (first pop)))]
-    (loop [epsilons [] i 0]
-      (if (= i length)
-        epsilons
-        (recur (conj epsilons (median-absolute-deviation (map #(nth % i) error-list))) (inc i))))))
+            [propeller.push.instructions.vector]
+            [propeller.selection :as selection]))
 
 (defn report
   "Reports information each generation."
@@ -85,7 +53,7 @@
                                    population))
           best-individual (first evaluated-pop)
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
-                           (assoc argmap :epsilons (epsilon-list evaluated-pop))
+                           (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
                            argmap)]
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)

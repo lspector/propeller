@@ -60,4 +60,16 @@
       (t/is (m/approx= (m/tan (/  m/PI 4)) 1.0 0.00001))
       (t/is (= (m/tan 0) 0.0)))
 
+(t/deftest mean-test
+  (t/is (= (m/mean []) 0.0))
+  (t/is (= (m/mean [1 2 3 4 5]) 3.0))
+  (t/is (= (m/mean '(6 7 8 9 10)) 8.0) 8.0))
+
+(t/deftest median-test
+  (t/is (= (m/median [1 2 3 4 5]) 3))
+  (t/is (= (m/median '(1 2 3 4 5 6)) 3.5)))
+
+(t/deftest median-absolute-deviation-test
+  (t/is (= (m/median-absolute-deviation [1 2 3 4 5]) 1))
+  (t/is (= (m/median-absolute-deviation '(1 2 3 4 5 6)) 1.5)))
 
