@@ -29,7 +29,10 @@
     (loop [epsilons [] i 0]
       (if (= i length)
         epsilons
-        (recur (conj epsilons (math-tools/median-absolute-deviation (map #(nth % i) error-list))) (inc i))))))
+        (recur (conj epsilons
+                     (math-tools/median-absolute-deviation
+                       (map #(nth % i) error-list)))
+               (inc i))))))
 
 (defn epsilon-lexicase-selection
   "Selects an individual from the population using epsilon-lexicase selection."
@@ -40,12 +43,13 @@
       (if (or (empty? cases)
               (empty? (rest survivors)))
         (rand-nth survivors)
-
         (let [min-err-for-case (apply min (map #(nth % (first cases))
                                                (map :errors survivors)))
               epsilon (nth epsilons (first cases))]
-
-          (recur (filter #(<= (Math/abs (- (nth (:errors %) (first cases)) min-err-for-case)) epsilon)
+          (recur (filter #(<= (Math/abs (- (nth (:errors %)
+                                                (first cases))
+                                           min-err-for-case))
+                              epsilon)
                          survivors)
                  (rest cases)))))))
 
