@@ -53,8 +53,8 @@
                                    population))
           best-individual (first evaluated-pop)
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
-                           (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
-                           argmap)]
+                   (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
+                   argmap)]
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)
         (report evaluated-pop generation argmap))
