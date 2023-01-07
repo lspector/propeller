@@ -11,7 +11,8 @@
             [propeller.push.instructions.numeric]
             [propeller.push.instructions.polymorphic]
             [propeller.push.instructions.string]
-            [propeller.push.instructions.vector]))
+            [propeller.push.instructions.vector]
+            [propeller.selection :as selection]))
 
 (defn report
   "Reports information each generation."
@@ -50,7 +51,10 @@
                                  (mapper
                                    (partial error-function argmap (:training-data argmap))
                                    population))
-          best-individual (first evaluated-pop)]
+          best-individual (first evaluated-pop)
+          argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
+                           (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
+                           argmap)]
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)
         (report evaluated-pop generation argmap))
