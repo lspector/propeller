@@ -13,7 +13,8 @@
             [propeller.push.instructions.numeric]
             [propeller.push.instructions.polymorphic]
             [propeller.push.instructions.string]
-            [propeller.push.instructions.vector]))
+            [propeller.push.instructions.vector]
+            [propeller.selection :as selection]))
 
 (defn report
   "Reports information each generation."
@@ -80,7 +81,10 @@
                                      (partial error-function argmap training-data)
                                      population))
           best-individual (first evaluated-pop)
-          best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))]
+          best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))
+          argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
+                   (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
+                   argmap)]
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluations evaluated-pop generation argmap)
         (report evaluations evaluated-pop generation argmap training-data))

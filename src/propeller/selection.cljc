@@ -1,4 +1,5 @@
-(ns propeller.selection)
+(ns propeller.selection
+  (:require [propeller.tools.math :as math-tools]))
 
 (defn tournament-selection
   "Selects an individual from the population using a tournament."
@@ -38,10 +39,42 @@
         (first individuals)
         (recur (+ tot (:fitness (first (rest individuals)))) (rest individuals))))))
 
+(defn epsilon-list
+  [pop]
+  (let [error-list (map :errors pop)
+        length (count (:errors (first pop)))]
+    (loop [epsilons [] i 0]
+      (if (= i length)
+        epsilons
+        (recur (conj epsilons
+                     (math-tools/median-absolute-deviation
+                       (map #(nth % i) error-list)))
+               (inc i))))))
+
+(defn epsilon-lexicase-selection
+  "Selects an individual from the population using epsilon-lexicase selection."
+  [pop argmap]
+  (let [epsilons (:epsilons argmap)]
+    (loop [survivors pop
+           cases (shuffle (range (count (:errors (first pop)))))]
+      (if (or (empty? cases)
+              (empty? (rest survivors)))
+        (rand-nth survivors)
+        (let [min-err-for-case (apply min (map #(nth % (first cases))
+                                               (map :errors survivors)))
+              epsilon (nth epsilons (first cases))]
+          (recur (filter #(<= (Math/abs (- (nth (:errors %)
+                                                (first cases))
+                                           min-err-for-case))
+                              epsilon)
+                         survivors)
+                 (rest cases)))))))
+
 (defn select-parent
   "Selects a parent from the population using the specified method."
   [pop argmap]
   (case (:parent-selection argmap)
     :tournament (tournament-selection pop argmap)
     :lexicase (lexicase-selection pop argmap)
-    :roulette (fitness-proportionate-selection pop argmap)))
+    :roulette (fitness-proportionate-selection pop argmap)
+    :epsilon-lexicase (epsilon-lexicase-selection pop argmap)))
