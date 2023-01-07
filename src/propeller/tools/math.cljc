@@ -11,7 +11,7 @@
         count (count coll)]
     (if (pos? count)
       (/ sum (float count))
-      0)))
+      0.0)))
 
 (defn median [coll]
   (let [sorted (sort coll)
