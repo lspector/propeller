@@ -1,4 +1,4 @@
-(ns propeller.problems.simple-regression
+(ns propeller.problems.float-regression
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
@@ -7,23 +7,23 @@
             #?(:cljs [cljs.reader :refer [read-string]])))
 
 (defn- target-function
-  "Target function: f(x) = x^3 + x + 3"
+  "Target function: f(x) = (1+ x^3)^3 + 1"
   [x]
-  (+ (* x x x) x 3))
+  (inc (* (inc (* x x x)) (inc (* x x x)) (inc (* x x x)))))
 
 (def train-and-test-data
-  (let [train-inputs (range -10 11)
-        test-inputs (concat (range -20 -10) (range 11 21))]
+  (let [train-inputs (range -1.5 1.5 0.1)
+        test-inputs (range -1.75 1.75 0.05)]
     {:train (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) train-inputs)
      :test (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) test-inputs)}))
 
 (def instructions
   (list :in1
-        :integer_add
-        :integer_subtract
-        :integer_mult
-        :integer_quot
-        :integer_eq
+        :float_add
+        :float_subtract
+        :float_mult
+        :float_quot
+        :float_eq
         :exec_dup
         :exec_if
         'close
@@ -34,7 +34,7 @@
   "Finds the behaviors and errors of an individual. The error is the absolute
   deviation between the target output value and the program's selected behavior,
   or 1000000 if no behavior is produced. The behavior is here defined as the
-  final top item on the INTEGER stack."
+  final top item on the FLOAT stack."
   ([argmap data individual]
    (let [program (genome/plushy->push (:plushy individual) argmap)
          inputs (map (fn [x] (first (:input1 x))) data)
@@ -45,7 +45,7 @@
                             program
                             (assoc state/empty-state :input {:in1 input})
                             (:step-limit argmap))
-                          :integer))
+                          :float))
                       inputs)
          errors (map (fn [correct-output output]
                        (if (= output :no-stack-item)
@@ -68,13 +68,14 @@
        :error-function           error-function
        :training-data            (:train train-and-test-data)
        :testing-data             (:test train-and-test-data)
-       :max-generations          500
-       :population-size          500
+       :max-generations          300
+       :population-size          1000
        :max-initial-plushy-size  100
        :step-limit               200
        :parent-selection         :lexicase
        :tournament-size          5
        :umad-rate                0.1
+       :solution-error-treshold  0.5
        :variation                {:umad 1.0 :crossover 0.0}
        :elitism                  false}
       (apply hash-map (map #(if (string? %) (read-string %) %) args))))

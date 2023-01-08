@@ -42,7 +42,7 @@
            dont-end false
            ds-parent-rate 0
            ds-parent-gens 1
-           ids-type :solved ; :solved or :elite
+           ids-type :solved ; :solved or :elite or :soft
            downsample? false
            ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
            ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
@@ -126,6 +126,6 @@
                                                                                 #(variation/new-individual reindexed-pop argmap)))))
                      (if downsample?
                       (if (zero? (mod generation ds-parent-gens))
-                        (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type) ; update distances every ds-parent-gens generations
+                        (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
                         indexed-training-data)
                        indexed-training-data))))))
