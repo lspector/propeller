@@ -71,6 +71,14 @@
     (t/testing "should work when input is a list"
       (t/is (= (ds/update-at-indices '(6 5 4 0 0) '(2 1) '(1 0)) [1 2 4 0 0])))))
 
+
+(t/deftest ids-types-test
+  (t/testing "replace-close-zero-with-zero"
+    (t/testing "should replace the close to zero values with zero"
+      (t/is (= (ds/replace-close-zero-with-zero '(0.1 2 3 4 0.1 2 3 4) 0.2) '(0 2 3 4 0 2 3 4)))
+      (t/is (= (ds/replace-close-zero-with-zero '(0.1 0.1) 0.0) '(0.1 0.1)))
+      (t/is (= (ds/replace-close-zero-with-zero '(100 100 200) 100) '(0 0 200))))))
+
 (t/deftest update-case-distances-test
   (t/testing "update-case-distances"
     (t/testing "should update correctly when fewer errors than all"

@@ -96,6 +96,11 @@
     (let [m (apply min coll)]
       (map #(if (= m %) 0 %) coll))))
 
+(defn replace-close-zero-with-zero
+  "replaces values within a delta of zero with zero, used for regression problems"
+  [coll delta]
+  (map #(if (>= delta %) 0 %) coll))
+
 (defn convert-to-elite-error
   "converts a set of errors into a list where all the elite errors are replaced with 0s so that we can use
    it in the selection of down-samples with elite/not-elite selection"
@@ -105,17 +110,19 @@
 (defn update-case-distances
   "updates the case distance field of training-data list, should be called after evaluation of individuals
    evaluated-pop should be a list of individuals that all have the :errors field with a list of this 
-   individuals performance on the each case in the training-data, in order. ids-type is :elite to use elite/not-elite
-   or :solved to use solve/not-solved"
-
-  [evaluated-pop ds-data training-data ids-type]
-  (flush)
+   individuals performance on the each case in the training-data, in order. ids-type is :elite to use elite/not-elite, :soft to consider near solves, and :solved to use solve/not-solved"
+  ([evaluated-pop ds-data training-data ids-type]
+   (update-case-distances evaluated-pop ds-data training-data ids-type 0)) ; default solution threshold is 0, only used if ids-type is :soft
+  ([evaluated-pop ds-data training-data ids-type solution-threshold]
   (let [ds-indices (map #(:index %) ds-data) 
         errors (map #(:errors %) evaluated-pop)
-        corr-errors (if (= ids-type :elite) (convert-to-elite-error errors) errors)] ;errors, including elite/not-elite distinction
+        corr-errors (case ids-type
+                      :elite (convert-to-elite-error errors)
+                      :soft (replace-close-zero-with-zero errors solution-threshold)
+                      errors)] ;errors, including elite/not-elite distinction
     (merge-map-lists-at-index 
      training-data (map-indexed
                     (fn [idx d-case] (update-in d-case
                              [:distances] #(update-at-indices
                                             % (map (fn [other] (get-distance-between-cases corr-errors idx other))
-                                                  (range (count ds-indices))) ds-indices))) ds-data))))
+                                                  (range (count ds-indices))) ds-indices))) ds-data)))))
