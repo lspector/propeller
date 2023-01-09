@@ -1,3 +1,10 @@
+; The "session" namespace is for trying things out interactively.
+; For example, you can use it to test a new Push instruction by running a program that uses it and seeing the result.
+; You might just want to do this interactively in the REPL, but the session file makes it a little easier since it alerady
+; requires most of the namespaces you'll want to refer to.
+; The commented-out stuff is a reminder of how to do some basic things.
+
+
 (ns propeller.session
   (:require [propeller.genome :as genome]
             [propeller.gp :as gp]
