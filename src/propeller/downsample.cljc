@@ -107,6 +107,10 @@
   [errors]
   (map #(replace-mins-with-zero %) errors))
 
+(defn convert-to-soft-error
+  [errors delta]
+  (map #(replace-close-zero-with-zero % delta) errors))
+
 (defn update-case-distances
   "updates the case distance field of training-data list, should be called after evaluation of individuals
    evaluated-pop should be a list of individuals that all have the :errors field with a list of this 
@@ -118,7 +122,7 @@
         errors (map #(:errors %) evaluated-pop)
         corr-errors (case ids-type
                       :elite (convert-to-elite-error errors)
-                      :soft (replace-close-zero-with-zero errors solution-threshold)
+                      :soft (convert-to-soft-error errors solution-threshold)
                       errors)] ;errors, including elite/not-elite distinction
     (merge-map-lists-at-index 
      training-data (map-indexed
