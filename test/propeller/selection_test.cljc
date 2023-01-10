@@ -12,7 +12,7 @@
                                                            {:index 3 :total-error 1}) {:empty :argmap})]
               (case (:index ret)
                 0 (= (:fitness ret) 1) ;if we selected index 0, check that fitness is correctly calculated to 1
-                (= (:fitness ret) 1/2)
+                (= (float (:fitness ret)) 0.5)
                 ))))
     (t/testing "should always return the same individual if there is only one"
       (t/testing "desipte it having bad error"
