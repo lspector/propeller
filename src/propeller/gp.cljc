@@ -46,15 +46,15 @@
   (loop [generation 0
          population (mapper
                       (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
-                      (range population-size))]
+                      (range population-size))]             ;creates population of random plushys
     (let [evaluated-pop (sort-by :total-error
                                  (mapper
                                    (partial error-function argmap (:training-data argmap))
-                                   population))
+                                   population))             ;population sorted by :total-error
           best-individual (first evaluated-pop)
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
                    (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
-                   argmap)]
+                   argmap)]                                 ;adds :epsilons if using epsilon-lexicase
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluated-pop generation argmap)
         (report evaluated-pop generation argmap))
@@ -75,6 +75,6 @@
                      (if (:elitism argmap)
                        (conj (repeatedly (dec population-size)
                                          #(variation/new-individual evaluated-pop argmap))
-                             (first evaluated-pop))
+                             (first evaluated-pop))         ;elitism maintains the most-fit individual
                        (repeatedly population-size
                                    #(variation/new-individual evaluated-pop argmap))))))))

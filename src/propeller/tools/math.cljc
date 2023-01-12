@@ -6,14 +6,18 @@
 (defonce E #?(:clj  Math/E
               :cljs js/Math.PI))
 
-(defn mean [coll]
+(defn mean
+  "Returns the mean."
+  [coll]
   (let [sum (apply + coll)
         count (count coll)]
     (if (pos? count)
       (/ sum (float count))
       0.0)))
 
-(defn median [coll]
+(defn median
+  "Returns the median."
+  [coll]
   (let [sorted (sort coll)
         cnt (count sorted)
         halfway (quot cnt 2.0)]
@@ -25,6 +29,7 @@
         (mean [bottom-val top-val])))))
 
 (defn median-absolute-deviation
+  "Returns the median absolute deviation."
   [coll]
   (let [median-val (median coll)]
     (median (map #(Math/abs (- % median-val)) coll))))
