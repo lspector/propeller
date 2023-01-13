@@ -1,4 +1,12 @@
 (ns propeller.problems.PSB2.bowling
+  "===========  PROBLEM DESCRIPTION  ======================
+BOWLING from PSB2
+Given a string representing the individual
+bowls in a 10-frame round of 10 pin bowling, return the
+score of that round.
+
+Source: https://arxiv.org/pdf/2106.06086.pdf
+========================================================="
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -9,20 +17,14 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  ======================
-; BOWLING from PSB2
-; Given a string representing the individual
-; bowls in a 10-frame round of 10 pin bowling, return the
-; score of that round.
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; =========================================================
+
 
 (def train-and-test-data (psb2/fetch-examples "data" "bowling" 200 2000))
 
-(defn random-int [] (- (rand-int 201) 100))
+(defn random-int "Returns random integer between -100 and 100" [] (- (rand-int 201) 100))
 
 (def instructions
+  "stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -35,6 +37,10 @@
       (list \- \X \/ \1 \2 \3 \4 \5 \6 \7 \8 \9 10 random-int))))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ, or 1000000 if no
+  behavior is produced. The behavior is here defined as the final top item on
+  the INTEGER stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (get i :input1)) data)

@@ -1,16 +1,19 @@
 (ns propeller.problems.string-classification
+  "===========  PROBLEM DESCRIPTION  =============================
+String Classification:
+Given a string, return true if it contains A, C, G, and T. Else return false.
+==============================================================="
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-;; =============================================================================
-;; String classification
-;; =============================================================================
+
 
 ;; Set of original propel instructions
 (def instructions
+  "stack-specific instructions, input instructions, close, and constants"
   (list :in1
         :integer_add
         :integer_subtract

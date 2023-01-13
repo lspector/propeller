@@ -1,4 +1,15 @@
 (ns propeller.problems.PSB2.twitter
+  "===========  PROBLEM DESCRIPTION  =============================
+TWITTER from PSB2
+Given a string representing a tweet, validate whether the tweet
+meets Twitter’s original character requirements. If the tweet
+has more than 140 characters, return the string \"Too many characters\".
+If the tweet is empty, return the string \"You didn’t type anything\".
+Otherwise, return \"Your tweet has X characters\", where
+the X is the number of characters in the tweet.
+
+Source: https://arxiv.org/pdf/2106.06086.pdf
+==============================================================="
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -9,23 +20,14 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  =============================
-; TWITTER from PSB2
-; Given a string representing a tweet, validate whether the tweet
-; meets Twitter’s original character requirements. If the tweet
-; has more than 140 characters, return the string "Too many characters".
-; If the tweet is empty, return the string "You didn’t type anything".
-; Otherwise, return "Your tweet has X characters", where
-; the X is the number of characters in the tweet.
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ===============================================================
+
 
 (def train-and-test-data (psb2/fetch-examples "data" "twitter" 200 2000))
 
-(defn random-int [] (- (rand-int 201) 100))
+(defn random-int "Random integer between -100 and 100" [] (- (rand-int 201) 100))
 
 (def instructions
+  "stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -38,6 +40,10 @@
       (list 0 140 "Too many characters" "You didn't type anything" "your tweet has " " characters"))))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ, or 1000000 if no
+  behavior is produced. The behavior is here defined as the final top item on
+  the STRING stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (get i :input1)) data)

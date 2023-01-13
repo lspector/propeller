@@ -1,4 +1,6 @@
 (ns propeller.problems.valiant
+  "Possibly impossible to solve with genetic programming. Stems from the work of Leslie Valiant and involves
+  determining the parity of an unknown subsequence of a larger sequence of bits."
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]

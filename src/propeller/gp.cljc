@@ -78,3 +78,27 @@
                              (first evaluated-pop))         ;elitism maintains the most-fit individual
                        (repeatedly population-size
                                    #(variation/new-individual evaluated-pop argmap))))))))
+
+; This code is defining a function called "gp" (short for genetic programming) that takes in a map of parameters as its argument.
+; The map contains keys such as "population-size", "max-generations", "error-function", "instructions", "max-initial-plushy-size",
+; "solution-error-threshold", and "mapper", with default values specified for some of them.
+;
+;The function starts by printing some information about the starting arguments using
+; the prn function and then uses a loop to iterate over generations.
+; On each iteration, it creates a population of random plushies using a mapper
+; function and genome/make-random-plushy function,
+; then it sorts the population by the total error using the error-function
+; and sort-by function. It then takes the best individual from the sorted population,
+; and if the parent selection is set to epsilon-lexicase, it adds the epsilons to the argmap.
+;
+;The function then checks if the custom-report argument is set,
+; if so it calls that function passing the evaluated population,
+; current generation and argmap. If not, it calls the report function
+; passing the evaluated population, current generation and argmap.
+;
+;Then, it checks if the total error of the best individual is less than or equal
+; to the solution-error-threshold or if the current generation is greater than or
+; equal to the max-generations specified. If either is true, the function
+; exits with the best individual or nil. If not, it creates new individuals
+; for the next generation using the variation/new-individual function and the
+; repeatedly function, and then continues to the next iteration of the loop.

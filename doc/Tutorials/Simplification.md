@@ -1,12 +1,7 @@
-# Introduction to Propeller
-
-TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
-
-
-
-
 # Simplification
 
+Propeller allows you to automatically simplify plushys by removing instructions that have no impact on the error values
+when evaluating the individual on test cases.
 To use Propeller's auto-simplification system, simply include the following four command line arguments when running a problem:
 
 ```clojure
@@ -16,7 +11,7 @@ Toggle auto-simplification
 ```clojure
 :simplification-k 4
 ``` 
-This is the upper bound for elements deleted from the plushy every step. Every step, a number in $[1, k]$ of elements is deleted from the plushy representation of the solution.
+This is the upper bound for elements deleted from the plushy every step. Every step, a number in [1, k] of elements is deleted from the plushy representation of the solution.
 ```clojure
 :simplification-steps 1000 
 ```
@@ -24,7 +19,7 @@ Number of simplification steps to perform
 ```clojure
 :simplification-verbose? true 
 ```
-whether or not to output simplification info into the output of the evolutionary run.
+Whether or not to output simplification info into the output of the evolutionary run.
 The output with verbose adds the following lines to the output:
 ```clojure
 {:start-plushy-length 42, :k 4}

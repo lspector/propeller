@@ -1,4 +1,14 @@
 (ns propeller.problems.PSB2.luhn
+  "===========  PROBLEM DESCRIPTION  ============================
+LUHN from PSB2
+Given a vector of 16 digits, implement Luhn’s
+algorithm to verify a credit card number, such that it follows
+the following rules: double every other digit starting with
+the second digit. If any of the results are over 9, subtract 9
+from them. Return the sum of all of the new digits.
+
+Source: https://arxiv.org/pdf/2106.06086.pdf
+==============================================================="
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -9,23 +19,14 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  ============================
-; LUHN from PSB2
-; Given a vector of 16 digits, implement Luhn’s
-; algorithm to verify a credit card number, such that it follows
-; the following rules: double every other digit starting with
-; the second digit. If any of the results are over 9, subtract 9
-; from them. Return the sum of all of the new digits.
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ===============================================================
 
 (def train-and-test-data (psb2/fetch-examples "data" "luhn" 200 2000))
 
 ; Random integer between -100 and 100 (from smallest)
-(defn random-int [] (- (rand-int 201) 100))
+(defn random-int "Random integer between -100 and 100" [] (- (rand-int 201) 100))
 
 (def instructions
+  "stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -38,6 +39,10 @@
       (list 0 2 9 10 random-int))))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ, or 1000000 if no
+  behavior is produced. The behavior is here defined as the final top item on
+  the INTEGER stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (get i :input1)) data)

@@ -1,4 +1,8 @@
 (ns propeller.problems.simple-regression
+  "===========  PROBLEM DESCRIPTION  =============================
+Simple Regression:
+Given inputs and outputs, find the target function.
+==============================================================="
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
@@ -18,6 +22,7 @@
      :test (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) test-inputs)}))
 
 (def instructions
+  "stack-specific instructions, input instructions, close, and constants"
   (list :in1
         :integer_add
         :integer_subtract
