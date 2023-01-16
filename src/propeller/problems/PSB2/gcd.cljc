@@ -1,11 +1,11 @@
 (ns propeller.problems.PSB2.gcd
-  "===========  PROBLEM DESCRIPTION  ===============================
-GCD [GREATEST COMMON DIVISOR] from PSB2
+  "GCD [GREATEST COMMON DIVISOR] from PSB2
+
 Given two integers, return the largest integer that divides each
 of the integers evenly
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-=================================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

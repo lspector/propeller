@@ -1,6 +1,5 @@
 (ns propeller.problems.PSB2.twitter
-  "===========  PROBLEM DESCRIPTION  =============================
-TWITTER from PSB2
+  "TWITTER from PSB2
 Given a string representing a tweet, validate whether the tweet
 meets Twitter’s original character requirements. If the tweet
 has more than 140 characters, return the string \"Too many characters\".
@@ -8,8 +7,8 @@ If the tweet is empty, return the string \"You didn’t type anything\".
 Otherwise, return \"Your tweet has X characters\", where
 the X is the number of characters in the tweet.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-==============================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

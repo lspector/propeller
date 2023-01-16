@@ -1,6 +1,6 @@
 (ns propeller.problems.PSB2.snow-day
-  "===========  PROBLEM DESCRIPTION  ===============================
-SNOW DAY from PSB2
+  "SNOW DAY from PSB2
+
 Given an integer representing a number
 of hours and 3 floats representing how much snow is on the
 ground, the rate of snow fall, and the proportion of snow
@@ -9,8 +9,8 @@ after the amount of hours given. Each hour is considered a
 discrete event of adding snow and then melting, not a continuous
 process.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-=================================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

@@ -1,12 +1,12 @@
 (ns propeller.problems.PSB2.bowling
-  "===========  PROBLEM DESCRIPTION  ======================
-BOWLING from PSB2
+  "BOWLING from PSB2
+
 Given a string representing the individual
 bowls in a 10-frame round of 10 pin bowling, return the
 score of that round.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-========================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

@@ -1,14 +1,14 @@
 (ns propeller.problems.PSB2.luhn
-  "===========  PROBLEM DESCRIPTION  ============================
-LUHN from PSB2
+  "LUHN from PSB2
+
 Given a vector of 16 digits, implement Luhn’s
 algorithm to verify a credit card number, such that it follows
 the following rules: double every other digit starting with
 the second digit. If any of the results are over 9, subtract 9
 from them. Return the sum of all of the new digits.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-==============================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

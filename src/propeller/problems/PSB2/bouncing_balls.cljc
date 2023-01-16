@@ -1,14 +1,14 @@
 (ns propeller.problems.PSB2.bouncing-balls
-  " ===========  PROBLEM DESCRIPTION  ===============================
-BOUNCING BALLS from PSB2
+  "BOUNCING BALLS from PSB2
+
 Given a starting height and a height after the first bounce of a
 dropped ball, calculate the bounciness index
 (height of first bounce / starting height). Then, given a number
 of bounces, use the bounciness index to calculate the total
 distance that the ball travels across those bounces.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-=================================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

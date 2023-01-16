@@ -1,13 +1,13 @@
 (ns propeller.problems.PSB2.fuel-cost
-  "===========  PROBLEM DESCRIPTION  =========================
-FUEL COST from PSB2
+  "FUEL COST from PSB2
+
 Given a vector of positive integers, divide
 each by 3, round the result down to the nearest integer, and
 subtract 2. Return the sum of all of the new integers in the
 vector
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-============================================================"
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

@@ -1,12 +1,12 @@
 (ns propeller.problems.PSB2.spin-words
-  "===========  PROBLEM DESCRIPTION  ==============================
-SPIN WORDS from PSB2
+  "SPIN WORDS from PSB2
+
 Given a string of one or more words
 (separated by spaces), reverse all of the words that are five
 or more letters long and return the resulting string.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-================================================================"
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

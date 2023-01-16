@@ -10,4 +10,7 @@
   :profiles {:profiling {:dependencies [[com.clojure-goes-fast/clj-async-profiler "0.5.1"]]}}
   :main ^:skip-aot propeller.core
   :repl-options {:init-ns propeller.core}
-  :jvm-opts ^:replace [])
+  :jvm-opts ^:replace []
+  :plugins [[lein-codox "0.10.8"]]
+  :codox {:output-path "codox"
+          :metadata {:doc/format :markdown}})

@@ -1,13 +1,13 @@
 (ns propeller.problems.PSB2.camel-case
-  "===========  PROBLEM DESCRIPTION  =====================================
-CAMEL CASE from PSB2
+  "CAMEL CASE from PSB2
+
 Take a string in kebab-case and convert all of the words to camelCase.
 Each group of words to convert is delimited by \"-\", and each grouping
 is separated by a space. For example: \"camel-case example-test-string\"
 → \"camelCase exampleTestString\"
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-======================================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

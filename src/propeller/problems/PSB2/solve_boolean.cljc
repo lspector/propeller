@@ -1,12 +1,12 @@
 (ns propeller.problems.PSB2.solve-boolean
-  "===========  PROBLEM DESCRIPTION  ================================
-SOLVE BOOLEAN from PSB2
+  "SOLVE BOOLEAN from PSB2
+
 Given a string representing a Boolean
 expression consisting of T, F, |, and &, evaluate it and return
 the resulting Boolean.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-=================================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

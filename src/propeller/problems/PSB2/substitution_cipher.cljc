@@ -1,14 +1,14 @@
 (ns propeller.problems.PSB2.substitution-cipher
-  "===========  PROBLEM DESCRIPTION  =========================
-SUBSTITUTION CIPHER from PSB2
+  "SUBSTITUTION CIPHER from PSB2
+
 This problem gives 3 strings.
 The first two represent a cipher, mapping each character in
 one string to the one at the same index in the other string.
 The program must apply this cipher to the third string and
 return the deciphered message.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-============================================================"
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

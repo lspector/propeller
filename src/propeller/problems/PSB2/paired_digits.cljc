@@ -1,11 +1,11 @@
 (ns propeller.problems.PSB2.paired-digits
-  "===========  PROBLEM DESCRIPTION  =============================
-PAIRED DIGITS from PSB2
+  "PAIRED DIGITS from PSB2
+
 Given a string of digits, return the sum
 of the digits whose following digit is the same.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-==============================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

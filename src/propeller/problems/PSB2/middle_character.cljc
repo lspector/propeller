@@ -1,12 +1,12 @@
 (ns propeller.problems.PSB2.middle-character
-  "===========  PROBLEM DESCRIPTION  =============================
-MIDDLE CHARACTER from PSB2
+  "MIDDLE CHARACTER from PSB2
+
 Given a string, return the middle
 character as a string if it is odd length; return the two middle
 characters as a string if it is even length.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-==============================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

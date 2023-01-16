@@ -1,8 +1,8 @@
 (ns propeller.problems.simple-regression
-  "===========  PROBLEM DESCRIPTION  =============================
-Simple Regression:
-Given inputs and outputs, find the target function.
-==============================================================="
+  "Simple Regression:
+
+Given inputs and outputs, find the target function."
+  {:doc/format :markdown}
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]

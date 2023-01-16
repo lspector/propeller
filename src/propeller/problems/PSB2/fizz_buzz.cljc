@@ -1,13 +1,12 @@
 (ns propeller.problems.PSB2.fizz-buzz
-  "===========  PROBLEM DESCRIPTION  =========================
-FIZZ BUZZ from PSB2
+  "FIZZ BUZZ from PSB2
 Given an integer x, return \"Fizz\" if x is
 divisible by 3, \"Buzz\" if x is divisible by 5, \"FizzBuzz\" if x
 is divisible by 3 and 5, and a string version of x if none of
 the above hold.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-============================================================"
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

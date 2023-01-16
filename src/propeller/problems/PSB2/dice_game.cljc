@@ -1,12 +1,12 @@
 (ns propeller.problems.PSB2.dice-game
-  "===========  PROBLEM DESCRIPTION  ===============================
-DICE GAME from PSB2
+  "DICE GAME from PSB2
+
 Peter has an n sided die and Colin has an m
 sided die. If they both roll their dice at the same time, return
 the probability that Peter rolls strictly higher than Colin.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-=================================================================="
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]

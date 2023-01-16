@@ -4,4 +4,8 @@
   org.clojure/clojurescript #:mvn{:version "1.9.946"},
   org.clojure/test.check #:mvn{:version "1.1.0"},
   net.clojars.schneau/psb2 #:mvn{:version "1.1.0"}},
- :mvn/repos {}}
+ :mvn/repos {}
+ :codox {:extra-deps {codox/codox {:mvn/version "0.10.8"}}
+         :exec-fn codox.main/generate-docs
+         :exec-args {:source-paths ["path/to/src"]}
+         }}

@@ -1,8 +1,8 @@
 (ns propeller.problems.string-classification
-  "===========  PROBLEM DESCRIPTION  =============================
-String Classification:
-Given a string, return true if it contains A, C, G, and T. Else return false.
-==============================================================="
+  "String Classification:
+
+Given a string, return true if it contains A, C, G, and T. Else return false."
+  {:doc/format :markdown}
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]

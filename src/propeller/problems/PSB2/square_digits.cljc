@@ -1,11 +1,11 @@
 (ns propeller.problems.PSB2.square-digits
-  "===========  PROBLEM DESCRIPTION  =========================
-SQUARE DIGITS from PSB2
+  "SQUARE DIGITS from PSB2
+
 Given a positive integer, square each
 digit and concatenate the squares into a returned string.
 
-Source: https://arxiv.org/pdf/2106.06086.pdf
-============================================================"
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
