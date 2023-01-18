@@ -1,4 +1,4 @@
-(ns propeller.core
+(ns ^:no-doc propeller.core
   #?(:clj (:gen-class)))
 
 (defn -main
