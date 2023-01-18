@@ -4,19 +4,17 @@
 <ol>
 <li>Define a selection method function in <code>propeller.selection</code> that selects an individual from the population</li>
 <li>Add the selection method in <code>propeller.selection/select-parent</code> under the <code>case</code> call:</li>
-</ol>
+
 <pre><code class="language-clojure"> (defn select-parent
  "Selects a parent from the population using the specified method."
  [pop argmap]
  (case (:parent-selection argmap)
  :new-selection-method (new-selection-method )))
- ```
-3. When runnning a problem, specify the selection method in `:parent-selection`. 
-For example:
- ```
- lein run -m propeller.problems.simple-regression :parent-selection :new-selection-method"
- ```
-
-
 </code></pre>
+
+<li>When runnning a problem, specify the selection method in <code>:parent-selection</code>. For example:
+<pre><code>lein run -m propeller.problems.simple-regression :parent-selection :new-selection-method"
+</code></pre>
+</li>
+</ol>
 </div></div></div></body></html>
