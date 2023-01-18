@@ -9,7 +9,8 @@
     [pop argmap]
     (case (:parent-selection argmap)
     :new-selection-method (new-selection-method )))
-    ```
+   ```
+
 3. When runnning a problem, specify the selection method in `:parent-selection`. 
 For example:
     ```
