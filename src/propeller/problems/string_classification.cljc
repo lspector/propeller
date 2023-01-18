@@ -46,6 +46,9 @@ Given a string, return true if it contains A, C, G, and T. Else return false."
         "T"))
 
 (def train-and-test-data
+  "Training data: \"GCG\" \"GACAG\" \"AGAAG\" \"CCCA\" \"GATTACA\" \"TAGG\" \"GACT\" with associated boolean values based on problem definition.
+
+  Test data: \"GCGT\" \"GACTTAG\" \"AGTAAG\" \"TCCTCA\" \"GAACA\" \"AGG\" \"GAC\" with associated boolean values based on problem definition."
   (let [train-inputs ["GCG" "GACAG" "AGAAG" "CCCA" "GATTACA" "TAGG" "GACT"]
         test-inputs ["GCGT" "GACTTAG" "AGTAAG" "TCCTCA" "GAACA" "AGG" "GAC"]
         train-outputs [false false false false true true true]

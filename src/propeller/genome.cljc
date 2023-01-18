@@ -1,4 +1,7 @@
 (ns propeller.genome
+  "The genetic material in Propeller. A `plushy` is a list of Push instructions that represent a Push program.
+They hold the genetic material for an `individual`. In the initial population, we create random plushys."
+  {:doc/format :markdown}
   (:require [propeller.push.instructions :as instructions]
             [propeller.utils :as utils]))
 

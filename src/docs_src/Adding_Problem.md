@@ -1,12 +1,39 @@
+# Adding a Problem
+
+In general, a problem file has 3 components: `train-and-test-data`, `instructions`, `error-function`, and `-main`.
+
+1. To add a new problem, you need training and test data. For Problem Synthesis Benchmark Problems (PSB2),
+you can fetch datasets using `psb2.core/fetch-examples`.
+
+```clojure
+(defn fetch-examples
+  "Fetches and returns training and test data from a PSB2 problem.
+   Returns a map of the form {:train training-examples :test testing-examples}
+   where training-examples and testing-examples are lists of training and test
+   data. The elements of these lists are maps of the form:
+   {:input1 first-input :input2 second-input ... :output1 first-output ...}
+   The training examples will include all hard-coded edge cases included in the suite,
+   along with enough random cases to include `n-train` cases.
+   Note that this function loads large datasets and can be slow, 30-120 seconds.
+   Parameters:
+     `datasets-directory` - Location of the PSB2 datasets as downloaded from https://zenodo.org/record/4678739
+     `problem-name` - Name of the PSB2 problem, lowercase and seperated by dashes.
+         - Ex: indices-of-substring
+     `n-train` - Number of training cases to return
+     `n-test` - Number of test cases to return"
+  [datasets-directory problem-name n-train n-test]
+
+```
+2. Define the possible Push instructions to be used to create plushys. It should be a non-lazy list of 
+instructions from `push/instructions`
+3. Define an error function that will evaluate plushys and add `:behaviors parsed-outputs`, 
+   `:errors`, and `:total-error` to the individual
+4. Define the function `-main` with a map of default arguments.
+
+## Example of a Problem
+
+```clojure
 (ns propeller.problems.PSB2.solve-boolean
-  "SOLVE BOOLEAN from PSB2
-
-Given a string representing a Boolean
-expression consisting of T, F, |, and &, evaluate it and return
-the resulting Boolean.
-
-Source: https://arxiv.org/pdf/2106.06086.pdf"
-  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -16,11 +43,18 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
+; ===========  PROBLEM DESCRIPTION  ================================
+; SOLVE BOOLEAN from PSB2
+; Given a string representing a Boolean
+; expression consisting of T, F, |, and &, evaluate it and return
+; the resulting Boolean.
+;
+; Source: https://arxiv.org/pdf/2106.06086.pdf
+; ==================================================================
 
-(def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "solve-boolean" 200 2000))
+(def train-and-test-data (psb2/fetch-examples "data" "solve-boolean" 200 2000))
 
 (def instructions
-  "stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -33,10 +67,6 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
       (list true false \t \f \& \|))))
 
 (defn error-function
-  "Finds the behaviors and errors of an individual: Error is 0 if the value and
-  the program's selected behavior match, or 1 if they differ, or 1000000 if no
-  behavior is produced. The behavior is here defined as the final top item on
-  the BOOLEAN stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (get i :input1)) data)
@@ -88,3 +118,5 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
        :elitism                 false}
       (apply hash-map (map #(if (string? %) (read-string %) %) args))))
   (#?(:clj shutdown-agents)))
+
+```

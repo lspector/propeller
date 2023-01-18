@@ -12,5 +12,6 @@
   :repl-options {:init-ns propeller.core}
   :jvm-opts ^:replace []
   :plugins [[lein-codox "0.10.8"]]
-  :codox {:output-path "codox"
-          :metadata {:doc/format :markdown}})
+  :codox {:output-path "docs"
+          :metadata {:doc/format :markdown}
+          :doc-paths ["src/docs_src"]})

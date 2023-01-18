@@ -1,4 +1,5 @@
 (ns propeller.push.instructions.input-output
+  "Push instructions for input and output."
   (:require [propeller.push.state :as state]
             [propeller.push.instructions :refer [def-instruction
                                                  generate-instructions]]))

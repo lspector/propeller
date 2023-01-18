@@ -7,4 +7,4 @@
   ;; Exception for when no args were passed
   (println "To run a genetic programming problem, provide a the problem's")
   (println "namespace as specified in the Propeller README file at")
-  (println "https://github.com/lspector/propeller/blob/master/README.md"))
+  (println "https://github.com/lspector/propeller/blob/master/A_Guide_To_Propeller.md"))

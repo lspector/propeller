@@ -17,7 +17,7 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-(def train-and-test-data (psb2/fetch-examples "data" "fizz-buzz" 200 2000))
+(def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "fizz-buzz" 200 2000))
 
 (def instructions
   "stack-specific instructions, input instructions, close, and constants"

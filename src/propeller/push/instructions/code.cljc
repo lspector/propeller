@@ -1,4 +1,5 @@
 (ns propeller.push.instructions.code
+  "Push instructions for code."
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
             [propeller.push.instructions :refer [def-instruction

@@ -19,7 +19,7 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
 
 
 
-(def train-and-test-data (psb2/fetch-examples "data" "bowling" 200 2000))
+(def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "bowling" 200 2000))
 
 (defn random-int "Returns random integer between -100 and 100" [] (- (rand-int 201) 100))
 
