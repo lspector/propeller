@@ -1,9 +1,9 @@
 (ns propeller.tools.math)
 
-(defonce PI #?(:clj  Math/PI
+(defonce ^:no-doc PI #?(:clj  Math/PI
                :cljs js/Math.PI))
 
-(defonce E #?(:clj  Math/E
+(defonce ^:no-doc E #?(:clj  Math/E
               :cljs js/Math.PI))
 
 (defn mean

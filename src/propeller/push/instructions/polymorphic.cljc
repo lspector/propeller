@@ -1,4 +1,5 @@
 (ns propeller.push.instructions.polymorphic
+  "Polymorphic Instructions (for all stacks, with the exception of non-data ones like input and output)"
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
             [propeller.push.limits :as limit]

@@ -14,6 +14,8 @@
 (def num-test 200)
 
 (def train-and-test-data
+  "Inputs are `num-train` random boolean values and outputs are the
+  even parity of a subset of input variables."
   (let [input-indices (take num-inputs (shuffle (range num-vars)))
         rand-vars (fn [] (vec (repeatedly num-vars #(< (rand) 0.5))))
         even-parity? (fn [vars]
@@ -25,7 +27,13 @@
     {:train (map (fn [x] {:input1 x :output1 (vector (even-parity? x))}) train-inputs)
      :test (map (fn [x] {:input1 x :output1 (vector (even-parity? x))}) test-inputs)}))
 
+;even-parity? takes in a list of variables and returns true if the number of true values in the input variables,
+;as determined by the input-indices is even, and false otherwise.
+
 (def instructions
+  "A list of instructions which includes keyword strings
+  with the format \"in + i\" where i is a number from 0 to num-vars-1
+  concatenated with boolean and exec_if instructions and close."
   (vec (concat (for [i (range num-vars)] (keyword (str "in" i)))
                (take num-inputs
                      (cycle [:boolean_xor
@@ -37,6 +45,10 @@
                              ])))))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual:
+  Error is 0 if the value and the program’s selected behavior
+  match, or 1 if they differ.
+  The behavior is here defined as the final top item on the BOOLEAN stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [x] (:input1 x)) data)

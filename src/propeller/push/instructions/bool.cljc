@@ -1,4 +1,5 @@
 (ns propeller.push.instructions.bool
+  "BOOLEAN Instructions, created with `propeller.push.instructions/def-instruction`"
   (:require [propeller.push.instructions :refer [def-instruction
                                                  make-instruction]]))
 

@@ -13,5 +13,5 @@
   :jvm-opts ^:replace []
   :plugins [[lein-codox "0.10.8"]]
   :codox {:output-path "docs"
-          :metadata {:doc/format :markdown}
+          :metadata {:doc "FIXME: write docs" :doc/format :markdown}
           :doc-paths ["src/docs_src"]})

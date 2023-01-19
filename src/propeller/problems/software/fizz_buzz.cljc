@@ -1,4 +1,4 @@
-(ns propeller.problems.software.fizz-buzz
+(ns ^:no-doc propeller.problems.software.fizz-buzz
   (:require [psb2.core :as psb2]))
 
 ;; @todo This namespace is never used an it isn't a complete problem. Furthermore fizz-buzz exists in the PSB2 folder.

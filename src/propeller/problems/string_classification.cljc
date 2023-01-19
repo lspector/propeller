@@ -13,7 +13,7 @@ Given a string, return true if it contains A, C, G, and T. Else return false."
 
 ;; Set of original propel instructions
 (def instructions
-  "stack-specific instructions, input instructions, close, and constants"
+  "Set of original propel instructions"
   (list :in1
         :integer_add
         :integer_subtract

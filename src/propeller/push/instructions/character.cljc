@@ -1,5 +1,5 @@
 (ns propeller.push.instructions.character
-  "Push instructions for CHARs."
+  "CHAR Instructions, created with `propeller.push.instructions/def-instruction`"
   (:require [propeller.push.state :as state]
             [propeller.tools.character :as char]
             [propeller.push.instructions :refer [def-instruction

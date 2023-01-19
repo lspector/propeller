@@ -1,5 +1,5 @@
 (ns propeller.push.instructions.input-output
-  "Push instructions for input and output."
+  "INPUT and OUTPUT Instructions"
   (:require [propeller.push.state :as state]
             [propeller.push.instructions :refer [def-instruction
                                                  generate-instructions]]))
@@ -12,6 +12,9 @@
 ;; elements thus labeled from the :input map and pushing them onto the :exec
 ;; stack.
 (defn handle-input-instruction
+  "Allows Push to handle input instructions of the form :inN, e.g. :in2, taking
+  elements thus labeled from the :input map and pushing them onto the :exec
+  stack."
   [state instruction]
   (if (contains? (:input state) instruction)
     (let [input (instruction (:input state))]
@@ -33,6 +36,7 @@
       (state/push-to-stack popped-state :print (str current-output \newline)))))
 
 (def _print
+  "Instruction to print output."
   ^{:stacks [:print]
     :name "_print"}
   (fn [stack state]

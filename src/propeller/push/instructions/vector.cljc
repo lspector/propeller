@@ -1,5 +1,5 @@
 (ns propeller.push.instructions.vector
-  "Vector instructions for all vector element subtypes: BOOLEAN, FLOAT, INTEGER, and STRING."
+  "VECTOR instructions for all vector element subtypes: BOOLEAN, FLOAT, INTEGER, and STRING."
   (:require [clojure.string]
             [propeller.utils :as utils]
             [propeller.push.state :as state]
