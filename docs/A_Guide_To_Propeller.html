@@ -24,7 +24,6 @@
 <li><a href="#contributing">Contributing</a></li>
 <li><a href="#license">License</a></li>
 <li><a href="#citation">Citation</a></li>
-<li><a href="#about-propeller">About Propeller</a></li>
 <li><a href="#contact">Contact</a></li>
 </ul>
 <!-- TOC -->
@@ -32,7 +31,7 @@
 <p>You can evolve a Push program to solve a problem. You can also use the Push interpreter to evaluate Push programs in other projects, for example in agent-based evolutionary simulations in which agents are controlled by evolving Push programs.</p>
 <h2><a href="#installation" id="installation"></a>Installation</h2>
 <p>If you have installed <a href="https://leiningen.org">leiningen</a>, which is a tool for running Clojure programs, then you can run Propeller on a genetic programming problem that is defined within this project from the command line with the command <code>lein run -m &lt;namespace&gt;</code>, replacing <code>&lt;namespace&gt;</code> with the actual namespace that you will find at the top of the problem file.</p>
-<p>If you have installed <a href="https://clojure.org/guides/install_clojure#java">Clojure</a>, you can run Propeller on a genetic programming problem with the command <code>clj -m &lt;namespace&gt;</code>, replacing <code>&lt;namespace&gt;</code> with the actual namespace that you will find at the top of the problem file. The examples below use leiningen, but you can replace <code>lein run -m</code> with <code>clj --main</code> to run the same problem.</p>
+<p>If you have installed <a href="https://clojure.org/guides/install_clojure#java">Clojure</a>, you can run Propeller on a genetic programming problem with the command <code>clj --main &lt;namespace&gt;</code>, replacing <code>&lt;namespace&gt;</code> with the actual namespace that you will find at the top of the problem file. The examples below use leiningen, but you can replace <code>lein run -m</code> with <code>clj --main</code> to run the same problem.</p>
 <p>A specific example is provided later below.</p>
 <h2><a href="#how-do-i-run-propeller-on-a-problem" id="how-do-i-run-propeller-on-a-problem"></a>How do I run Propeller on a problem?</h2>
 <p>To run a problem in Propeller, you want to call the <code>-main</code> function in the problem file using leiningen. The <code>-main</code> function will create a map of arguments from the input and run the main genetic programming loop.</p>
@@ -64,7 +63,7 @@
 </tbody>
 </table>
 <p>When you run a problem, you will get a report each generation with the following information:</p>
-<pre><code>:generation            
+<pre><code> :generation            
  :best-plushy 
  :best-program          
  :best-total-error      
@@ -114,10 +113,9 @@
 <p>If you want to run the problem with the default parameters, then you should call <code>-main</code> without arguments, as `(-main).</p>
 <h2><a href="#tutorials" id="tutorials"></a>Tutorials</h2>
 <ul>
-<li>Adding genetic operators</li>
-<li>Adding selection methods</li>
-<li>Adding a new problem</li>
-<li>Using Propeller for Experiments</li>
+<li><a href="Adding_Genetic_Operators.html">Adding genetic operators</a></li>
+<li><a href="Adding_Selection_Method.html">Adding selection methods</a></li>
+<li><a href="Adding_Problem.html">Adding a new problem</a></li>
 </ul>
 <h2><a href="#contributing" id="contributing"></a>Contributing</h2>
 <p>You can report a bug on the <a href="https://github.com/lspector/propeller/issues">GitHub issues page</a>.</p>
@@ -127,8 +125,6 @@
 <p>This commercially-friendly copyleft license provides the ability to commercially license binaries; a modern royalty-free patent license grant; and the ability for linked works to use other licenses, including commercial ones.</p>
 <h2><a href="#citation" id="citation"></a>Citation</h2>
 <p>We are in the process of creating a DOI, but in the meantime, we ask that you cite the <a href="https://github.com/lspector/propeller">link to the repository</a> if you use Propeller.</p>
-<h2><a href="#about-propeller" id="about-propeller"></a>About Propeller</h2>
-<p>Propeller was created by</p>
 <h2><a href="#contact" id="contact"></a>Contact</h2>
 <p>To discuss Propeller, Push, and PushGP, you can join the <a href="https://discourse.pushlanguage.org/">Push-Language Discourse</a>.</p>
 </div></div></div></body></html>

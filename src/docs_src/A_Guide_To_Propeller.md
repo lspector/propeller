@@ -20,7 +20,6 @@ For more information on Push and PushGP see http://pushlanguage.org.
   * [Contributing](#contributing)
   * [License](#license)
   * [Citation](#citation)
-  * [About Propeller](#about-propeller)
   * [Contact](#contact)
 <!-- TOC -->
 
@@ -40,7 +39,7 @@ line with the command `lein run -m <namespace>`, replacing `<namespace>`
 with the actual namespace that you will find at the top of the problem file.
 
 If you have installed [Clojure](https://clojure.org/guides/install_clojure#java), you can run Propeller on a genetic programming 
-problem with the command `clj -m <namespace>`, replacing `<namespace>` with 
+problem with the command `clj --main <namespace>`, replacing `<namespace>` with 
 the actual namespace that you will find at the top of the problem file. 
 The examples below use leiningen, but you can replace `lein run -m` with `clj --main` to run the same problem.
 
@@ -86,7 +85,7 @@ The possible keys come from the table below:
 When you run a problem, you will get a report each generation with the following information:
 
 ```
-:generation            
+ :generation            
  :best-plushy 
  :best-program          
  :best-total-error      
@@ -172,10 +171,9 @@ then you should call `-main` without arguments, as `(-main).
 
 ## Tutorials
 
-- Adding genetic operators
-- Adding selection methods
-- Adding a new problem
-- Using Propeller for Experiments
+- [Adding genetic operators](Adding_Genetic_Operators.md)
+- [Adding selection methods](Adding_Selection_Method.md)
+- [Adding a new problem](Adding_Problem.md)
 
 ## Contributing
 
@@ -194,10 +192,6 @@ a modern royalty-free patent license grant; and the ability for linked works to 
 
 We are in the process of creating a DOI, but in the meantime, 
 we ask that you cite the [link to the repository](https://github.com/lspector/propeller) if you use Propeller.
-
-## About Propeller
-
-Propeller was created by
 
 ## Contact
 
