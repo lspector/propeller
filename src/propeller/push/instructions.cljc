@@ -1,4 +1,5 @@
 (ns propeller.push.instructions
+  "Push Instructions"
   (:require [clojure.set]
             [propeller.push.state :as state]
             [propeller.utils :as u]
@@ -45,7 +46,7 @@ can be either constant literals or functions that take and return a Push state"
 
 
 #?(:clj
-   (def cls->type
+   (def ^{:no-doc true} cls->type
      {Boolean    :boolean
       Short      :integer
       Integer    :integer

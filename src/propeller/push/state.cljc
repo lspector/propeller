@@ -1,4 +1,5 @@
 (ns propeller.push.state
+  "Push states"
   (:require [propeller.push.limits :as l]
             #?(:cljs [goog.string :as gstring])))
 
