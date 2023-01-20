@@ -7,7 +7,7 @@
 <li>Go to <code>propeller.variation.cljc</code></li>
 <li>Define a genetic operator function</li>
 <li>In <code>propeller.variation/new-individual</code>, add the new genetic operator in the <code>new-individual</code> function under the <code>case</code> call</li>
-</ol>
+
 <pre><code class="language-clojure">(defn new-individual
   "Returns a new individual produced by selection and variation of
   individuals in the population."
@@ -25,7 +25,7 @@
                  :cljs (js/Error
                          (str "No match in new-individual for " op))))))})
 </code></pre>
-<ol>
+
 <li>When running a problem, specify the genetic operator in <code>:variation</code>. For example:</li>
 </ol>
 <pre><code>lein run -m propeller.problems.simple-regression :variation "{:new-genetic-operator 1.0}"
@@ -36,7 +36,7 @@
 <li>Go to <code>propeller.selection.cljc</code></li>
 <li>Define a genetic operator function</li>
 <li>In <code>propeller.selection.cljc</code>, add the new genetic operator in the <code>select-parent</code> function under the <code>case</code> call.</li>
-</ol>
+
 <pre><code class="language-clojure">(defn select-parent
   "Selects a parent from the population using the specified method."
   [pop argmap]
@@ -46,7 +46,7 @@
     ...
     ))
 </code></pre>
-<ol>
+
 <li>When running a problem, specify the selection method in <code>:parent-selection</code></li>
 </ol>
 <p>For example:</p>

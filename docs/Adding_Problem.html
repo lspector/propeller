@@ -4,7 +4,7 @@
 <p>In general, a problem file has 3 components: <code>train-and-test-data</code>, <code>instructions</code>, <code>error-function</code>, and <code>-main</code>.</p>
 <ol>
 <li>To add a new problem, you need training and test data. For Problem Synthesis Benchmark Problems (PSB2), you can fetch datasets using <code>psb2.core/fetch-examples</code>.</li>
-</ol>
+
 <pre><code class="language-clojure">(defn fetch-examples
   "Fetches and returns training and test data from a PSB2 problem.
    Returns a map of the form {:train training-examples :test testing-examples}
@@ -23,7 +23,7 @@
   [datasets-directory problem-name n-train n-test]
 
 </code></pre>
-<ol>
+
 <li>Define the possible Push instructions to be used to create plushys. It should be a non-lazy list of instructions from <code>push/instructions</code></li>
 <li>Define an error function that will evaluate plushys and add <code>:behaviors parsed-outputs</code>, <code>:errors</code>, and <code>:total-error</code> to the individual</li>
 <li>Define the function <code>-main</code> with a map of default arguments.</li>
