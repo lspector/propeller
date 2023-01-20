@@ -33,7 +33,7 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
   (get i :output1))
 
 (def instructions
-  "stack-specific instructions, input instructions, close, and constants"
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions

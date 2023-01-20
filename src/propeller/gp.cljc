@@ -1,4 +1,5 @@
 (ns propeller.gp
+  "Main genetic programming loop."
   (:require [clojure.string]
             [clojure.pprint]
             [propeller.genome :as genome]

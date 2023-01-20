@@ -6,8 +6,7 @@
      doi: 10.1109/TSE.2015.2454513
 
 This problem file defines the following problem:
-takes as input four ints, computes the smallest, and prints to the screen the smallest input.
-```"
+takes as input four ints, computes the smallest, and prints to the screen the smallest input."
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]

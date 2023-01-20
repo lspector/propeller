@@ -1,4 +1,5 @@
 (ns propeller.tools.distributions
+  "Functions to calculate distribution."
   (:require [propeller.tools.calculus :as calculus]
             [propeller.tools.math :as math]))
 

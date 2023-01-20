@@ -24,7 +24,7 @@
   [] (- (rand-int 201) 100))
 
 (def instructions
-  "stack-specific instructions, input instructions, close, and constants"
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions

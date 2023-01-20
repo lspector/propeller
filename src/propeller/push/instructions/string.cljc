@@ -1,5 +1,5 @@
 (ns propeller.push.instructions.string
-  "STRING Instructions"
+  "STRING Instructions, created with `propeller.push.instructions/def-instruction`"
   (:require [clojure.string :as string]
             [propeller.push.state :as state]
             [propeller.push.instructions :refer [def-instruction
