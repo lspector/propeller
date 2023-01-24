@@ -4,11 +4,13 @@
 
 import os
 from mdutils.mdutils import MdUtils
-mdFile = MdUtils(file_name='src/docs_src/Additional_Instructions', title='Bool, Char, Code, Input-Output, Numeric, and String Instructions')
-
+mdFile = MdUtils(file_name='src/docs_src/Additional_Instructions')
+mdFile.new_header(level=1, title='Additional Instructions')
 os.chdir('..')
 
 instructionFiles = os.listdir('src/propeller/push/instructions')
+instructionFiles.remove('vector.cljc')
+instructionFiles.remove('polymorphic.cljc')
 print(instructionFiles)
 
 hasDefInstruction = False
@@ -59,6 +61,7 @@ for file in instructionFiles:
         # found in the text file
         if not hasDefInstruction:
             print("\n\"" + text + "\" is not found in \"" + file + "\"!")
+            mdFile.new_paragraph('')
         else:
             print("There is"+text)
 
@@ -66,5 +69,5 @@ for file in instructionFiles:
     # if input file doesn't exist
     except:
         print("\nThe file doesn't exist!")
-
+mdFile.new_table_of_contents()
 mdFile.create_md_file()

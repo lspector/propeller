@@ -1,12 +1,24 @@
 
-Bool, Char, Code, Input-Output, Numeric, and String Instructions
-================================================================
+
+
+
+Table of contents
+=================
+
+* [Additional Instructions](#additional-instructions)
+* [input_output.cljc](#input_outputcljc)
+* [numeric.cljc](#numericcljc)
+* [string.cljc](#stringcljc)
+* [character.cljc](#charactercljc)
+* [bool.cljc](#boolcljc)
+* [code.cljc](#codecljc)
+
+# Additional Instructions
 
 # input_output.cljc
 
 ## :print_newline
-Prints new line
-
+Prints new line 
 # numeric.cljc
 
 ## :float_cos
@@ -80,8 +92,7 @@ Splits the top STRING on whitespace, and pushes back the resulting components in
 ## :string_substr
 Pushes the substring of the top STRING, with beginning and end indices determined by the second topmost and topmost INTEGERs respectively. If an index is out of bounds, the beginning/end of the string is used instead 
 ## :string_take
-Pushes the substring of the top STRING consisting of its first n letters, where n is determined by the top INTEGER
-
+Pushes the substring of the top STRING consisting of its first n letters, where n is determined by the top INTEGER 
 # character.cljc
 
 ## :char_is_letter
