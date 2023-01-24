@@ -1,5 +1,6 @@
 (ns propeller.push.instructions.input-output
-  "INPUT and OUTPUT Instructions"
+  "INPUT and OUTPUT Instructions.
+  Additional instructions can be found at [Additional Instructions](Additional_Instructions.md)."
   (:require [propeller.push.state :as state]
             [propeller.push.instructions :refer [def-instruction
                                                  generate-instructions]]))
@@ -27,6 +28,7 @@
 ;; OUTPUT Instructions
 ;; =============================================================================
 
+;; Prints new line
 (def-instruction
   :print_newline
   ^{:stacks [:print]}

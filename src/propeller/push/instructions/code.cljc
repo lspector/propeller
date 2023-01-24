@@ -1,5 +1,6 @@
 (ns propeller.push.instructions.code
-  "CODE Instructions, created with `propeller.push.instructions/def-instruction`"
+  "CODE Instructions, created with `propeller.push.instructions/def-instruction`.
+  List of instructions can be found at [Additional Instructions](Additional_Instructions.md)."
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
             [propeller.push.instructions :refer [def-instruction

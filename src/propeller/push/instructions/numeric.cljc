@@ -1,5 +1,6 @@
 (ns propeller.push.instructions.numeric
-  "FLOAT and INTEGER Instructions (polymorphic)"
+  "FLOAT and INTEGER Instructions (polymorphic).
+  Additional instructions can be found at [Additional Instructions](Additional_Instructions.md)."
   (:require [propeller.tools.math :as math]
             [propeller.push.instructions :refer [def-instruction
                                                  generate-instructions
