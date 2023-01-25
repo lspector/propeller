@@ -47,7 +47,7 @@ A specific example is provided later below.
 
 ## How do I run Propeller on a problem?
 
-To run a problem in Propeller, you want to call the `-main` function in the problem file using leiningen. 
+To run Propeller on a problem, you want to call the `-main` function in the problem file using leiningen. 
 The `-main` function will create a map of arguments from the input and run the main genetic programming loop.
 
 Below is the general format to run a problem through the command-line:
