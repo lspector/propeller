@@ -8,10 +8,10 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-(def num-vars 100)                                          ;10) ;100)                                          ;1000)
-(def num-inputs 50)                                         ;5) ; 50)                                         ;500)
-(def num-train 500)                                         ;5000)
-(def num-test 200)
+(def ^:no-doc num-vars 100)                                          ;10) ;100)                                          ;1000)
+(def ^:no-doc num-inputs 50)                                         ;5) ; 50)                                         ;500)
+(def ^:no-doc num-train 500)                                         ;5000)
+(def ^:no-doc num-test 200)
 
 (def train-and-test-data
   "Inputs are `num-train` random boolean values and outputs are the

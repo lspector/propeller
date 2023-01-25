@@ -167,6 +167,7 @@ Otherwise, acts as a NOOP"
 
 ;; Pushes the decrement (i.e. -1) of the top item of the stack
 (def _dec
+  "Pushes the decrement (i.e. -1) of the top item of the stack"
   ^{:stacks #{}
     :name "_dec"}
   (fn [stack state]

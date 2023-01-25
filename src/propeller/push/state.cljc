@@ -39,7 +39,7 @@
                         :vector_integer #(mapv (fn [i] (int (l/limit-number i))) (l/limit-vector %))
                         :vector_string  #(mapv (fn [s] (l/limit-string s)) (l/limit-vector %))})
 
-(def example-state {:exec    '()
+(def example-state "Example of a Push state." {:exec    '()
                     :integer '(1 2 3 4 5 6 7)
                     :string  '("abc")
                     :input   {:in1 4}})
