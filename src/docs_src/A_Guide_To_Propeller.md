@@ -174,12 +174,16 @@ then you should call `-main` without arguments, as `(-main).
 - [Adding genetic operators](Adding_Genetic_Operators.md)
 - [Adding selection methods](Adding_Selection_Method.md)
 - [Adding a new problem](Adding_Problem.md)
+- [Generating Documentation](Generating_Documentation.md)
 
 ## Contributing
 
 You can report a bug on the [GitHub issues page](https://github.com/lspector/propeller/issues).
 
 The best way to contribute to Propeller is to fork the [main GitHub repository](https://github.com/lspector/propeller) and submit a pull request.
+
+Propeller provides a way to automatically [generate documentation](Generating_Documentation.md) for any contributions
+you might make.
 
 ## License
 

@@ -1,9 +1,10 @@
 (ns propeller.problems.PSB2.shopping-list
-  "DICE GAME from PSB2
+  "SHOPPING LIST from PSB2
 
-Peter has an n sided die and Colin has an m
-sided die. If they both roll their dice at the same time, return
-the probability that Peter rolls strictly higher than Colin.
+Given a vector of floats representing
+the prices of various shopping goods and another vector of
+floats representing the percent discount of each of those
+goods, return the total price of the shopping trip after applying the discount to each item.
 
 Source: https://arxiv.org/pdf/2106.06086.pdf"
   {:doc/format :markdown}

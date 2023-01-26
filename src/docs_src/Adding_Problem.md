@@ -25,7 +25,7 @@ you can fetch datasets using `psb2.core/fetch-examples`.
 
 ```
 2. Define the possible Push instructions to be used to create plushys. It should be a non-lazy list of 
-instructions from `push/instructions`
+instructions from `push/instructions`, input instructions, close, and constants (including functions that produce constants).
 3. Define an error function that will evaluate plushys and add `:behaviors parsed-outputs`, 
    `:errors`, and `:total-error` to the individual
 4. Define the function `-main` with a map of default arguments.
