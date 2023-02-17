@@ -20,9 +20,9 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ============================================================
 
-(def train-data (dc/read-data-formatted "fizz-buzz" "train"))
-(def test-data (dc/read-data-formatted "fizz-buzz" "test"))
-
+(def train-and-test-data (psb2/fetch-examples "data" "fizz-buzz" 200 2000))
+(def train-data (:train train-and-test-data))
+(def test-data (:test train-and-test-data))
 
 (def instructions
   (utils/not-lazy

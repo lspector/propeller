@@ -18,10 +18,10 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ==================================================================
 
-;(def train-and-test-data (psb2/fetch-examples "data" "gcd" 200 2000))
 
-(def train-data (dc/read-data-formatted "gcd" "train"))
-(def test-data (dc/read-data-formatted "gcd" "test"))
+(def train-and-test-data (psb2/fetch-examples "data" "gcd" 200 2000))
+(def train-data (:train train-and-test-data))
+(def test-data (:test train-and-test-data))
 
 (defn random-int [] (- (rand-int 201) 100))
 
