@@ -35,7 +35,7 @@
     lst))
 
 (defn ensure-list
-  "Returns a non-lazy list if passed a seq argument. Othwrwise, returns a list
+  "Returns a non-lazy list if passed a seq argument. Otherwise, returns a list
   containing the argument."
   [thing]
   (if (seq? thing)

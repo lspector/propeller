@@ -1,0 +1,7 @@
+{:paths ["src" "target/classes"],
+ :deps
+ {org.clojure/clojure #:mvn{:version "1.10.0"},
+  org.clojure/clojurescript #:mvn{:version "1.9.946"},
+  org.clojure/test.check #:mvn{:version "1.1.0"},
+  net.clojars.schneau/psb2 #:mvn{:version "1.1.0"}},
+ :mvn/repos {}}

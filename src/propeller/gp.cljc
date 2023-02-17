@@ -84,7 +84,7 @@
           best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
                    (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
-                   argmap)]
+                   argmap)]                                 ;adds :epsilons if using epsilon-lexicase
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluations evaluated-pop generation argmap)
         (report evaluations evaluated-pop generation argmap training-data))

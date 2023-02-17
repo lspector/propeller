@@ -3,7 +3,7 @@
             [propeller.utils :as utils]))
 
 (defn make-random-plushy
-  "Creates and returns a new plushy."
+  "Creates and returns a new plushy made of random instructions and of a maximum size of max-initial-plushy-size."
   [instructions max-initial-plushy-size]
   (repeatedly
     (rand-int max-initial-plushy-size)

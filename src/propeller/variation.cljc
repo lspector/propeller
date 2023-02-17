@@ -3,7 +3,8 @@
       [propeller.utils :as utils]))
 
 (defn crossover
-  "Crosses over two individuals using uniform crossover. Pads shorter one."
+  "Crosses over two individuals using uniform crossover, one Push instruction at a time.
+   Pads shorter one from the end of the list of instructions."
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (= shorter plushy-a)
@@ -17,7 +18,8 @@
                  longer))))
 
 (defn tail-aligned-crossover
-  "Crosses over two individuals using uniform crossover. Pads shorter one on the left."
+  "Crosses over two individuals using uniform crossover, one Push instruction at a time.
+   Pads shorter one from the beginning of the list of instructions."
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (= shorter plushy-a)
@@ -31,7 +33,8 @@
                  longer))))
 
 (defn diploid-crossover
-  "Crosses over two individuals using uniform crossover. Pads shorter one."
+  "Crosses over two individuals using uniform crossover with pairs of Push instructions.
+   Pads shorter one from the end of the list of instructions."
   [plushy-a plushy-b]
   (let [plushy-a (partition 2 plushy-a)
         plushy-b (partition 2 plushy-b)
@@ -47,7 +50,8 @@
                           longer)))))
 
 (defn tail-aligned-diploid-crossover
-  "Crosses over two individuals using uniform crossover. Pads shorter one on the left."
+  "Crosses over two individuals using uniform crossover with pairs of Push instructions.
+   Pads shorter one from the beginning of the list of instructions."
   [plushy-a plushy-b]
   (let [plushy-a (partition 2 plushy-a)
         plushy-b (partition 2 plushy-b)
@@ -158,7 +162,10 @@
        (-> (:plushy umad-parent)
            (uniform-addition (:instructions argmap) (:umad-rate argmap))
            (uniform-deletion (:umad-rate argmap)))
-       ;
+       ; uniform mutation by addition and deletion is a uniform mutation operator which
+       ;first adds genes with some probability before or after every existing gene and then
+       ;deletes random genes from the resulting genome
+
        :rumad
        (let [parent-genome (:plushy (selection/select-parent pop argmap))
              after-addition (uniform-addition parent-genome
@@ -168,7 +175,8 @@
                                            (count parent-genome))
                                         (count parent-genome))]
          (uniform-deletion after-addition effective-addition-rate))
-       ;
+       ; Adds and deletes instructions in the parent genome with the same rate
+
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-addition (:instructions argmap) (:umad-rate argmap)))

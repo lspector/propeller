@@ -5,6 +5,7 @@
             [propeller.tools.math :as math]))
 
 (defn choose-random-k
+  "Takes k random indices"
   [k indices]
   (take k (shuffle indices)))
 
@@ -15,11 +16,12 @@
     (keep-indexed #(when (not (some #{%1} sorted-indices)) %2) plushy)))
 
 (defn delete-k-random
+  "Deletes k random instructions from the plushy"
   [k plushy]
   (delete-at-indices (choose-random-k k (range (count plushy))) plushy))
 
 (defn auto-simplify-plushy
-  "naive auto-simplification"
+  "simplifies plushy by deleting instructions that have no impact on errors. naive auto-simplification"
   [plushy error-function {:keys [simplification-steps training-data simplification-k simplification-verbose?] :as argmap}]
   (when simplification-verbose? (prn {:start-plushy-length (count plushy) :k simplification-k}))
   (let [initial-errors (:errors (error-function argmap training-data {:plushy plushy}))]
