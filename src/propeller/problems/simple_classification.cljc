@@ -49,7 +49,7 @@
   "Finds the behaviors and errors of an individual: Error is 0 if the value and
   the program's selected behavior match, or 1 if they differ, or 1000000 if no
   behavior is produced. The behavior is here defined as the final top item on
-  the INTEGER stack."
+  the BOOLEAN stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [x] (first (:input1 x))) data)
@@ -85,7 +85,6 @@
        :error-function          error-function
        :training-data           (:train train-and-test-data)
        :testing-data            (:test train-and-test-data)
-       :case-t-size             (count (:train train-and-test-data))
        :max-generations         500
        :population-size         500
        :max-initial-plushy-size 100
