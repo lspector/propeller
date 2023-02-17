@@ -10,8 +10,10 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-(def train-data (dc/read-data-formatted "count-odds" "train"))
-(def test-data (dc/read-data-formatted "count-odds" "test"))
+
+(def train-and-test-data (psb2/fetch-examples "data" "count-odds" 200 2000))
+(def train-data (:train train-and-test-data))
+(def test-data (:test train-and-test-data))
 
 ; Random integer between -100 and 100 (from smallest)
 (defn random-int [] (- (rand-int 201) 100))

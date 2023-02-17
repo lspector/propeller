@@ -12,8 +12,9 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-(def train-data (dc/scrabble-score-read-data-formatted "scrabble-score" "train"))
-(def test-data (dc/scrabble-score-read-data-formatted "scrabble-score" "test"))
+(def train-and-test-data (psb2/fetch-examples "data" "scrabble-score" 200 2000))
+(def train-data (:train train-and-test-data))
+(def test-data (:test train-and-test-data))
 
 (def scrabble-letter-values
   (let [scrabble-map {\a 1

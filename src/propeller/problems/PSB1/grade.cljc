@@ -1,18 +1,23 @@
 (ns propeller.problems.PSB1.grade
-  (:require [propeller.genome :as genome]
-            [propeller.push.interpreter :as interpreter]
-            [propeller.problems.data-creation :as dc]
-            [propeller.push.state :as state]
-            [propeller.push.instructions :refer [get-stack-instructions]]
-            [propeller.utils :as utils]
-            [propeller.tools.metrics :as metrics]
-            [propeller.gp :as gp]
-            #?(:cljs [cljs.reader :refer [read-string]])))
+  (:require
+   [psb2.core :as psb2]
+   [propeller.genome :as genome]
+   [propeller.push.interpreter :as interpreter]
+   [propeller.problems.data-creation :as dc]
+   [propeller.push.state :as state]
+   [propeller.push.instructions :refer [get-stack-instructions]]
+   [propeller.utils :as utils]
+   [propeller.tools.metrics :as metrics]
+   [propeller.gp :as gp]
+   #?(:cljs [cljs.reader :refer [read-string]])))
 
+
+; Based on the grade PSB1 problem, this verion only requires an output of a single character
 ;"“Student has a ”, “ grade.”, “A”, “B”, “C”, “D”, “F”, integer ERC"
 
-(def train-data (dc/read-data-formatted "grade" "train"))
-(def test-data (dc/read-data-formatted "grade" "test"))
+(def train-and-test-data (psb2/fetch-examples "data" "grade" 200 2000))
+(def train-data (:train train-and-test-data))
+(def test-data (:test train-and-test-data))
 
 (defn map-vals-input
   "Returns all the input values of a map"
