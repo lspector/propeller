@@ -1,4 +1,5 @@
 (ns propeller.gp
+  "Main genetic programming loop."
   (:require [clojure.string]
             [clojure.pprint]
             [propeller.genome :as genome]
@@ -15,7 +16,7 @@
             [propeller.selection :as selection]))
 
 (defn report
-  "Reports information each generation."
+  "Reports information for each generation."
   [pop generation argmap]
   (let [best (first pop)]
     (clojure.pprint/pprint {:generation            generation
@@ -31,7 +32,25 @@
     (println)))
 
 (defn gp
-  "Main GP loop."
+  "Main GP loop.
+
+On each iteration, it creates a population of random plushies using a mapper
+function and genome/make-random-plushy function,
+then it sorts the population by the total error using the error-function
+and sort-by function. It then takes the best individual from the sorted population,
+and if the parent selection is set to epsilon-lexicase, it adds the epsilons to the argmap.
+
+The function then checks if the custom-report argument is set,
+if so it calls that function passing the evaluated population,
+current generation and argmap. If not, it calls the report function
+passing the evaluated population, current generation and argmap.
+
+Then, it checks if the total error of the best individual is less than or equal
+to the solution-error-threshold or if the current generation is greater than or
+equal to the max-generations specified. If either is true, the function
+exits with the best individual or nil. If not, it creates new individuals
+for the next generation using the variation/new-individual function and the
+repeatedly function, and then continues to the next iteration of the loop. "
   [{:keys [population-size max-generations error-function instructions
            max-initial-plushy-size solution-error-threshold mapper]
     :or   {solution-error-threshold 0.0
@@ -78,3 +97,4 @@
                              (first evaluated-pop))         ;elitism maintains the most-fit individual
                        (repeatedly population-size
                                    #(variation/new-individual evaluated-pop argmap))))))))
+

@@ -1,6 +1,7 @@
-(ns propeller.tools.calculus)
+(ns propeller.tools.calculus
+  "Functions for calculus operations")
 
-(defonce ^:const dx 0.0001)
+(defonce ^{:no-doc true :const true} dx  0.0001)
 
 (defn deriv
   "Returns the derivative of f evaluated at c. If called with only one argument,

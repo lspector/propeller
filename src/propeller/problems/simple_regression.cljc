@@ -1,4 +1,8 @@
 (ns propeller.problems.simple-regression
+  "Simple Regression:
+
+Given inputs and outputs, find the target function."
+  {:doc/format :markdown}
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
@@ -12,12 +16,16 @@
   (+ (* x x x) x 3))
 
 (def train-and-test-data
+  "Training data: Inputs and outputs with -10 <= x < 11
+
+  Test data: Inputs and outputs of -20 <= x < -10 and 11 <= x < 21"
   (let [train-inputs (range -10 11)
         test-inputs (concat (range -20 -10) (range 11 21))]
     {:train (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) train-inputs)
      :test (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) test-inputs)}))
 
 (def instructions
+  "stack-specific instructions, input instructions, close, and constants"
   (list :in1
         :integer_add
         :integer_subtract

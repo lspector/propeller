@@ -1,4 +1,12 @@
 (ns propeller.problems.software.smallest
+  "SMALLEST PROBLEM from C. Le Goues et al.,
+  \"The ManyBugs and IntroClass Benchmarks\n
+   for Automated Repair of C Programs,\" in IEEE Transactions on Software\n
+    Engineering, vol. 41, no. 12, pp. 1236-1256, Dec. 1 2015.\n
+     doi: 10.1109/TSE.2015.2454513
+
+This problem file defines the following problem:
+takes as input four ints, computes the smallest, and prints to the screen the smallest input."
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
@@ -12,20 +20,10 @@
 ;;
 ;; SMALLEST PROBLEM
 ;;
-;; This problem file defines the following problem:
-;; There are two inputs, a float and an int. The program must read them in, find
-;; their sum as a float, and print the result as a float.
-;;
 ;; Problem Source: C. Le Goues et al., "The ManyBugs and IntroClass Benchmarks
 ;; for Automated Repair of C Programs," in IEEE Transactions on Software
 ;; Engineering, vol. 41, no. 12, pp. 1236-1256, Dec. 1 2015.
 ;; doi: 10.1109/TSE.2015.2454513
-;;
-;; NOTE: input stack: in1 (int),
-;;                    in2 (int),
-;;                    in3 (int),
-;;                    in4 (int),
-;;       output stack: printed output
 ;; =============================================================================
 
 ;; =============================================================================
@@ -38,9 +36,10 @@
 ;; =============================================================================
 
 ; Random integer between -100 and 100
-(defn random-int [] (- (rand-int 201) 100))
+(defn random-int "Random integer between -100 and 100" [] (- (rand-int 201) 100))
 
 (def instructions
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;; stack-specific instructions
@@ -51,6 +50,7 @@
       (list random-int))))
 
 (def train-and-test-data
+  "Inputs are 4-tuples of random integers and the outputs are the minimum value of each tuple."
   (let [inputs (vec (repeatedly 1100 #(vector (random-int) (random-int)
                                               (random-int) (random-int))))
         outputs (mapv #(apply min %) inputs)
@@ -62,6 +62,10 @@
      :test  test-set}))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ.
+  The behavior is here defined as the final top item on
+  the PRINT stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (:inputs data)

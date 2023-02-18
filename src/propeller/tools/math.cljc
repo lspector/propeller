@@ -1,9 +1,10 @@
-(ns propeller.tools.math)
+(ns propeller.tools.math
+  "Math functions.")
 
-(defonce PI #?(:clj  Math/PI
+(defonce ^{:no-doc true :const true} PI #?(:clj  Math/PI
                :cljs js/Math.PI))
 
-(defonce E #?(:clj  Math/E
+(defonce ^{:no-doc true :const true} E #?(:clj  Math/E
               :cljs js/Math.PI))
 
 (defn mean
@@ -39,9 +40,10 @@
   [x]
   (if (neg? x) (- x) x))
 
-(defn approx= [x y epsilon]
+(defn approx=
   "Returns true if the absolute difference between x and y is less than or
   equal to some specified error level, epsilon."
+  [x y epsilon]
   (<= (abs (- y x)) epsilon))
 
 (defn ceil

@@ -1,4 +1,5 @@
-(ns propeller.tools.character)
+(ns propeller.tools.character
+  "Functions for CHARs")
 
 (defn get-ascii
   "Gets the ASCII code of a char"

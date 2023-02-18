@@ -1,4 +1,12 @@
 (ns propeller.problems.PSB2.dice-game
+  "DICE GAME from PSB2
+
+Peter has an n sided die and Colin has an m
+sided die. If they both roll their dice at the same time, return
+the probability that Peter rolls strictly higher than Colin.
+
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -9,16 +17,8 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  ===============================
-; DICE GAME from PSB2
-; Peter has an n sided die and Colin has an m
-; sided die. If they both roll their dice at the same time, return
-; the probability that Peter rolls strictly higher than Colin.
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ==================================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "dice-game" 200 2000))
+(def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "dice-game" 200 2000))
 
 (defn map-vals-input
   "Returns all the input values of a map"
@@ -31,6 +31,7 @@
   (get i :output1))
 
 (def instructions
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -43,6 +44,10 @@
       (list 0.0 1.0))))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ, or 1000000 if no
+  behavior is produced. The behavior is here defined as the final top item on
+  the FLOAT stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (map-vals-input i)) data)

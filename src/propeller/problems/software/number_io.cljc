@@ -1,4 +1,10 @@
 (ns propeller.problems.software.number-io
+  "Number IO from iJava (http://ijava.cs.umass.edu/)
+
+     This problem file defines the following problem:
+There are two inputs, a float and an int. The program must read them in, find
+their sum as a float, and print the result as a float.
+     "
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
@@ -34,12 +40,13 @@
 ;; =============================================================================
 
 ;; Random float between -100.0 and 100.0
-(defn random-float [] (- (* (rand) 200) 100.0))
+(defn random-float "Random float between -100.0 and 100.0" [] (- (* (rand) 200) 100.0))
 
 ; Random integer between -100 and 100
-(defn random-int [] (- (rand-int 201) 100))
+(defn random-int "Random integer between -100 and 100" [] (- (rand-int 201) 100))
 
 (def instructions
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;; stack-specific instructions
@@ -50,6 +57,7 @@
       (list random-float random-int))))
 
 (def train-and-test-data
+  "Inputs are random integers and random floats and outputs are the sum as a float."
   (let [inputs (vec (repeatedly 1025 #(vector (random-int) (random-float))))
         outputs (mapv #(apply + %) inputs)
         train-set {:inputs  (take 25 inputs)
@@ -60,6 +68,10 @@
      :test  test-set}))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is the absolute difference between
+  program output and the correct output.
+  The behavior is here defined as the final top item on
+  the PRINT stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (:inputs data)

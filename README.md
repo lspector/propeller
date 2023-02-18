@@ -2,6 +2,8 @@
 
 Yet another Push-based genetic programming system in Clojure.
 
+Full documentation is on the GitHub pages link.
+
 ## Usage
 
 If you have installed [leiningen](https://leiningen.org), which is a tool

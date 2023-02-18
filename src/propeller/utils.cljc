@@ -1,4 +1,5 @@
 (ns propeller.utils
+  "Useful functions."
   (:require [clojure.zip :as zip]))
 
 (defn first-non-nil
