@@ -6,6 +6,17 @@ Full documentation is on the GitHub pages link.
 
 ## Usage
 
+If you are working in a Clojure IDE with an integrated REPL, the first
+thing you may want to do is to open `src/propeller/session.cljc` and 
+evaluate the namespace declaration and the commented-out expressions 
+therein. These demonstrate core components of Propeller including
+complete genetic programming runs.
+
+[TODO: Add instructions for running Propeller from the command line
+using the Clojure [CLI](https://clojure.org/guides/deps_and_cli)
+command-line tools. This is supported (we included a `deps.edn`
+configuration file), but not yet documented here.]
+
 If you have installed [leiningen](https://leiningen.org), which is a tool
 for running Clojure programs, then you can run Propeller on a genetic
 programming problem that is defined within this project from the command
