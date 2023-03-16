@@ -18,16 +18,24 @@
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]))
 
+;; Interpreting a simple Push program:
+
 #_(interpreter/interpret-program
     '(1 2 :integer_add) state/empty-state 1000)
 
+;; Retaining history:
+
 #_(interpreter/interpret-program
     '(1 2 :integer_add) (assoc state/empty-state :keep-history true) 1000)
+
+;; A program with a conditional:
 
 #_(interpreter/interpret-program
     '(3 3 :integer_eq :exec_if (1 "yes") (2 "no"))
     state/empty-state
     1000)
+
+;; A program using an input instruction:
 
 #_(interpreter/interpret-program
     '(:in1 :string_reverse 1 :string_take "?" :string_eq :exec_if
@@ -43,8 +51,15 @@
     (assoc state/empty-state :input {:in1 "I can hear you."})
     1000)
 
+;; Making a random genome (plushy) using instructions with specified types,
+;; and returning the Push program expressed by the genome:
+
 #_(genome/plushy->push
     (genome/make-random-plushy (instructions/get-stack-instructions #{:float :integer :exec :boolean}) 20))
+
+;; One way of running a genetic programming problem defined in the project
+;; is to require the problem's namespace and then call `gp/gp` using the
+;; items defined for the problem:
 
 #_(require '[propeller.problems.simple-regression :as regression])
 
@@ -78,4 +93,16 @@
           :umad-rate               0.1
           :variation               {:umad 0.5 :crossover 0.5}
           :elitism                 false})
+
+;; Another way to run a problem defined within the project is to require
+;; the problem's namespace and then call its `-main`. This will use defaults 
+;; defined in the problem file:
+
+#_(require '[propeller.problems.simple-regression :as regression])
+#_(regression/-main)
+
+;; Default values can be used but also partially overridden
+
+#_(require '[propeller.problems.simple-regression :as regression])
+#_(regression/-main :population-size 100 :variation {:umad 1.0})
 
