@@ -12,8 +12,8 @@ evaluate the namespace declaration and the commented-out expressions
 therein. These demonstrate core components of Propeller including
 complete genetic programming runs.
 
-To run Propeller on a genetic programming that is defined within this
-project from the command line, you will probably want to use either
+To run Propeller from the command line, on a genetic programming problem 
+that is defined within this project, you will probably want to use either
 the Clojure [CLI tools](https://clojure.org/guides/deps_and_cli) or 
 [leiningen](https://leiningen.org).
 
@@ -21,7 +21,7 @@ The instructions below are written for leiningen. If you are using
 the CLI tools instead, then replace `lein run -m` in each command
 with `clj -M -m`.
 
-If you are using leiningen, then you can start a ruh with the command 
+If you are using leiningen, then you can start a run with the command 
 `lein run -m <namespace>`, replacing `<namespace>` 
 with the actual namespace that you will find at the top of the problem file. 
 
