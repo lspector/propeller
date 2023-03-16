@@ -88,7 +88,9 @@ Given a string, return true if it contains A, C, G, and T. Else return false."
                       :cljs (apply + errors)))))
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge
