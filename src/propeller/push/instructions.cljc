@@ -1,16 +1,21 @@
 (ns propeller.push.instructions
+  "Push Instructions"
   (:require [clojure.set]
             [propeller.push.state :as state]
             [propeller.utils :as u]
             #?(:cljs [goog.string :as gstring])
             #?(:cljs [goog.string.format])))
 
-;; PushGP instructions are represented as keywords, and stored in an atom. They
-;; can be either constant literals or functions that take and return a Push state
-(def instruction-table (atom (hash-map)))
+
+(def instruction-table
+  "PushGP instructions are represented as keywords, and stored in an atom. They
+can be either constant literals or functions that take and return a Push state"
+  (atom (hash-map)))
 
 ;; Number of blocks opened by instructions (default = 0)
-(def opens {:exec_dup 1
+(def opens
+  "Number of blocks opened by instructions. The default is 0."
+  {:exec_dup 1
             :exec_dup_times 1
             :exec_dup_items 0 ; explicitly set to 0 to make it clear that this is intended
             :exec_eq 0 ; explicitly set to 0 to make it clear that this is intended
@@ -41,7 +46,7 @@
 
 
 #?(:clj
-   (def cls->type
+   (def ^{:no-doc true} cls->type
      {Boolean    :boolean
       Short      :integer
       Integer    :integer

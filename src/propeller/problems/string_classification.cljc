@@ -1,16 +1,19 @@
 (ns propeller.problems.string-classification
+  "String Classification:
+
+Given a string, return true if it contains A, C, G, and T. Else return false."
+  {:doc/format :markdown}
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-;; =============================================================================
-;; String classification
-;; =============================================================================
+
 
 ;; Set of original propel instructions
 (def instructions
+  "Set of original propel instructions"
   (list :in1
         :integer_add
         :integer_subtract
@@ -43,6 +46,9 @@
         "T"))
 
 (def train-and-test-data
+  "Training data: \"GCG\" \"GACAG\" \"AGAAG\" \"CCCA\" \"GATTACA\" \"TAGG\" \"GACT\" with associated boolean values based on problem definition.
+
+  Test data: \"GCGT\" \"GACTTAG\" \"AGTAAG\" \"TCCTCA\" \"GAACA\" \"AGG\" \"GAC\" with associated boolean values based on problem definition."
   (let [train-inputs ["GCG" "GACAG" "AGAAG" "CCCA" "GATTACA" "TAGG" "GACT"]
         test-inputs ["GCGT" "GACTTAG" "AGTAAG" "TCCTCA" "GAACA" "AGG" "GAC"]
         train-outputs [false false false false true true true]
@@ -82,7 +88,9 @@
                       :cljs (apply + errors)))))
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge

@@ -49,7 +49,7 @@
   "Finds the behaviors and errors of an individual: Error is 0 if the value and
   the program's selected behavior match, or 1 if they differ, or 1000000 if no
   behavior is produced. The behavior is here defined as the final top item on
-  the INTEGER stack."
+  the BOOLEAN stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [x] (first (:input1 x))) data)
@@ -77,7 +77,9 @@
                       :cljs (apply + errors)))))
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge

@@ -1,4 +1,7 @@
 (ns propeller.selection
+  "Propeller includes many kinds of genetic operators to select parents within the population such as tournament selection,
+  lexicase selection, and epsilon lexicase selection."
+  {:doc/format :markdown}
   (:require [propeller.tools.math :as math-tools]))
 
 (defn tournament-selection

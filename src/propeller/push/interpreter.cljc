@@ -1,4 +1,5 @@
 (ns propeller.push.interpreter
+  "Interprets Push programs."
   (:require [propeller.push.instructions :as instructions]
             [propeller.push.state :as state]
             [propeller.push.instructions.input-output :as io]))

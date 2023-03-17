@@ -27,8 +27,8 @@
         :exec_dup
         :exec_if
         'close
-        0
-        1))
+        0.0
+        1.0))
 
 (defn error-function
   "Finds the behaviors and errors of an individual. The error is the absolute
@@ -60,7 +60,9 @@
                        :cljs (apply + errors))))))
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge
@@ -72,7 +74,7 @@
        :population-size          1000
        :max-initial-plushy-size  100
        :step-limit               200
-       :parent-selection         :lexicase
+       :parent-selection         :epsilon-lexicase
        :tournament-size          5
        :umad-rate                0.1
        :solution-error-threshold  0.5

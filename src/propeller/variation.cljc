@@ -1,6 +1,60 @@
 (ns propeller.variation
+  "Propeller includes many kinds of genetic operators to create variation within the population.
+  You can specify the rate of the variation genetic operators with the `:variation` map.
+
+# Variation
+
+Propeller includes many kinds of genetic operators to create variation within the population.
+You can specify the rate of the variation genetic operators with the `:variation` map.
+
+## Crossover
+
+Crossover genetic operators take two `plushy` representations of Push programs
+and exchange genetic material to create a new `plushy`.
+
+| Function                         | Parameters             | Description                                                                                                                                            |
+|----------------------------------|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `crossover`                      | `plushy-a` `plushy-b`  | Crosses over two individuals using uniform crossover, one Push instruction at a time. Pads shorter one from the end of the list of instructions.       |
+| `tail-aligned-crossover`         | `plushy-a` `plushy-b`  | Crosses over two individuals using uniform crossover, one Push instruction at a time. Pads shorter one from the beginning of the list of instructions. |
+| `diploid-crossover`              | `plushy-a` `plushy-b`  | Crosses over two individuals using uniform crossover with pairs of Push instructions. Pads shorter one from the end of the list of instructions.       |
+| `tail-aligned-diploid-crossover` | `plushy-a` `plushy-b`  | Crosses over two individuals using uniform crossover with pairs of Push instructions. Pads shorter one from the beginning of the list of instructions. |
+
+## Addition, Deletion, Replacement, Flip
+
+Addition, deletion, replacement, and flip genetic operators take a `plushy` and a rate of occurrence to create a new `plushy`.
+
+| Function                                  | Parameters                                 | Description                                                                                                                     |
+|-------------------------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `uniform-addition`                        | `plushy` `instructions` `umad-rate`        | Returns a plushy with new instructions possibly added before or after each existing instruction.                                |
+| `uniform-replacement`                     | `plushy` `instructions` `replacement-rate` | Returns a plushy with new instructions possibly replacing existing instructions.                                                |
+| `diploid-uniform-silent-replacement`      | `plushy` `instructions` `replacement-rate` | Returns a plushy with new instructions possibly replacing existing instructions, but only among the silent member of each pair. |
+| `diploid-uniform-addition`                | `plushy` `instructions` `umad-rate`        | Returns a plushy with new instructions possibly added before or after each existing pair of instructions.                       |
+| `uniform-deletion`                        | `plushy` `umad-rate`                       | Randomly deletes instructions from plushy at some rate.                                                                         |
+| `diploid-uniform-deletion`                | `plushy` `flip-rate`                       | Randomly flips pairs in a diploid plushy at some rate.                                                                          |
+
+## Uniform Mutation by Addition and Deletion
+
+Uniform Mutation by Addition and Deletion (UMAD) is a uniform mutation operator which
+first adds genes with some probability before or after every existing gene and then
+deletes random genes from the resulting genome. [It has been found](http://cs.hamilton.edu/~thelmuth/Pubs/2018-GECCO-UMAD.pdf) that UMAD, with relatively
+high rates of addition and deletion, results in significant increases
+in problem-solving performance on a range of program synthesis
+benchmark problems. When you run a problem in Propeller, you can specify the `umad-rate` to determine the frequency
+of addition and deletion.
+
+`:umad` in the `:variation` map when running a problem will call `uniform-addition` and `uniform-deletion` with the `umad-rate`.
+Since `uniform-addition` and `uniform-deletion` are somewhat stochastic, you can use
+`:rumad` to ensure that the actual rates of addition and deletion are equal when mutating a genome.
+
+## New Individual
+
+The function `new-individual` returns a new individual produced by selection and variation of individuals in the population based on the genetic operators provided in the `:variation` map."
+  {:doc/format :markdown}
     (:require [propeller.selection :as selection]
       [propeller.utils :as utils]))
+
+
+
 
 (defn crossover
   "Crosses over two individuals using uniform crossover, one Push instruction at a time.

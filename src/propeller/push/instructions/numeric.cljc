@@ -1,4 +1,6 @@
 (ns propeller.push.instructions.numeric
+  "FLOAT and INTEGER Instructions (polymorphic).
+  Additional instructions can be found at [Additional Instructions](Additional_Instructions.md)."
   (:require [propeller.tools.math :as math]
             [propeller.push.instructions :refer [def-instruction
                                                  generate-instructions
@@ -11,6 +13,8 @@
 ;; Pushes TRUE onto the BOOLEAN stack if the first item is greater than the second
 ;; item, and FALSE otherwise
 (def _gt
+  "Pushes TRUE onto the BOOLEAN stack if the first item is greater
+  than the second item, and FALSE otherwise"
   ^{:stacks #{:boolean}
     :name "_gt"}
   (fn [stack state]
@@ -19,6 +23,8 @@
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is greater than or
 ;; equal to the top item, and FALSE otherwise
 (def _gte
+  "Pushes TRUE onto the BOOLEAN stack if the second item is greater than or
+  equal to the top item, and FALSE otherwise"
   ^{:stacks #{:boolean}
     :name "_gte"}
   (fn [stack state]
@@ -27,6 +33,8 @@
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is less than the top
 ;; item, and FALSE otherwise
 (def _lt
+  "Pushes TRUE onto the BOOLEAN stack if the second item is less than the top
+  item, and FALSE otherwise"
   ^{:stacks #{:boolean}
     :name "_lt"}
   (fn [stack state]
@@ -35,6 +43,8 @@
 ;; Pushes TRUE onto the BOOLEAN stack if the second item is less than or equal
 ;; to the top item, and FALSE otherwise
 (def _lte
+  "Pushes TRUE onto the BOOLEAN stack if the second item is less than or equal
+  to the top item, and FALSE otherwise"
   ^{:stacks #{:boolean}
     :name "_lte"}
   (fn [stack state]
@@ -42,6 +52,7 @@
 
 ;; Pushes the sum of the top two items onto the same stack
 (def _add
+  "Pushes the sum of the top two items onto the same stack"
   ^{:stacks #{}
     :name "_add"}
   (fn [stack state]
@@ -51,6 +62,8 @@
 ;; Pushes the difference of the top two items (i.e. the second item minus the
 ;; top item) onto the same stack
 (def _subtract
+  "Pushes the difference of the top two items (i.e. the second item minus the
+  top item) onto the same stack"
   ^{:stacks #{}
     :name "_subtract"}
   (fn [stack state]
@@ -59,6 +72,7 @@
 
 ;; Pushes the product of the top two items onto the same stack
 (def _mult
+  "Pushes the product of the top two items onto the same stack"
   ^{:stacks #{}
     :name "_mult"}
   (fn [stack state]
@@ -68,6 +82,8 @@
 ;; Pushes the quotient of the top two items (i.e. the first item divided by the
 ;; second item) onto the same stack. If the second item is zero, pushes 1
 (def _quot
+  "Pushes the quotient of the top two items (i.e. the first item divided by the
+  second item) onto the same stack. If the second item is zero, pushes 1"
   ^{:stacks #{}
     :name "_quot"}
   (fn [stack state]
@@ -78,6 +94,10 @@
 ;; quotient, where the quotient has first been truncated towards negative
 ;; infinity.
 (def _mod
+  "Pushes the top item modulo the second item onto the same stack. If the second
+  item is zero, pushes 1. The modulus is computed as the remainder of the
+   quotient, where the quotient has first been truncated towards negative
+   infinity."
   ^{:stacks #{}
     :name "_mod"}
   (fn [stack state]
@@ -85,6 +105,7 @@
 
 ;; Pushes the maximum of the top two items
 (def _max
+  "Pushes the maximum of the top two items"
   ^{:stacks #{}
     :name "_max"}
   (fn [stack state]
@@ -92,6 +113,7 @@
 
 ;; Pushes the minimum of the top two items
 (def _min
+  "Pushes the minimum of the top two items"
   ^{:stacks #{}
     :name "_min"}
   (fn [stack state]
@@ -99,6 +121,7 @@
 
 ;; Pushes 1 / 1.0 if the top BOOLEAN is TRUE, or 0 / 0.0 if FALSE
 (def _from_boolean
+  "Pushes 1 / 1.0 if the top BOOLEAN is TRUE, or 0 / 0.0 if FALSE"
   ^{:stacks #{:boolean}
     :name "_from_boolean"}
   (fn [stack state]
@@ -109,6 +132,7 @@
 
 ;; Pushes the ASCII value of the top CHAR
 (def _from_char
+  "Pushes the ASCII value of the top CHAR"
   ^{:stacks #{:char}
     :name "_from_char"}
   (fn [stack state]
@@ -117,6 +141,8 @@
 ;; Pushes the value of the top STRING, if it can be parsed as a number.
 ;; Otherwise, acts as a NOOP
 (def _from_string
+  "Pushes the value of the top STRING, if it can be parsed as a number.
+Otherwise, acts as a NOOP"
   ^{:stacks #{:string}
     :name "_from_string"}
   (fn [stack state]
@@ -133,6 +159,7 @@
 
 ;; Pushes the increment (i.e. +1) of the top item of the stack
 (def _inc
+  "Pushes the increment (i.e. +1) of the top item of the stack"
   ^{:stacks #{}
     :name "_inc"}
   (fn [stack state]
@@ -140,6 +167,7 @@
 
 ;; Pushes the decrement (i.e. -1) of the top item of the stack
 (def _dec
+  "Pushes the decrement (i.e. -1) of the top item of the stack"
   ^{:stacks #{}
     :name "_dec"}
   (fn [stack state]

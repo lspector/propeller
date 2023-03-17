@@ -1,4 +1,5 @@
 (ns propeller.tools.metrics
+  "Functions to measure things."
   (:require [propeller.tools.math :as math]))
 
 (defn argmins

@@ -12,12 +12,15 @@
   (+ (* x x x) (* 2 x x) x 3))
 
 (def train-and-test-data
+  "Training data: Inputs and outputs with -10 <= x < 11
+  Test data: Inputs and outputs of -20 <= x < -10 and 11 <= x < 21"
   (let [train-inputs (range -10 11)
         test-inputs (concat (range -20 -10) (range 11 21))]
     {:train (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) train-inputs)
      :test (map (fn [x] {:input1 (vector x) :output1 (vector (target-function x))}) test-inputs)}))
 
 (def instructions
+  "stack-specific instructions, input instructions, close, and constants"
   (list :in1
         :integer_add
         :integer_subtract
@@ -60,7 +63,9 @@
                        :cljs (apply + errors))))))
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge

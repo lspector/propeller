@@ -2,12 +2,27 @@
 
 Yet another Push-based genetic programming system in Clojure.
 
+Full documentation is on the GitHub pages link.
+
 ## Usage
 
-If you have installed [leiningen](https://leiningen.org), which is a tool
-for running Clojure programs, then you can run Propeller on a genetic
-programming problem that is defined within this project from the command
-line with the command `lein run -m <namespace>`, replacing `<namespace>` 
+If you are working in a Clojure IDE with an integrated REPL, the first
+thing you may want to do is to open `src/propeller/session.cljc` and 
+evaluate the namespace declaration and the commented-out expressions 
+therein. These demonstrate core components of Propeller including
+complete genetic programming runs.
+
+To run Propeller from the command line, on a genetic programming problem 
+that is defined within this project, you will probably want to use either
+the Clojure [CLI tools](https://clojure.org/guides/deps_and_cli) or 
+[leiningen](https://leiningen.org).
+
+The instructions below are written for leiningen. If you are using
+the CLI tools instead, then replace `lein run -m` in each command
+with `clj -M -m`.
+
+If you are using leiningen, then you can start a run with the command 
+`lein run -m <namespace>`, replacing `<namespace>` 
 with the actual namespace that you will find at the top of the problem file. 
 
 For example, you can run the simple-regression genetic programming problem with:
@@ -43,22 +58,6 @@ containing curly brackets that may confuse your shell:
 ```
 lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
 ```
-
-To run a genetic programming problem from a REPL, start
-your REPL for the project (e.g. with `lein repl` at the
-command line when in the project directory, or through your
-IDE) and then do something like the following (which in
-this case runs the simple-regression problem with 
-`:population-size` 100):
-
-```
-(require 'propeller.problems.simple-regression)
-(in-ns 'propeller.problems.simple-regression)
-(-main :population-size 100 :variation {:umad 1.0})
-```
-
-If you want to run the problem with the default parameters,
-then you should call `-main` without arguments, as `(-main)`.
 
 
 ## CLJS Usage

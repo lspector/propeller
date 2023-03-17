@@ -1,4 +1,5 @@
 (ns propeller.push.instructions.vector
+  "VECTOR instructions for all vector element subtypes: BOOLEAN, FLOAT, INTEGER, and STRING."
   (:require [clojure.string]
             [propeller.utils :as utils]
             [propeller.push.state :as state]
@@ -14,6 +15,7 @@
 
 ;; Pushes the butlast of the top item
 (def _butlast
+  "Pushes the butlast of the top item"
   ^{:stacks #{}
     :name "_butlast"}
   (fn [stack state]
@@ -21,6 +23,7 @@
 
 ;; Concats and pushes the top two vectors of the stack
 (def _concat
+  "Concats and pushes the top two vectors of the stack"
   ^{:stacks #{}
     :name "_concat"}
   (fn [stack state]
@@ -29,6 +32,8 @@
 ;; Conj's the top item of the appropriately-typed literal stack onto the vector
 ;; stack (e.g. pop the top INTEGER and conj it onto the top VECTOR_INTEGER)
 (def _conj
+  "Conj's the top item of the appropriately-typed literal stack onto the vector
+   stack (e.g. pop the top INTEGER and conj it onto the top VECTOR_INTEGER)"
   ^{:stacks #{:elem}
     :name "_conj"}
   (fn [stack state]
@@ -39,6 +44,9 @@
 ;; contains the top element of the appropriately-typed literal stack. Otherwise,
 ;; pushes FALSE
 (def _contains
+  "Pushes TRUE onto the BOOLEAN stack if the top element of the vector stack
+  contains the top element of the appropriately-typed literal stack. Otherwise,
+  pushes FALSE"
   ^{:stacks #{:boolean}
     :name "_contains"}
   (fn [stack state]
@@ -48,6 +56,8 @@
 ;; Pushes TRUE onto the BOOLEAN stack if the top element is an empty vector.
 ;; Otherwise, pushes FALSE
 (def _emptyvector
+  "Pushes TRUE onto the BOOLEAN stack if the top element is an empty vector.
+   Otherwise, pushes FALSE"
   ^{:stacks #{:boolean}
     :name "_emptyvector"}
   (fn [stack state]
@@ -57,6 +67,9 @@
 ;; appropriately-typed literal stack. If the vector is empty, return
 ;; :ignore-instruction so that nothing is changed on the stacks.
 (def _first
+  "Pushes the first item of the top element of the vector stack onto the
+   appropriately-typed literal stack. If the vector is empty, return
+    :ignore-instruction so that nothing is changed on the stacks."
   ^{:stacks #{:elem}
     :name "_first"}
   (fn [stack state]
@@ -69,6 +82,8 @@
 ;; Pushes onto the INTEGER stack the index of the top element of the
 ;; appropriately-typed literal stack within the top element of the vector stack
 (def _indexof
+  "Pushes onto the INTEGER stack the index of the top element of the
+   appropriately-typed literal stack within the top element of the vector stack"
   ^{:stacks #{:elem :integer}
     :name "_indexof"}
   (fn [stack state]
@@ -77,6 +92,7 @@
 
 ;; Iterates over the vector using the code on the exec stack
 (def _iterate
+  "Iterates over the vector using the code on the exec stack"
   ^{:stacks #{:elem :integer}
     :name "_iterate"}
   (fn [stack state]
@@ -103,6 +119,8 @@
 ;; Pushes the last item of the top element of the vector stack onto the
 ;; approrpiately-typed literal stack
 (def _last
+  "Pushes the last item of the top element of the vector stack onto the
+   appropriately-typed literal stack"
   ^{:stacks #{:elem}
     :name "_last"}
   (fn [stack state]
@@ -115,6 +133,7 @@
 
 ;; Pushes the length of the top item onto the INTEGER stack
 (def _length
+  "Pushes the length of the top item onto the INTEGER stack"
   ^{:stacks #{:integer}
     :name "_length"}
   (fn [stack state]
@@ -124,6 +143,9 @@
 ;; approrpiately-typed literal stack, where N is taken from the INTEGER stack.
 ;; To insure the index is within bounds, N is taken mod the vector length
 (def _nth
+  "Pushes the Nth item of the top element of the vector stack onto the
+   appropriately-typed literal stack, where N is taken from the INTEGER stack.
+    To insure the index is within bounds, N is taken mod the vector length"
   ^{:stacks #{:elem :integer}
     :name "_nth"}
   (fn [stack state]
@@ -139,6 +161,9 @@
 ;; the appropriately-typed literal stack within the top element of the vector
 ;; stack
 (def _occurrencesof
+  "Pushes onto the INTEGER stack the number of occurrences of the top element of
+   the appropriately-typed literal stack within the top element of the vector
+   stack"
   ^{:stacks #{:elem :integer}
     :name "_occurrencesof"}
   (fn [stack state]
@@ -150,6 +175,7 @@
 
 ;; Pushes every item of the top element onto the appropriately-typed stack
 (def _pushall
+  "Pushes every item of the top element onto the appropriately-typed stack"
   ^{:stacks #{:elem}
     :name "_pushall"}
   (fn [stack state]
@@ -163,6 +189,8 @@
 ;; Removes all occurrences of the top element of the appropriately-typed literal
 ;; stack from the first element of the vector stack
 (def _remove
+  "Removes all occurrences of the top element of the appropriately-typed literal
+   stack from the first element of the vector stack"
   ^{:stacks #{:elem}
     :name "_remove"}
   (fn [stack state]
@@ -176,6 +204,9 @@
 ;; literal stack with the top element of the appropriately-typed literal stack
 ;; within the top item of the vector stack
 (def _replace
+  "Replaces all occurrences of the second element of the appropriately-typed
+   literal stack with the top element of the appropriately-typed literal stack
+   within the top item of the vector stack"
   ^{:stacks #{:elem}
     :name "_replace"}
   (fn [stack state]
@@ -190,6 +221,9 @@
 ;; literal stack with the top element of the appropriately-typed literal stack
 ;; within the top item of the vector stack
 (def _replacefirst
+  "Replaces the first occurrence of the second element of the appropriately-typed
+   literal stack with the top element of the appropriately-typed literal stack
+   within the top item of the vector stack"
   ^{:stacks #{:elem}
     :name "_replacefirst"}
   (fn [stack state]
@@ -205,6 +239,7 @@
 
 ;; Pushes the rest of the top item
 (def _rest
+  "Pushes the rest of the top item"
   ^{:stacks #{}
     :name "_rest"}
   (fn [stack state]
@@ -212,6 +247,7 @@
 
 ;; Pushes the reverse of the top item
 (def _reverse
+  "Pushes the reverse of the top item"
   ^{:stacks #{}
     :name "_reverse"}
   (fn [stack state]
@@ -221,6 +257,9 @@
 ;; with the top item from the appropriately-typed literal stack. To insure the
 ;; index is within bounds, N is taken mod the vector length
 (def _set
+  "Replaces in the top vector the item at index N (taken from the INTEGER stack)
+   with the top item from the appropriately-typed literal stack. To insure the
+   index is within bounds, N is taken mod the vector length"
   ^{:stacks #{:elem :integer}
     :name "_set"}
   (fn [stack state]
@@ -236,6 +275,8 @@
 ;; Pushes a subvector of the top item, with start and end indices determined by
 ;; the second and top items of the INTEGER stack respectively
 (def _subvec
+  "Pushes a subvector of the top item, with start and end indices determined by
+   the second and top items of the INTEGER stack respectively"
   ^{:stacks #{:integer}
     :name "_subvec"}
   (fn [stack state]
@@ -250,6 +291,8 @@
 ;; Pushes the first N items of the top element, where N is taken from the top of
 ;; the INTEGER stack
 (def _take
+  "Pushes the first N items of the top element, where N is taken from the top of
+  the INTEGER stack"
   ^{:stacks #{:integer}
     :name "_take"}
   (fn [stack state]
