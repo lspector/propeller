@@ -4,7 +4,6 @@
             [propeller.push.interpreter :as interpreter]
             [clojure.string :as string]
             [propeller.tools.math :as math]
-            [propeller.problems.data-creation :as dc]
             [propeller.utils :as utils]
             [propeller.push.instructions :refer [get-stack-instructions]]
             [propeller.push.state :as state]

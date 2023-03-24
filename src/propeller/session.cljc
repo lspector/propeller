@@ -59,7 +59,8 @@
 
 ;; One way of running a genetic programming problem defined in the project
 ;; is to require the problem's namespace and then call `gp/gp` using the
-;; items defined for the problem:
+;; items defined for the problem. Depending on your IDE and setup, you may
+;; also have to open the problem's file and evaluate its contents.
 
 #_(require '[propeller.problems.simple-regression :as regression])
 
