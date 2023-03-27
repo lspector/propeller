@@ -10,10 +10,10 @@ If you are working in a Clojure IDE with an integrated REPL, the first
 thing you may want to do is to open `src/propeller/session.cljc` and 
 evaluate the namespace declaration and the commented-out expressions 
 therein. These demonstrate core components of Propeller including
-complete genetic programming runs. When conducting complete GP runs
-this way (using `gp/gp`), depending on your IDE you may need to explicitly
-open and load the problem file before evaluating the calls to `require`
-and `gp/gp`.
+complete genetic programming runs. When conducting complete genetic
+programming runs this way (using `gp/gp`), depending on your IDE you 
+may need to explicitly open and load the problem file before evaluating 
+the calls to `require` and `gp/gp`.
 
 To run Propeller from the command line, on a genetic programming problem 
 that is defined within this project, you will probably want to use either
