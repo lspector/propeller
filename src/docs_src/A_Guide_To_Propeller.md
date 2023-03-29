@@ -39,9 +39,9 @@ line with the command `lein run -m <namespace>`, replacing `<namespace>`
 with the actual namespace that you will find at the top of the problem file.
 
 If you have installed [Clojure](https://clojure.org/guides/install_clojure#java), you can run Propeller on a genetic programming 
-problem with the command `clj --main <namespace>`, replacing `<namespace>` with 
+problem with the command `clj -M -m <namespace>`, replacing `<namespace>` with 
 the actual namespace that you will find at the top of the problem file. 
-The examples below use leiningen, but you can replace `lein run -m` with `clj --main` to run the same problem.
+The examples below use leiningen, but you can replace `lein run -m` with `clj -M -m` to run the same problem.
 
 A specific example is provided later below.
 
