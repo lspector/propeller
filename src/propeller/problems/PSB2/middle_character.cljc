@@ -83,5 +83,4 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
        :umad-rate               0.1
        :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
-      (apply hash-map (map #(if (string? %) (read-string %) %) args))))
-  (#?(:clj shutdown-agents)))
+      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

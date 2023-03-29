@@ -121,5 +121,4 @@ their sum as a float, and print the result as a float.
        :umad-rate               0.1
        :variation               {:umad 0.5 :crossover 0.5}
        :elitism                 false}
-      (apply hash-map (map #(if (string? %) (read-string %) %) args))))
-  (#?(:clj shutdown-agents)))
+      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
