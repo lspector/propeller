@@ -18,17 +18,20 @@ the calls to `require` and `gp/gp`.
 To run Propeller from the command line, on a genetic programming problem 
 that is defined within this project, you will probably want to use either
 the Clojure [CLI tools](https://clojure.org/guides/deps_and_cli) or 
-[leiningen](https://leiningen.org).
+[leiningen](https://leiningen.org). In the examples below, the leiningen
+and CLI commands are identical except that the former begin with
+`lein run -m`, while the latter begin with `clj -M -m`.
 
-The instructions below are written for leiningen. If you are using
-the CLI tools instead, then replace `lein run -m` in each command
-with `clj -M -m`.
-
-If you are using leiningen, then you can start a run with the command 
+To start a run use `clj -M -m <namespace>` or 
 `lein run -m <namespace>`, replacing `<namespace>` 
 with the actual namespace that you will find at the top of the problem file. 
 
 For example, you can run the simple-regression genetic programming problem with:
+
+```
+clj -M -m propeller.problems.simple-regression
+```
+or 
 
 ```
 lein run -m propeller.problems.simple-regression
@@ -38,6 +41,11 @@ Additional command-line arguments may
 be provided to override the default key/value pairs specified in the 
 problem file, for example:
 
+```
+clj -M -m propeller.problems.simple-regression :population-size 100
+```
+
+or
 
 ```
 lein run -m propeller.problems.simple-regression :population-size 100
@@ -46,6 +54,13 @@ lein run -m propeller.problems.simple-regression :population-size 100
 On Unix operating systems, including MacOS, you can use something
 like the following to send output both to the terminal
 and to a text file (called `outfile` in this example):
+
+
+```
+clj -M -m propeller.problems.simple-regression | tee outfile
+```
+
+or
 
 ```
 lein run -m propeller.problems.simple-regression | tee outfile
@@ -57,6 +72,12 @@ before they get to Clojure, then enclose those in double
 quotes, like in this example that provides a non-default
 value for the `:variation` argument, which is a clojure map
 containing curly brackets that may confuse your shell:
+
+```
+clj -M -m propeller.problems.simple-regression :variation "{:umad 1.0}"
+```
+
+or
 
 ```
 lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
