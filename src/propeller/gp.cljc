@@ -80,9 +80,11 @@
         ;;
         :else (recur (inc generation)
                      (if (:elitism argmap)
-                       (conj (repeatedly (dec population-size)
-                                         #(variation/new-individual evaluated-pop argmap))
+                       (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
+                                             (range (dec population-size))
+                                             argmap)
                              (first evaluated-pop))         ;elitism maintains the most-fit individual
-                       (repeatedly population-size
-                                   #(variation/new-individual evaluated-pop argmap))))))))
+                       (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
+                                       (range population-size)
+                                       argmap)))))))
 
