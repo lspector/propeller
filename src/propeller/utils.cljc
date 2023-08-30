@@ -1,6 +1,7 @@
 (ns propeller.utils
   "Useful functions."
-  (:require [clojure.zip :as zip]))
+  (:require [clojure.zip :as zip]
+            [clojure.repl :as repl]))
 
 (defn first-non-nil
   "Returns the first non-nil values from the collection, or returns `nil` if
@@ -97,7 +98,7 @@ multicore processor utilization, and 4) takes only one coll so far."
                  (doall (map f coll))
                  (let [agents (map #(agent % :error-handler
                                            (fn [agnt except] 
-                                             (clojure.repl/pst except 1000) 
+                                             (repl/pst except 1000) 
                                              (System/exit 0)))
                                    coll)]
                    (dorun (map #(send % f) agents))
