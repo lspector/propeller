@@ -83,6 +83,12 @@ or
 lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
 ```
 
+By default, Propeller will conduct many processes concurrently on multiple 
+cores using threads. If you  want to disable this behavior (for example, during 
+debugging) then provide the argument `:single-thread-mode` with the value `true`.
+Threads are not available in Javascript, so no processes are run concurrnetly
+when Propeller is run in Clojurescript.
+
 
 ## CLJS Usage
 
