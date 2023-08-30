@@ -173,13 +173,13 @@
         :boolean_nand ;; defined here
         :boolean_nor ;; defined here
         :boolean_xnor ;; defined here
-        :boolean_dup
-        :boolean_swap
-        :boolean_rot
-        :boolean_pop
-        :exec_pop
-        :exec_dup
-        'close
+        ;:boolean_dup
+        ;:boolean_swap
+        ;:boolean_rot
+        ;:boolean_pop
+        ;:exec_pop
+        ;:exec_dup
+        ;'close
         true
         false))
 
@@ -238,13 +238,13 @@
      :parent-selection         :lexicase
      ;:parent-selection         :tournament
      :tournament-size          5
-     :umad-rate                0.1
-     ;:variation                {:umad 1}
-     :diploid                  true
-     :variation                {:diploid-umad 0.8
-                                :diploid-uniform-silent-replacement 0.1
-                                :diploid-flip 0.1}
-     :replacement-rate         0.1
-     :diploid-flip-rate        0.1
+     :umad-rate                0.01
+     :variation                {:vumad 1}
+     ;:diploid                  true
+     ;:variation                {:diploid-umad 0.8
+     ;                           :diploid-uniform-silent-replacement 0.1
+     ;                           :diploid-flip 0.1}
+     ;:replacement-rate         0.1
+     ;:diploid-flip-rate        0.1
      :elitism                  false}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

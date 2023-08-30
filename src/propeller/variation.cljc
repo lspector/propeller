@@ -202,13 +202,13 @@ The function `new-individual` returns a new individual produced by selection and
      (case op
        :crossover
        (crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :tail-aligned-crossover
        (tail-aligned-crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :umad
        (-> (:plushy (selection/select-parent pop argmap))
@@ -229,6 +229,12 @@ The function `new-individual` returns a new individual produced by selection and
          (uniform-deletion after-addition effective-addition-rate))
        ; Adds and deletes instructions in the parent genome with the same rate
 
+       :vumad ;; variable umad: :umad-rate is interpreted as max, actual uniform 0-max
+       (let [rate (rand (:umad-rate argmap))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (uniform-addition (:instructions argmap) rate)
+             (uniform-deletion rate)))
+
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-addition (:instructions argmap) (:umad-rate argmap)))
@@ -247,13 +253,13 @@ The function `new-individual` returns a new individual produced by selection and
        ;
        :diploid-crossover
        (diploid-crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :tail-aligned-diploid-crossover
        (tail-aligned-diploid-crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :diploid-umad
        (-> (:plushy (selection/select-parent pop argmap))
@@ -278,4 +284,4 @@ The function `new-individual` returns a new individual produced by selection and
        :else
        (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
                  :cljs (js/Error
-                         (str "No match in new-individual for " op))))))})
+                        (str "No match in new-individual for " op))))))})
