@@ -236,14 +236,15 @@
      :max-initial-plushy-size  100
      :step-limit               1000
      :parent-selection         :lexicase
+     ;:parent-selection         :tournament
      :tournament-size          5
-     :umad-rate                0.01
+     :umad-rate                0.1
+     ;:variation                {:umad 1}
      :diploid                  true
-     ;; :variation                {:umad 0.5 :crossover 0.5}
-     :replacement-rate         0.01
-     :diploid-flip-rate        0.01
      :variation                {:diploid-umad 0.8
                                 :diploid-uniform-silent-replacement 0.1
                                 :diploid-flip 0.1}
+     :replacement-rate         0.1
+     :diploid-flip-rate        0.1
      :elitism                  false}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
