@@ -164,6 +164,9 @@
         :set-c2 ;; defined here
         :set-c1 ;; defined here
         :set-c0 ;; defined here
+;; PROVIDE ACCESS ALSO TO c0-c5?
+        ;; AND/OR BOOLEAN TAGGING?
+
         ;; Recommended by Kalkreuth et al: BUFa, NOTa, AND, OR, XOR, NAND, NOR, XNOR
         :boolean_bufa ;; defined here
         :boolean_nota ;; defined here
@@ -173,15 +176,21 @@
         :boolean_nand ;; defined here
         :boolean_nor ;; defined here
         :boolean_xnor ;; defined here
+
+        ;:boolean_pop
         ;:boolean_dup
         ;:boolean_swap
         ;:boolean_rot
-        ;:boolean_pop
+
         ;:exec_pop
         ;:exec_dup
+        ;:exec_swap
+        ;:exec_rot
         ;'close
-        true
-        false))
+
+        ;true
+        ;false
+        ))
 
 
 
@@ -231,7 +240,7 @@
      :error-function           error-function
      :training-data            (:train train-and-test-data)
      :testing-data             (:test train-and-test-data)
-     :max-generations          100
+     :max-generations          1000
      :population-size          1000
      :max-initial-plushy-size  100
      :step-limit               1000
@@ -239,12 +248,15 @@
      ;:parent-selection         :tournament
      :tournament-size          5
      :umad-rate                0.01
-     :variation                {:vumad 1}
+     :variation                {:umad 1
+                                :reproduction 0
+                                :tail-aligned-crossover 0
+                                }
      ;:diploid                  true
-     ;:variation                {:diploid-umad 0.8
+     ;:variation                {:diploid-vumad 0.8
      ;                           :diploid-uniform-silent-replacement 0.1
      ;                           :diploid-flip 0.1}
-     ;:replacement-rate         0.1
-     ;:diploid-flip-rate        0.1
+     ;:replacement-rate         0.01
+     ;:diploid-flip-rate        0.01
      :elitism                  false}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

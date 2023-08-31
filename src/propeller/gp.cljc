@@ -44,7 +44,10 @@
   ;;
   (loop [generation 0
          population (utils/pmapallv
-                     (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
+                     (fn [_] {:plushy (let [plushy  (genome/make-random-plushy instructions max-initial-plushy-size)]
+                                        (if (:diploid argmap)
+                                          (interleave plushy plushy)
+                                          plushy))})
                      (range population-size)
                      argmap)]             ;creates population of random plushys
     (let [evaluated-pop (sort-by :total-error

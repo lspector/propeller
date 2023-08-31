@@ -266,6 +266,12 @@ The function `new-individual` returns a new individual produced by selection and
            (diploid-uniform-addition (:instructions argmap) (:umad-rate argmap))
            (diploid-uniform-deletion (:umad-rate argmap)))
        ;
+       :diploid-vumad ;; variable umad: :umad-rate is interpreted as max, actual uniform 0-max
+       (let [rate (rand (:umad-rate argmap))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (diploid-uniform-addition (:instructions argmap) rate)
+             (diploid-uniform-deletion rate)))
+       ;
        :diploid-uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
            (diploid-uniform-addition (:instructions argmap) (:umad-rate argmap)))
