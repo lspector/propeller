@@ -306,8 +306,10 @@
      :population-size          1000
      :max-initial-plushy-size  100
      :step-limit               1000
-     :parent-selection         :lexicase
+     ;:parent-selection         :lexicase
      ;:parent-selection         :tournament
+     :parent-selection         :motley-batch-lexicase
+     :max-batch-size           16
      :tournament-size          5
      :umad-rate                0.05
      :alternation-rate         0.05
@@ -323,5 +325,6 @@
      ;                           :diploid-flip 0.1}
      ;:replacement-rate         0.01
      ;:diploid-flip-rate        0.01
-     :elitism                  false}
+     :elitism                  false
+     :single-thread-mode       false}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

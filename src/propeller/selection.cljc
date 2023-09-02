@@ -29,6 +29,29 @@
                        survivors)
                (rest cases))))))
 
+(defn motley-batch-lexicase-selection
+  "Selects an individual from the population using motley batch lexicase selection.
+   Cases are combined in random collections of max size (:max-batch-size argmap),
+   and then the population is passed to lexicase-selection."
+  [pop argmap]
+  (let [cases (range (count (:errors (first pop))))
+        batches (loop [remaining (shuffle cases)
+                       result ()]
+                  (if (empty? remaining)
+                    result
+                    (let [n (inc (rand-int (:max-batch-size argmap)))]
+                      (recur (drop n remaining)
+                             (conj result (take n remaining))))))]
+    (lexicase-selection (mapv (fn [ind]
+                                (assoc ind
+                                       :errors
+                                       (mapv (fn [batch]
+                                               (reduce + (map #(nth (:errors ind) %)
+                                                              batch)))
+                                             batches)))
+                              pop)
+                        argmap)))
+
 (defn epsilon-list
   "List of epsilons for each training case based on median absolute deviation of errors."
   [pop]
@@ -39,7 +62,7 @@
         epsilons
         (recur (conj epsilons
                      (math-tools/median-absolute-deviation
-                       (map #(nth % i) error-list)))
+                      (map #(nth % i) error-list)))
                (inc i))))))
 
 (defn epsilon-lexicase-selection
@@ -69,4 +92,5 @@
   (case (:parent-selection argmap)
     :tournament (tournament-selection pop argmap)
     :lexicase (lexicase-selection pop argmap)
-    :epsilon-lexicase (epsilon-lexicase-selection pop argmap)))
+    :epsilon-lexicase (epsilon-lexicase-selection pop argmap)
+    :motley-batch-lexicase (motley-batch-lexicase-selection pop argmap)))
