@@ -105,3 +105,26 @@ multicore processor utilization, and 4) takes only one coll so far."
                    (apply await agents)
                    (doall (map deref agents)))))
      :cljs (mapv f coll)))
+
+(def PI
+  #?(:clj Math/PI
+     :cljs js/Math.PI))
+
+(defn log [x]
+  #?(:clj  (Math/log x)
+     :cljs (js/Math.log x)))
+
+(defn round [x]
+  #?(:clj  (Math/round x)
+     :cljs (js/Math.round x)))
+
+(defn gaussian-noise-factor
+  "Returns gaussian noise of mean 0, std dev 1."
+  []
+  (* (Math/sqrt (* -2.0 (log (rand))))
+      (Math/cos (* 2.0 PI (rand)))))
+
+(defn perturb-with-gaussian-noise
+  "Returns n perturbed with std dev sd."
+  [sd n]
+  (+ n (* sd (gaussian-noise-factor))))

@@ -71,6 +71,29 @@ The function `new-individual` returns a new individual produced by selection and
                  shorter-padded
                  longer))))
 
+(defn alternation
+  "Alternates between the two parent genomes."
+  [genome1 genome2 {:keys [alternation-rate alignment-deviation] :as argmap}]
+  (let [alternation-rate (or alternation-rate 0)
+        alignment-deviation (or alignment-deviation 0)]
+    (loop [i 0
+           use-genome1 (rand-nth [true false])
+           result-genome []
+           iteration-budget (+ (count genome1) (count genome2))]
+      (if (or (>= i (count (if use-genome1 genome1 genome2))) ;; finished current program
+              (<= iteration-budget 0)) ;; looping too long
+        result-genome ;; Return
+        (if (< (rand) alternation-rate)
+          (recur (max 0 (+ i (utils/round (* alignment-deviation
+                                             (utils/gaussian-noise-factor)))))
+                 (not use-genome1)
+                 result-genome
+                 (dec iteration-budget))
+          (recur (inc i)
+                 use-genome1
+                 (conj result-genome (nth (if use-genome1 genome1 genome2) i))
+                 (dec iteration-budget)))))))
+
 (defn tail-aligned-crossover
   "Crosses over two individuals using uniform crossover, one Push instruction at a time.
    Pads shorter one from the beginning of the list of instructions."
@@ -217,7 +240,7 @@ The function `new-individual` returns a new individual produced by selection and
        ; uniform mutation by addition and deletion is a uniform mutation operator which
        ;first adds genes with some probability before or after every existing gene and then
        ;deletes random genes from the resulting genome
-
+       ;
        :rumad
        (let [parent-genome (:plushy (selection/select-parent pop argmap))
              after-addition (uniform-addition parent-genome
@@ -228,13 +251,13 @@ The function `new-individual` returns a new individual produced by selection and
                                         (count parent-genome))]
          (uniform-deletion after-addition effective-addition-rate))
        ; Adds and deletes instructions in the parent genome with the same rate
-
+       ;
        :vumad ;; variable umad: :umad-rate is interpreted as max, actual uniform 0-max
        (let [rate (rand (:umad-rate argmap))]
          (-> (:plushy (selection/select-parent pop argmap))
              (uniform-addition (:instructions argmap) rate)
              (uniform-deletion rate)))
-
+       ;
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-addition (:instructions argmap) (:umad-rate argmap)))
@@ -283,6 +306,11 @@ The function `new-individual` returns a new individual produced by selection and
        :diploid-flip
        (-> (:plushy (selection/select-parent pop argmap))
            (diploid-flip (:diploid-flip-rate argmap)))
+       ;
+       :alternation
+       (alternation (:plushy (selection/select-parent pop argmap))
+                    (:plushy (selection/select-parent pop argmap))
+                    argmap)
        ;
        :reproduction
        (:plushy (selection/select-parent pop argmap))

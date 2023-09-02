@@ -104,6 +104,61 @@
                 [:output :c0]
                 (state/peek-stack state :boolean)))))
 
+
+(def-instruction
+  :c5
+  ^{:stacks [:boolean :output]}
+  (fn [state]
+    (let [val (:c5 (:output state))]
+      (if (boolean? val)
+        (state/push-to-stack state :boolean val)
+        state))))
+
+(def-instruction
+  :c4
+  ^{:stacks [:boolean :output]}
+  (fn [state]
+    (let [val (:c4 (:output state))]
+      (if (boolean? val)
+        (state/push-to-stack state :boolean val)
+        state))))
+
+(def-instruction
+  :c3
+  ^{:stacks [:boolean :output]}
+  (fn [state]
+    (let [val (:c3 (:output state))]
+      (if (boolean? val)
+        (state/push-to-stack state :boolean val)
+        state))))
+
+(def-instruction
+  :c2
+  ^{:stacks [:boolean :output]}
+  (fn [state]
+    (let [val (:c2 (:output state))]
+      (if (boolean? val)
+        (state/push-to-stack state :boolean val)
+        state))))
+
+(def-instruction
+  :c1
+  ^{:stacks [:boolean :output]}
+  (fn [state]
+    (let [val (:c1 (:output state))]
+      (if (boolean? val)
+        (state/push-to-stack state :boolean val)
+        state))))
+
+(def-instruction
+  :c0
+  ^{:stacks [:boolean :output]}
+  (fn [state]
+    (let [val (:c0 (:output state))]
+      (if (boolean? val)
+        (state/push-to-stack state :boolean val)
+        state))))
+
 (def-instruction
   :boolean_bufa
   ^{:stacks #{:boolean}}
@@ -112,7 +167,6 @@
                       (fn [b1 b2] b1) 
                       [:boolean :boolean]
                       :boolean)))
-
 
 (def-instruction
   :boolean_nota
@@ -164,12 +218,18 @@
         :set-c2 ;; defined here
         :set-c1 ;; defined here
         :set-c0 ;; defined here
-;; PROVIDE ACCESS ALSO TO c0-c5?
-        ;; AND/OR BOOLEAN TAGGING?
+        :c5 ;; defined here
+        :c4 ;; defined here
+        :c3 ;; defined here
+        :c2 ;; defined here
+        :c1 ;; defined here
+        :c0 ;; defined here
+        
+        ;; BOOLEAN TAGGING?
 
         ;; Recommended by Kalkreuth et al: BUFa, NOTa, AND, OR, XOR, NAND, NOR, XNOR
-        :boolean_bufa ;; defined here
-        :boolean_nota ;; defined here
+        ;:boolean_bufa ;; defined here
+        ;:boolean_nota ;; defined here
         :boolean_and
         :boolean_or
         :boolean_xor
@@ -177,10 +237,12 @@
         :boolean_nor ;; defined here
         :boolean_xnor ;; defined here
 
+        :boolean_not ;; added to compensate for commenting out :boolean_nota
+
         ;:boolean_pop
-        ;:boolean_dup
-        ;:boolean_swap
-        ;:boolean_rot
+        :boolean_dup
+        :boolean_swap
+        :boolean_rot
 
         ;:exec_pop
         ;:exec_dup
@@ -247,8 +309,11 @@
      :parent-selection         :lexicase
      ;:parent-selection         :tournament
      :tournament-size          5
-     :umad-rate                0.01
-     :variation                {:umad 1
+     :umad-rate                0.05
+     :alternation-rate         0.05
+     :alignment-deviation      1
+     :variation                {:umad 0.5
+                                :alternation 0.5
                                 :reproduction 0
                                 :tail-aligned-crossover 0
                                 }
