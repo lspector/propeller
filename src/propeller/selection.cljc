@@ -31,26 +31,24 @@
 
 (defn motley-batch-lexicase-selection
   "Selects an individual from the population using motley batch lexicase selection.
-   Cases are combined in random collections of max size (:max-batch-size argmap),
-   and then the population is passed to lexicase-selection."
+   Cases are combined in random collections of max size (:max-batch-size argmap)."
   [pop argmap]
-  (let [cases (range (count (:errors (first pop))))
-        batches (loop [remaining (shuffle cases)
-                       result ()]
-                  (if (empty? remaining)
-                    result
-                    (let [n (inc (rand-int (:max-batch-size argmap)))]
-                      (recur (drop n remaining)
-                             (conj result (take n remaining))))))]
-    (lexicase-selection (mapv (fn [ind]
-                                (assoc ind
-                                       :errors
-                                       (mapv (fn [batch]
-                                               (reduce + (map #(nth (:errors ind) %)
-                                                              batch)))
-                                             batches)))
-                              pop)
-                        argmap)))
+  (loop [survivors (map rand-nth (vals (group-by :errors pop)))
+         cases (shuffle (range (count (:errors (first pop)))))]
+    (if (or (empty? cases)
+            (empty? (rest survivors)))
+      (rand-nth survivors)
+      (let [batch-size (inc (rand-int (:max-batch-size argmap)))
+            batch (take batch-size cases)
+            ind-err-pairs (map (fn [ind]
+                                 [ind
+                                  (reduce + (map #(nth (:errors ind) %)
+                                                 batch))])
+                               survivors)
+            min-err (apply min (map second ind-err-pairs))]
+        (recur (map first (filter #(= (second %) min-err) 
+                                  ind-err-pairs))
+               (drop batch-size cases))))))
 
 (defn epsilon-list
   "List of epsilons for each training case based on median absolute deviation of errors."
