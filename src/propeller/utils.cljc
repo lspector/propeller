@@ -128,3 +128,12 @@ multicore processor utilization, and 4) takes only one coll so far."
   "Returns n perturbed with std dev sd."
   [sd n]
   (+ n (* sd (gaussian-noise-factor))))
+
+(defn rate
+  "If given a number, returns it. If given a collection, returns a member of the collection.
+  Intended for allowing arguments to genetic operators, such as mutation rates, to take
+  collections in addition to single values"
+  [thing-or-collection]
+  (if (coll? thing-or-collection)
+    (rand-nth thing-or-collection)
+    thing-or-collection))
