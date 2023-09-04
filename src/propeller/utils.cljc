@@ -129,7 +129,7 @@ multicore processor utilization, and 4) takes only one coll so far."
   [sd n]
   (+ n (* sd (gaussian-noise-factor))))
 
-(defn rate
+(defn onenum
   "If given a number, returns it. If given a collection, returns a member of the collection.
   Intended for allowing arguments to genetic operators, such as mutation rates, to take
   collections in addition to single values"
