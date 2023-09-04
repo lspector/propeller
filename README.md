@@ -83,6 +83,8 @@ or
 lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
 ```
 
+For many genetic operator hyperparameters, collections may be provided in place of single values. When this is done, a random element of the collection will be chosen (with each being equally likely) each time the operator is used. When specied at the command line, these collections will also have to be quoted, for example with `:umad-rate "[0.01 0.05 0.1]"` to mean that UMAD rates of 0.01, 0.05, and 0.1 can be used.
+
 By default, Propeller will conduct many processes concurrently on multiple 
 cores using threads. If you  want to disable this behavior (for example, during 
 debugging) then provide the argument `:single-thread-mode` with the value `true`.
