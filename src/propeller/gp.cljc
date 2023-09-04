@@ -79,7 +79,7 @@
             #?(:clj (shutdown-agents)))
         ;;
         (>= generation max-generations)
-        #?(:clj (shutdown-agents))
+        (do #?(:clj (shutdown-agents)))
         ;;
         :else (recur (inc generation)
                      (if (:elitism argmap)
