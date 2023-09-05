@@ -303,22 +303,28 @@
      :training-data            (:train train-and-test-data)
      :testing-data             (:test train-and-test-data)
      :max-generations          1000
-     :population-size          500
+     :population-size          100
      :max-initial-plushy-size  100
      :step-limit               1000
-     ;:parent-selection         :lexicase
+     :parent-selection         :lexicase
      ;:parent-selection         :tournament
-     :parent-selection         :motley-batch-lexicase
-     :max-batch-size           8
+     ;:parent-selection         :motley-batch-lexicase
+     ;:max-batch-size           [1 2 4 8 16 32 64 128 256]
      ;:tournament-size          5
-     :umad-rate                [1/64 1/128 1/256]
-     ;:alternation-rate         [1/64 1/128 1/256]
-     ;:alignment-deviation      [0 4 16 64]
+     :umad-rate                [1/2
+                                1/4 1/4 
+                                1/8 1/8 1/8  
+                                1/16 1/16 1/16 1/16 
+                                1/32 1/32 1/32 1/32 1/32 
+                                1/64 1/64 1/64 1/64 1/64 1/64 
+                                1/128 1/128 1/128 1/128 1/128 1/128 1/128 
+                                1/256 1/256 1/256 1/256 1/256 1/256 1/256 1/256]
+     ;:alternation-rate         [1 1/2 1/4 1/8 1/16 1/32 1/64 1/128 1/256]
+     ;:alignment-deviation      [0 1 2 4 8 16 32 64 128]
      :variation                {:umad 1
                                 :alternation 0
                                 :reproduction 0
-                                :tail-aligned-crossover 0
-                                }
+                                :tail-aligned-crossover 0}
      ;:diploid                  true
      ;:variation                {:diploid-vumad 0.8
      ;                           :diploid-uniform-silent-replacement 0.1

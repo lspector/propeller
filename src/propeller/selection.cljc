@@ -2,7 +2,8 @@
   "Propeller includes many kinds of genetic operators to select parents within the population such as tournament selection,
   lexicase selection, and epsilon lexicase selection."
   {:doc/format :markdown}
-  (:require [propeller.tools.math :as math-tools]))
+  (:require [propeller.tools.math :as math-tools] 
+            [propeller.utils :as utils]))
 
 (defn tournament-selection
   "Selects an individual from the population using tournaments of
@@ -38,7 +39,7 @@
     (if (or (empty? cases)
             (empty? (rest survivors)))
       (rand-nth survivors)
-      (let [batch-size (inc (rand-int (:max-batch-size argmap)))
+      (let [batch-size (inc (rand-int (utils/onenum (:max-batch-size argmap))))
             batch (take batch-size cases)
             ind-err-pairs (map (fn [ind]
                                  [ind
