@@ -53,7 +53,7 @@
     (let [evaluated-pop (sort-by :total-error
                                  (utils/pmapallv
                                   (partial error-function argmap (:training-data argmap))
-                                  population ;population sorted by :total-error
+                                  population
                                   argmap))         
           best-individual (first evaluated-pop)
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
