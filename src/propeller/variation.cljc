@@ -50,8 +50,8 @@ Since `uniform-addition` and `uniform-deletion` are somewhat stochastic, you can
 
 The function `new-individual` returns a new individual produced by selection and variation of individuals in the population based on the genetic operators provided in the `:variation` map."
   {:doc/format :markdown}
-    (:require [propeller.selection :as selection]
-      [propeller.utils :as utils]))
+  (:require [propeller.selection :as selection]
+            [propeller.utils :as utils]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover, one Push instruction at a time.
@@ -172,11 +172,11 @@ The function `new-individual` returns a new individual produced by selection and
   existing instruction."
   [plushy instructions umad-rate]
   (flatten
-    (map (fn [pair]
-           (if (< (rand) umad-rate)
-             (shuffle [pair (repeatedly 2 #(utils/random-instruction instructions))])
-             [pair]))
-         (partition 2 plushy))))
+   (map (fn [pair]
+          (if (< (rand) umad-rate)
+            (shuffle [pair (repeatedly 2 #(utils/random-instruction instructions))])
+            [pair]))
+        (partition 2 plushy))))
 
 (defn uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
@@ -201,6 +201,52 @@ The function `new-individual` returns a new individual produced by selection and
                    (reverse %)
                    %)
                 (partition 2 plushy))))
+
+(defn ah-rates
+  [plushy protect-rate hypervariable-rate]
+  (loop [i 0
+         protected true
+         rates []
+         remainder plushy]
+    (if (empty? remainder)
+      rates
+      (if (and (not protected)
+               (= (first remainder) :protect))
+        (recur i
+               true
+               rates
+               remainder)
+        (recur (inc i)
+               (if protected
+                 (not= (first remainder) :vary)
+                 false)
+               (conj rates (if protected protect-rate hypervariable-rate))
+               (rest remainder))))))
+
+(defn ah-uniform-addition
+  "Returns plushy with new instructions possibly added before or after each
+  existing instruction. Rates are autoconstructively hypervariable."
+  [plushy instructions protect-rate hypervariable-rate]
+  (apply concat
+         (map #(if (< (rand) %2)
+                 (shuffle [%1 (utils/random-instruction instructions)])
+                 [%1])
+              plushy
+              (ah-rates plushy protect-rate hypervariable-rate))))
+
+(defn ah-uniform-deletion
+  "Randomly deletes instructions from plushy at some rate.
+   Rates are autoconstructively hypervariable."
+  [plushy protect-rate hypervariable-rate]
+  (map first
+       (remove (fn [[_ rate]]
+                 (< (rand)
+                    (if (zero? rate)
+                      0
+                      (/ 1 (+ 1 (/ 1 rate))))))
+               (map vector
+                    plushy
+                    (ah-rates plushy protect-rate hypervariable-rate)))))
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of
@@ -253,6 +299,13 @@ The function `new-individual` returns a new individual produced by selection and
          (-> (:plushy (selection/select-parent pop argmap))
              (uniform-addition (:instructions argmap) rate)
              (uniform-deletion rate)))
+       ;
+       :ah-umad
+       (let [rate (utils/onenum (:umad-rate argmap))
+             ah-rate (utils/onenum (:ah-umad-rate argmap))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (ah-uniform-addition (:instructions argmap) rate ah-rate)
+             (ah-uniform-deletion rate ah-rate)))
        ;
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
