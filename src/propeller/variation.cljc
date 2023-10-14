@@ -302,10 +302,17 @@ The function `new-individual` returns a new individual produced by selection and
        ;
        :ah-umad
        (let [rate (utils/onenum (:umad-rate argmap))
-             ah-rate (utils/onenum (:ah-umad-rate argmap))]
-         (-> (:plushy (selection/select-parent pop argmap))
-             (ah-uniform-addition (:instructions argmap) rate ah-rate)
-             (ah-uniform-deletion rate ah-rate)))
+             ah-rate (utils/onenum (:ah-umad-rate argmap))
+             tourn-size (utils/onenum (:ah-umad-tournament-size argmap))
+             parent-genome (:plushy (selection/select-parent pop argmap))
+             offspring (repeatedly
+                        tourn-size
+                        #(-> parent-genome
+                             (ah-uniform-addition (:instructions argmap) rate ah-rate)
+                             (ah-uniform-deletion rate ah-rate)))
+             hypervariabilities (map #(reduce + (ah-rates % 0 1))
+                                     offspring)]
+         (second (last (sort-by first (map vector hypervariabilities offspring)))))
        ;
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))

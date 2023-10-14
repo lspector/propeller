@@ -313,6 +313,7 @@
      ;:tournament-size          5
      :umad-rate                0.001 ;; ah-umad
      :ah-umad-rate             0.1 ;; ah-umad
+     :ah-umad-tournament-size  2 ;; ah-umad
      ;:umad-rate                [1/2
      ;                           1/4 1/4 
      ;                           1/8 1/8 1/8  
