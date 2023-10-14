@@ -203,6 +203,8 @@ The function `new-individual` returns a new individual produced by selection and
                 (partition 2 plushy))))
 
 (defn ah-rates
+  "Returns the sequence of rates with which each element of plushy should
+   be mutated when using autoconstructive hypervariability."
   [plushy protect-rate hypervariable-rate]
   (loop [i 0
          protected true
@@ -300,18 +302,17 @@ The function `new-individual` returns a new individual produced by selection and
              (uniform-addition (:instructions argmap) rate)
              (uniform-deletion rate)))
        ;
-       :ah-umad
-       (let [rate (utils/onenum (:umad-rate argmap))
-             ah-rate (utils/onenum (:ah-umad-rate argmap))
+       :ah-umad ;; autoconstructive hypervariability UMAD
+       (let [protect-rate (utils/onenum (:ah-umad-protect-rate argmap))
+             vary-rate (utils/onenum (:ah-umad-vary-rate argmap))
              tourn-size (utils/onenum (:ah-umad-tournament-size argmap))
              parent-genome (:plushy (selection/select-parent pop argmap))
              offspring (repeatedly
                         tourn-size
                         #(-> parent-genome
-                             (ah-uniform-addition (:instructions argmap) rate ah-rate)
-                             (ah-uniform-deletion rate ah-rate)))
-             hypervariabilities (map #(reduce + (ah-rates % 0 1))
-                                     offspring)]
+                             (ah-uniform-addition (:instructions argmap) protect-rate vary-rate)
+                             (ah-uniform-deletion protect-rate vary-rate)))
+             hypervariabilities (map #(reduce + (ah-rates % 0 1)) offspring)]
          (second (last (sort-by first (map vector hypervariabilities offspring)))))
        ;
        :uniform-addition

@@ -311,8 +311,9 @@
      ;:parent-selection         :motley-batch-lexicase
      ;:max-batch-size           [1 2 4 8 16 32 64 128 256]
      ;:tournament-size          5
-     :umad-rate                0.001 ;; ah-umad
-     :ah-umad-rate             0.1 ;; ah-umad
+     ;:umad-rate                0.09
+     :ah-umad-protect-rate     0.001 ;; ah-umad
+     :ah-umad-vary-rate        0.1 ;; ah-umad
      :ah-umad-tournament-size  2 ;; ah-umad
      ;:umad-rate                [1/2
      ;                           1/4 1/4 
