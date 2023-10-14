@@ -20,16 +20,28 @@
   "Reports information for each generation."
   [pop generation argmap]
   (let [best (first pop)]
-    (clojure.pprint/pprint {:generation            generation
-                            :best-plushy           (:plushy best)
-                            :best-program          (genome/plushy->push (:plushy best) argmap)
-                            :best-total-error      (:total-error best)
-                            :best-errors           (:errors best)
-                            :best-behaviors        (:behaviors best)
-                            :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
-                            :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
-                            :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-                            :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
+    (clojure.pprint/pprint
+     (merge {:generation            generation
+             :best-plushy           (:plushy best)
+             :best-program          (genome/plushy->push (:plushy best) argmap)
+             :best-total-error      (:total-error best)
+             :best-errors           (:errors best)
+             :best-behaviors        (:behaviors best)
+             :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+             :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+             :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+             :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))}
+            (if (> (or (:ah-umad (:variation argmap)) 0) 0) ;; using autoconstructive hypervariability
+              {:average-hypervariability
+               (let [variabilities (map (fn [i]
+                                          (let [p (:plushy i)]
+                                            (if (empty? p)
+                                              0
+                                              (/ (reduce + (variation/ah-rates p 0 1))
+                                                 (count p)))))
+                                        pop)]
+                 (float (/ (reduce + variabilities) (count variabilities))))}
+              {})))
     (println)))
 
 (defn gp
@@ -54,7 +66,7 @@
                                  (utils/pmapallv
                                   (partial error-function argmap (:training-data argmap))
                                   population
-                                  argmap))         
+                                  argmap))
           best-individual (first evaluated-pop)
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
                    (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
@@ -69,8 +81,8 @@
             (prn {:total-test-error
                   (:total-error (error-function argmap (:testing-data argmap) best-individual))})
             (when (:simplification? argmap)
-              (let [simplified-plushy (simplification/auto-simplify-plushy 
-                                       (:plushy best-individual) 
+              (let [simplified-plushy (simplification/auto-simplify-plushy
+                                       (:plushy best-individual)
                                        error-function argmap)]
                 (prn {:total-test-error-simplified
                       (:total-error (error-function argmap
