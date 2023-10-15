@@ -383,4 +383,4 @@ The function `new-individual` returns a new individual produced by selection and
        :else
        (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
                  :cljs (js/Error
-                        (str "No match in new-individual for " op))))))})
+                        (str "No match in new-individual for " op))))))}))
