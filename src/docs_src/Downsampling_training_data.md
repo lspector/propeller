@@ -8,7 +8,7 @@ Using Downsampled selection with propeller is easy:
 Set the :parent-selection argument to whichever selection strategy you would like, and set the :downsample? argument to true as follows:
 
 ```clojure
-lein run -m propeller.problems.simple-regression :parent-selection :lexicase :downsample? true
+lein run -m propeller.problems.simple-regression :parent-selection :lexicase :downsample? true <required downsampling args here>
 ```
 
 The number of evaluations is held constant when comparing to a full training set run, so set the :max-generations to a number of generations that you would have gone to using a **full** sample.
