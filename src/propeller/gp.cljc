@@ -51,16 +51,13 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
+           max-initial-plushy-size solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
     :or   {solution-error-threshold 0.0
            dont-end false
            ds-parent-rate 0
            ds-parent-gens 1
            ids-type :solved ; :solved or :elite or :soft
-           downsample? false
-           ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
-           ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
-           mapper #?(:clj pmap :cljs map)}
+           downsample? false}
     :as   argmap}]
   ;;
   (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
