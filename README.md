@@ -10,22 +10,28 @@ If you are working in a Clojure IDE with an integrated REPL, the first
 thing you may want to do is to open `src/propeller/session.cljc` and 
 evaluate the namespace declaration and the commented-out expressions 
 therein. These demonstrate core components of Propeller including
-complete genetic programming runs.
+complete genetic programming runs. When conducting complete genetic
+programming runs this way (using `gp/gp`), depending on your IDE you 
+may need to explicitly open and load the problem file before evaluating 
+the calls to `require` and `gp/gp`.
 
 To run Propeller from the command line, on a genetic programming problem 
 that is defined within this project, you will probably want to use either
 the Clojure [CLI tools](https://clojure.org/guides/deps_and_cli) or 
-[leiningen](https://leiningen.org).
+[leiningen](https://leiningen.org). In the examples below, the leiningen
+and CLI commands are identical except that the former begin with
+`lein run -m`, while the latter begin with `clj -M -m`.
 
-The instructions below are written for leiningen. If you are using
-the CLI tools instead, then replace `lein run -m` in each command
-with `clj -M -m`.
-
-If you are using leiningen, then you can start a run with the command 
+To start a run use `clj -M -m <namespace>` or 
 `lein run -m <namespace>`, replacing `<namespace>` 
 with the actual namespace that you will find at the top of the problem file. 
 
 For example, you can run the simple-regression genetic programming problem with:
+
+```
+clj -M -m propeller.problems.simple-regression
+```
+or 
 
 ```
 lein run -m propeller.problems.simple-regression
@@ -35,6 +41,11 @@ Additional command-line arguments may
 be provided to override the default key/value pairs specified in the 
 problem file, for example:
 
+```
+clj -M -m propeller.problems.simple-regression :population-size 100
+```
+
+or
 
 ```
 lein run -m propeller.problems.simple-regression :population-size 100
@@ -43,6 +54,13 @@ lein run -m propeller.problems.simple-regression :population-size 100
 On Unix operating systems, including MacOS, you can use something
 like the following to send output both to the terminal
 and to a text file (called `outfile` in this example):
+
+
+```
+clj -M -m propeller.problems.simple-regression | tee outfile
+```
+
+or
 
 ```
 lein run -m propeller.problems.simple-regression | tee outfile
@@ -56,8 +74,22 @@ value for the `:variation` argument, which is a clojure map
 containing curly brackets that may confuse your shell:
 
 ```
+clj -M -m propeller.problems.simple-regression :variation "{:umad 1.0}"
+```
+
+or
+
+```
 lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
 ```
+
+For many genetic operator hyperparameters, collections may be provided in place of single values. When this is done, a random element of the collection will be chosen (with each being equally likely) each time the operator is used. When specied at the command line, these collections will also have to be quoted, for example with `:umad-rate "[0.01 0.05 0.1]"` to mean that UMAD rates of 0.01, 0.05, and 0.1 can be used.
+
+By default, Propeller will conduct many processes concurrently on multiple 
+cores using threads. If you  want to disable this behavior (for example, during 
+debugging) then provide the argument `:single-thread-mode` with the value `true`.
+Threads are not available in Javascript, so no processes are run concurrnetly
+when Propeller is run in Clojurescript.
 
 
 ## CLJS Usage

@@ -7,6 +7,7 @@ Table of contents
 
 * [Additional Instructions](#additional-instructions)
 * [input_output.cljc](#input_outputcljc)
+* [.DS_Store](#ds_store)
 * [numeric.cljc](#numericcljc)
 * [string.cljc](#stringcljc)
 * [character.cljc](#charactercljc)
@@ -19,6 +20,8 @@ Table of contents
 
 ## :print_newline
 Prints new line 
+# .DS_Store
+
 # numeric.cljc
 
 ## :float_cos

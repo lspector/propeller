@@ -2,7 +2,8 @@
   "Propeller includes many kinds of genetic operators to select parents within the population such as tournament selection,
   lexicase selection, and epsilon lexicase selection."
   {:doc/format :markdown}
-  (:require [propeller.tools.math :as math-tools]))
+  (:require [propeller.tools.math :as math-tools] 
+            [propeller.utils :as utils]))
 
 (defn tournament-selection
   "Selects an individual from the population using tournaments of
@@ -46,6 +47,27 @@
         (first individuals)
         (recur (+ tot (:fitness (first (rest individuals)))) (rest individuals))))))
 
+(defn motley-batch-lexicase-selection
+  "Selects an individual from the population using motley batch lexicase selection.
+   Cases are combined in random collections of max size (:max-batch-size argmap)."
+  [pop argmap]
+  (loop [survivors (map rand-nth (vals (group-by :errors pop)))
+         cases (shuffle (range (count (:errors (first pop)))))]
+    (if (or (empty? cases)
+            (empty? (rest survivors)))
+      (rand-nth survivors)
+      (let [batch-size (inc (rand-int (utils/onenum (:max-batch-size argmap))))
+            batch (take batch-size cases)
+            ind-err-pairs (map (fn [ind]
+                                 [ind
+                                  (reduce + (map #(nth (:errors ind) %)
+                                                 batch))])
+                               survivors)
+            min-err (apply min (map second ind-err-pairs))]
+        (recur (map first (filter #(= (second %) min-err) 
+                                  ind-err-pairs))
+               (drop batch-size cases))))))
+
 (defn epsilon-list
   "List of epsilons for each training case based on median absolute deviation of errors."
   [pop]
@@ -56,7 +78,7 @@
         epsilons
         (recur (conj epsilons
                      (math-tools/median-absolute-deviation
-                       (map #(nth % i) error-list)))
+                      (map #(nth % i) error-list)))
                (inc i))))))
 
 (defn epsilon-lexicase-selection
@@ -87,4 +109,5 @@
     :tournament (tournament-selection pop argmap)
     :lexicase (lexicase-selection pop argmap)
     :roulette (fitness-proportionate-selection pop argmap)
-    :epsilon-lexicase (epsilon-lexicase-selection pop argmap)))
+    :epsilon-lexicase (epsilon-lexicase-selection pop argmap)
+    :motley-batch-lexicase (motley-batch-lexicase-selection pop argmap)))

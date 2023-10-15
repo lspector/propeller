@@ -1,6 +1,7 @@
 (ns propeller.utils
   "Useful functions."
-  (:require [clojure.zip :as zip]))
+  (:require [clojure.zip :as zip]
+            [clojure.repl :as repl]))
 
 (defn filter-by-index
   "filters a collection by a list of indices"
@@ -99,3 +100,54 @@
                  zip/path
                  count
                  (max height))))))
+
+(defn pmapallv
+  "A utility for concurrent execution of a function on items in a collection.
+In single-thread-mode this acts like mapv. Otherwise it acts like pmap but: 
+1) coll should be finite, 2) the returned sequence will not be lazy, and will
+in fact be a vector, 3) calls to f may occur in any order, to maximize
+multicore processor utilization, and 4) takes only one coll so far."
+  [f coll args]
+  #?(:clj (vec (if (:single-thread-mode args)
+                 (doall (map f coll))
+                 (let [agents (map #(agent % :error-handler
+                                           (fn [agnt except] 
+                                             (repl/pst except 1000) 
+                                             (System/exit 0)))
+                                   coll)]
+                   (dorun (map #(send % f) agents))
+                   (apply await agents)
+                   (doall (map deref agents)))))
+     :cljs (mapv f coll)))
+
+(def PI
+  #?(:clj Math/PI
+     :cljs js/Math.PI))
+
+(defn log [x]
+  #?(:clj  (Math/log x)
+     :cljs (js/Math.log x)))
+
+(defn round [x]
+  #?(:clj  (Math/round x)
+     :cljs (js/Math.round x)))
+
+(defn gaussian-noise-factor
+  "Returns gaussian noise of mean 0, std dev 1."
+  []
+  (* (Math/sqrt (* -2.0 (log (rand))))
+      (Math/cos (* 2.0 PI (rand)))))
+
+(defn perturb-with-gaussian-noise
+  "Returns n perturbed with std dev sd."
+  [sd n]
+  (+ n (* sd (gaussian-noise-factor))))
+
+(defn onenum
+  "If given a number, returns it. If given a collection, returns a member of the collection.
+  Intended for allowing arguments to genetic operators, such as mutation rates, to take
+  collections in addition to single values"
+  [thing-or-collection]
+  (if (coll? thing-or-collection)
+    (rand-nth thing-or-collection)
+    thing-or-collection))

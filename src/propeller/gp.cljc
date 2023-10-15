@@ -15,46 +15,41 @@
             [propeller.push.instructions.polymorphic]
             [propeller.push.instructions.string]
             [propeller.push.instructions.vector]
-            [propeller.selection :as selection]))
+            [propeller.selection :as selection]
+            [propeller.utils :as utils]))
 
 (defn report
   "Reports information each generation."
   [evaluations pop generation argmap training-data]
   (let [best (first pop)]
-    (clojure.pprint/pprint {:generation            generation
-                            :best-plushy           (:plushy best)
-                            :best-program          (genome/plushy->push (:plushy best) argmap)
-                            :best-total-error      (:total-error best)
-                            :evaluations           evaluations
-                            :ds-indices            (map #(:index %) training-data)
-                            :best-errors           (:errors best)
-                            :best-behaviors        (:behaviors best)
-                            :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
-                            :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
-                            :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-                            :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
+    (clojure.pprint/pprint
+     (merge {:generation            generation
+             :best-plushy           (:plushy best)
+             :best-program          (genome/plushy->push (:plushy best) argmap)
+             :best-total-error      (:total-error best) 
+             :evaluations           evaluations 
+             :ds-indices            (map #(:index %) training-data)
+             :best-errors           (:errors best)
+             :best-behaviors        (:behaviors best)
+             :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+             :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+             :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+             :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))}
+            (if (> (or (:ah-umad (:variation argmap)) 0) 0) ;; using autoconstructive hypervariability
+              {:average-hypervariability
+               (let [variabilities (map (fn [i]
+                                          (let [p (:plushy i)]
+                                            (if (empty? p)
+                                              0
+                                              (/ (reduce + (variation/ah-rates p 0 1))
+                                                 (count p)))))
+                                        pop)]
+                 (float (/ (reduce + variabilities) (count variabilities))))}
+              {})))
     (println)))
 
 (defn gp
-  "Main GP loop.
-
-On each iteration, it creates a population of random plushies using a mapper
-function and genome/make-random-plushy function,
-then it sorts the population by the total error using the error-function
-and sort-by function. It then takes the best individual from the sorted population,
-and if the parent selection is set to epsilon-lexicase, it adds the epsilons to the argmap.
-
-The function then checks if the custom-report argument is set,
-if so it calls that function passing the evaluated population,
-current generation and argmap. If not, it calls the report function
-passing the evaluated population, current generation and argmap.
-
-Then, it checks if the total error of the best individual is less than or equal
-to the solution-error-threshold or if the current generation is greater than or
-equal to the max-generations specified. If either is true, the function
-exits with the best individual or nil. If not, it creates new individuals
-for the next generation using the variation/new-individual function and the
-repeatedly function, and then continues to the next iteration of the loop. "
+  "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
            max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
     :or   {solution-error-threshold 0.0
@@ -73,9 +68,11 @@ repeatedly function, and then continues to the next iteration of the loop. "
   ;;
   (loop [generation 0
          evaluations 0
-         population (mapper
-                     (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
-                     (range population-size))
+         population (utils/pmapallv
+                     (fn [_] {:plushy (let [plushy  (genome/make-random-plushy instructions max-initial-plushy-size)]
+                                        (if (:diploid argmap)
+                                          (interleave plushy plushy)
+                                          plushy))}) (range population-size) argmap)
          indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
     (let [training-data (if downsample?
                           (case (:ds-function argmap)
@@ -89,21 +86,24 @@ repeatedly function, and then continues to the next iteration of the loop. "
                             (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
                         (take (* ds-parent-rate (count population)) (shuffle population))
                         '()) ;else just empty list
+          ; parent representatives for down-sampling
           rep-evaluated-pop (if downsample? 
                               (sort-by :total-error
-                                     (mapper
+                                     (utils/pmapallv
                                       (partial error-function argmap indexed-training-data)
-                                      parent-reps))
+                                      parent-reps
+                                      argmap))
                               '())
           evaluated-pop (sort-by :total-error
-                                    (mapper
+                                    (utils/pmapallv
                                      (partial error-function argmap training-data)
-                                     population))
+                                     population
+                                     argmap)) 
           best-individual (first evaluated-pop)
           best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
                    (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
-                   argmap)]                                 ;adds :epsilons if using epsilon-lexicase
+                   argmap)]   ; epsilons
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluations evaluated-pop generation argmap)
         (report evaluations evaluated-pop generation argmap training-data))

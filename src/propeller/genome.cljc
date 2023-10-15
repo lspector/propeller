@@ -22,6 +22,9 @@ They hold the genetic material for an `individual`. In the initial population, w
   ([plushy] (plushy->push plushy {}))
   ([plushy argmap]
    (let [plushy (if (:diploid argmap) (map first (partition 2 plushy)) plushy)
+         plushy (if (> (or (:ah-umad (:variation argmap)) 0) 0) ;; strip :vary and :protect if using :ah-umad
+                  (filter (complement #{:vary :protect}) plushy)
+                  plushy)
          opener? #(and (vector? %) (= (first %) 'open))]    ;; [open <n>] marks opens
      (loop [push ()                                         ;; iteratively build the Push program from the plushy
             plushy (mapcat #(let [n (get instructions/opens %)]

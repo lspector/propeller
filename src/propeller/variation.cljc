@@ -50,11 +50,8 @@ Since `uniform-addition` and `uniform-deletion` are somewhat stochastic, you can
 
 The function `new-individual` returns a new individual produced by selection and variation of individuals in the population based on the genetic operators provided in the `:variation` map."
   {:doc/format :markdown}
-    (:require [propeller.selection :as selection]
-      [propeller.utils :as utils]))
-
-
-
+  (:require [propeller.selection :as selection]
+            [propeller.utils :as utils]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover, one Push instruction at a time.
@@ -70,6 +67,27 @@ The function `new-individual` returns a new individual produced by selection and
             (map #(if (< (rand) 0.5) %1 %2)
                  shorter-padded
                  longer))))
+
+(defn alternation
+  "Alternates between the two parent genomes."
+  [genome1 genome2 alternation-rate alignment-deviation]
+  (loop [i 0
+         use-genome1 (rand-nth [true false])
+         result-genome []
+         iteration-budget (+ (count genome1) (count genome2))]
+    (if (or (>= i (count (if use-genome1 genome1 genome2))) ;; finished current program
+            (<= iteration-budget 0)) ;; looping too long
+      result-genome ;; Return
+      (if (< (rand) alternation-rate)
+        (recur (max 0 (+ i (utils/round (* alignment-deviation
+                                           (utils/gaussian-noise-factor)))))
+               (not use-genome1)
+               result-genome
+               (dec iteration-budget))
+        (recur (inc i)
+               use-genome1
+               (conj result-genome (nth (if use-genome1 genome1 genome2) i))
+               (dec iteration-budget))))))
 
 (defn tail-aligned-crossover
   "Crosses over two individuals using uniform crossover, one Push instruction at a time.
@@ -154,11 +172,11 @@ The function `new-individual` returns a new individual produced by selection and
   existing instruction."
   [plushy instructions umad-rate]
   (flatten
-    (map (fn [pair]
-           (if (< (rand) umad-rate)
-             (shuffle [pair (repeatedly 2 #(utils/random-instruction instructions))])
-             [pair]))
-         (partition 2 plushy))))
+   (map (fn [pair]
+          (if (< (rand) umad-rate)
+            (shuffle [pair (repeatedly 2 #(utils/random-instruction instructions))])
+            [pair]))
+        (partition 2 plushy))))
 
 (defn uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
@@ -184,6 +202,54 @@ The function `new-individual` returns a new individual produced by selection and
                    %)
                 (partition 2 plushy))))
 
+(defn ah-rates
+  "Returns the sequence of rates with which each element of plushy should
+   be mutated when using autoconstructive hypervariability."
+  [plushy protect-rate hypervariable-rate]
+  (loop [i 0
+         protected true
+         rates []
+         remainder plushy]
+    (if (empty? remainder)
+      rates
+      (if (and (not protected)
+               (= (first remainder) :protect))
+        (recur i
+               true
+               rates
+               remainder)
+        (recur (inc i)
+               (if protected
+                 (not= (first remainder) :vary)
+                 false)
+               (conj rates (if protected protect-rate hypervariable-rate))
+               (rest remainder))))))
+
+(defn ah-uniform-addition
+  "Returns plushy with new instructions possibly added before or after each
+  existing instruction. Rates are autoconstructively hypervariable."
+  [plushy instructions protect-rate hypervariable-rate]
+  (apply concat
+         (map #(if (< (rand) %2)
+                 (shuffle [%1 (utils/random-instruction instructions)])
+                 [%1])
+              plushy
+              (ah-rates plushy protect-rate hypervariable-rate))))
+
+(defn ah-uniform-deletion
+  "Randomly deletes instructions from plushy at some rate.
+   Rates are autoconstructively hypervariable."
+  [plushy protect-rate hypervariable-rate]
+  (map first
+       (remove (fn [[_ rate]]
+                 (< (rand)
+                    (if (zero? rate)
+                      0
+                      (/ 1 (+ 1 (/ 1 rate))))))
+               (map vector
+                    plushy
+                    (ah-rates plushy protect-rate hypervariable-rate)))))
+
 (defn new-individual
   "Returns a new individual produced by selection and variation of
   individuals in the population."
@@ -204,75 +270,112 @@ The function `new-individual` returns a new individual produced by selection and
      (case op
        :crossover
        (crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :tail-aligned-crossover
        (tail-aligned-crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :umad
-       (-> (:plushy umad-parent)
-           (uniform-addition (:instructions argmap) (:umad-rate argmap))
-           (uniform-deletion (:umad-rate argmap)))
+       (let [rate (utils/onenum (:umad-rate argmap))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (uniform-addition (:instructions argmap) rate)
+             (uniform-deletion rate)))
        ; uniform mutation by addition and deletion is a uniform mutation operator which
        ;first adds genes with some probability before or after every existing gene and then
        ;deletes random genes from the resulting genome
-
+       ;
        :rumad
        (let [parent-genome (:plushy (selection/select-parent pop argmap))
              after-addition (uniform-addition parent-genome
                                               (:instructions argmap)
-                                              (:umad-rate argmap))
+                                              (utils/onenum (:umad-rate argmap)))
              effective-addition-rate (/ (- (count after-addition)
                                            (count parent-genome))
                                         (count parent-genome))]
          (uniform-deletion after-addition effective-addition-rate))
        ; Adds and deletes instructions in the parent genome with the same rate
-
+       ;
+       :vumad ;; variable umad: :umad-rate is interpreted as max, actual uniform 0-max
+       (let [rate (rand (utils/onenum (:umad-rate argmap)))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (uniform-addition (:instructions argmap) rate)
+             (uniform-deletion rate)))
+       ;
+       :ah-umad ;; autoconstructive hypervariability UMAD
+       (let [protect-rate (utils/onenum (:ah-umad-protect-rate argmap))
+             vary-rate (utils/onenum (:ah-umad-vary-rate argmap))
+             tourn-size (utils/onenum (:ah-umad-tournament-size argmap))
+             parent-genome (:plushy (selection/select-parent pop argmap))
+             offspring (repeatedly
+                        tourn-size
+                        #(-> parent-genome
+                             (ah-uniform-addition (:instructions argmap) protect-rate vary-rate)
+                             (ah-uniform-deletion protect-rate vary-rate)))
+             hypervariabilities (map #(reduce + (ah-rates % 0 1)) offspring)]
+         (second (last (sort-by first (map vector hypervariabilities offspring)))))
+       ;
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
-           (uniform-addition (:instructions argmap) (:umad-rate argmap)))
+           (uniform-addition (:instructions argmap)
+                             (utils/onenum (:umad-rate argmap))))
        ;
        :uniform-replacement
        (-> (:plushy (selection/select-parent pop argmap))
-           (uniform-replacement (:instructions argmap) (:replacement-rate argmap)))
+           (uniform-replacement (:instructions argmap)
+                                (utils/onenum (:replacement-rate argmap))))
        ;
        :diploid-uniform-silent-replacement
        (-> (:plushy (selection/select-parent pop argmap))
-           (diploid-uniform-silent-replacement (:instructions argmap) (:replacement-rate argmap)))
+           (diploid-uniform-silent-replacement (:instructions argmap)
+                                               (utils/onenum (:replacement-rate argmap))))
        ;
        :uniform-deletion
        (-> (:plushy (selection/select-parent pop argmap))
-           (uniform-deletion (:umad-rate argmap)))
+           (uniform-deletion (utils/onenum (:umad-rate argmap))))
        ;
        :diploid-crossover
        (diploid-crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :tail-aligned-diploid-crossover
        (tail-aligned-diploid-crossover
-         (:plushy (selection/select-parent pop argmap))
-         (:plushy (selection/select-parent pop argmap)))
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
        :diploid-umad
-       (-> (:plushy (selection/select-parent pop argmap))
-           (diploid-uniform-addition (:instructions argmap) (:umad-rate argmap))
-           (diploid-uniform-deletion (:umad-rate argmap)))
+       (let [rate (utils/onenum (:umad-rate argmap))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (diploid-uniform-addition (:instructions argmap) rate)
+             (diploid-uniform-deletion rate)))
+       ;
+       :diploid-vumad ;; variable umad: :umad-rate is interpreted as max, actual uniform 0-max
+       (let [rate (rand (utils/onenum (:umad-rate argmap)))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (diploid-uniform-addition (:instructions argmap) rate)
+             (diploid-uniform-deletion rate)))
        ;
        :diploid-uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
-           (diploid-uniform-addition (:instructions argmap) (:umad-rate argmap)))
+           (diploid-uniform-addition (:instructions argmap)
+                                     (utils/onenum (:umad-rate argmap))))
        ;
        :diploid-uniform-deletion
        (-> (:plushy (selection/select-parent pop argmap))
-           (diploid-uniform-deletion (:umad-rate argmap)))
+           (diploid-uniform-deletion (utils/onenum (:umad-rate argmap))))
        ;
        :diploid-flip
        (-> (:plushy (selection/select-parent pop argmap))
-           (diploid-flip (:diploid-flip-rate argmap)))
+           (diploid-flip (utils/onenum (:diploid-flip-rate argmap))))
+       ;
+       :alternation
+       (alternation (:plushy (selection/select-parent pop argmap))
+                    (:plushy (selection/select-parent pop argmap))
+                    (utils/onenum (or (:alternation-rate argmap) 0))
+                    (utils/onenum (or (:alignment-deviation argmap) 0)))
        ;
        :reproduction
        (:plushy (selection/select-parent pop argmap))
@@ -280,5 +383,4 @@ The function `new-individual` returns a new individual produced by selection and
        :else
        (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
                  :cljs (js/Error
-                         (str "No match in new-individual for " op))))))
-      :index parent-ind}))
+                        (str "No match in new-individual for " op))))))})

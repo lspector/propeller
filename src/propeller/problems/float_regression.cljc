@@ -80,5 +80,4 @@
        :solution-error-threshold  0.5
        :variation                {:umad 1.0 :crossover 0.0}
        :elitism                  false}
-      (apply hash-map (map #(if (string? %) (read-string %) %) args))))
-  (#?(:clj shutdown-agents)))
+      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
