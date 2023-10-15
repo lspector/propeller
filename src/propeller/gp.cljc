@@ -5,6 +5,8 @@
             [propeller.genome :as genome]
             [propeller.simplification :as simplification]
             [propeller.variation :as variation]
+            [propeller.downsample :as downsample]
+            [propeller.hyperselection :as hyperselection]
             [propeller.push.instructions.bool]
             [propeller.push.instructions.character]
             [propeller.push.instructions.code]
@@ -17,14 +19,16 @@
             [propeller.utils :as utils]))
 
 (defn report
-  "Reports information for each generation."
-  [pop generation argmap]
+  "Reports information each generation."
+  [evaluations pop generation argmap training-data]
   (let [best (first pop)]
     (clojure.pprint/pprint
      (merge {:generation            generation
              :best-plushy           (:plushy best)
              :best-program          (genome/plushy->push (:plushy best) argmap)
-             :best-total-error      (:total-error best)
+             :best-total-error      (:total-error best) 
+             :evaluations           evaluations 
+             :ds-indices            (map #(:index %) training-data)
              :best-errors           (:errors best)
              :best-behaviors        (:behaviors best)
              :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
@@ -47,59 +51,100 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold]
-    :or   {solution-error-threshold 0.0}
+           max-initial-plushy-size solution-error-threshold mapper ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
+    :or   {solution-error-threshold 0.0
+           dont-end false
+           ds-parent-rate 0
+           ds-parent-gens 1
+           ids-type :solved ; :solved or :elite or :soft
+           downsample? false
+           ;; The `mapper` will perform a `map`-like operation to apply a function to every individual
+           ;; in the population. The default is `map` but other options include `mapv`, or `pmap`.
+           mapper #?(:clj pmap :cljs map)}
     :as   argmap}]
   ;;
   (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
   (println)
   ;;
   (loop [generation 0
+         evaluations 0
          population (utils/pmapallv
                      (fn [_] {:plushy (let [plushy  (genome/make-random-plushy instructions max-initial-plushy-size)]
                                         (if (:diploid argmap)
                                           (interleave plushy plushy)
-                                          plushy))})
-                     (range population-size)
-                     argmap)]             ;creates population of random plushys
-    (let [evaluated-pop (sort-by :total-error
-                                 (utils/pmapallv
-                                  (partial error-function argmap (:training-data argmap))
-                                  population
-                                  argmap))
+                                          plushy))}) (range population-size) argmap)
+         indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
+    (let [training-data (if downsample?
+                          (case (:ds-function argmap)
+                            :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
+                            :case-maxmin-auto (downsample/select-downsample-maxmin-adaptive indexed-training-data argmap)
+                            :case-rand (downsample/select-downsample-random indexed-training-data argmap)
+                            (do (prn {:error "Invalid Downsample Function"}) (downsample/select-downsample-random indexed-training-data argmap)))
+                          indexed-training-data) ;defaults to full training set
+          parent-reps (if 
+                       (and downsample? ; if we are down-sampling
+                            (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
+                        (take (* ds-parent-rate (count population)) (shuffle population))
+                        '()) ;else just empty list
+          ; parent representatives for down-sampling
+          rep-evaluated-pop (if downsample? 
+                              (sort-by :total-error
+                                     (utils/pmapallv
+                                      (partial error-function argmap indexed-training-data)
+                                      parent-reps
+                                      argmap))
+                              '())
+          evaluated-pop (sort-by :total-error
+                                    (utils/pmapallv
+                                     (partial error-function argmap training-data)
+                                     population
+                                     argmap)) 
           best-individual (first evaluated-pop)
+          best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
                    (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
-                   argmap)]                                 ;adds :epsilons if using epsilon-lexicase
+                   argmap)]   ; epsilons
       (if (:custom-report argmap)
-        ((:custom-report argmap) evaluated-pop generation argmap)
-        (report evaluated-pop generation argmap))
+        ((:custom-report argmap) evaluations evaluated-pop generation argmap)
+        (report evaluations evaluated-pop generation argmap training-data))
+      ;;did the indvidual pass all cases in ds?
+      (when best-individual-passes-ds
+        (prn {:semi-success-generation generation}))
       (cond
-        ;; Success on training cases is verified on testing cases
-        (<= (:total-error best-individual) solution-error-threshold)
-        (do (prn {:success-generation generation})
-            (prn {:total-test-error
-                  (:total-error (error-function argmap (:testing-data argmap) best-individual))})
-            (when (:simplification? argmap)
-              (let [simplified-plushy (simplification/auto-simplify-plushy
-                                       (:plushy best-individual)
-                                       error-function argmap)]
-                (prn {:total-test-error-simplified
-                      (:total-error (error-function argmap
-                                                    (:testing-data argmap)
-                                                    (hash-map :plushy simplified-plushy)))})))
-            #?(:clj (shutdown-agents)))
+        ;; If either the best individual on the ds passes all training cases, or best individual on full sample passes all training cases
+        ;; We verify success on test cases and end evolution
+        (if (or (and best-individual-passes-ds (<= (:total-error (error-function argmap indexed-training-data best-individual)) solution-error-threshold))
+                     (and (not downsample?)
+                          (<= (:total-error best-individual) solution-error-threshold)))
+               (do (prn {:success-generation generation})
+                   (prn {:total-test-error
+                         (:total-error (error-function argmap (:testing-data argmap) best-individual))})
+                   (when (:simplification? argmap)
+                     (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
+                       (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))})))
+                   (if dont-end false true))
+               false)
+        nil
         ;;
-        (>= generation max-generations)
-        (do #?(:clj (shutdown-agents)))
+        (and (not downsample?) (>= generation max-generations))
+        nil
+        ;;
+        (and downsample? (>= evaluations (* max-generations population-size (count indexed-training-data))))
+        nil
         ;;
         :else (recur (inc generation)
-                     (if (:elitism argmap)
-                       (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
-                                             (range (dec population-size))
-                                             argmap)
-                             (first evaluated-pop))         ;elitism maintains the most-fit individual
-                       (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
-                                       (range population-size)
-                                       argmap)))))))
-
+                     (+ evaluations (* population-size (count training-data)) ;every member evaluated on the current sample
+                        (if (zero? (mod generation ds-parent-gens)) (* (count parent-reps) (- (count indexed-training-data) (count training-data))) 0) ; the parent-reps not evaluted already on down-sample
+                        (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
+                     (let [reindexed-pop (hyperselection/reindex-pop evaluated-pop)] ; give every individual an index for hyperselection loggin
+                       (hyperselection/log-hyperselection-and-ret
+                        (if (:elitism argmap)
+                         (conj (repeatedly (dec population-size) #(variation/new-individual reindexed-pop argmap))
+                                                                          (first reindexed-pop))
+                         (repeatedly population-size ;need to count occurance of each parent, and reset IDs
+                                                                                #(variation/new-individual reindexed-pop argmap)))))
+                     (if downsample?
+                      (if (zero? (mod generation ds-parent-gens))
+                        (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
+                        indexed-training-data)
+                       indexed-training-data))))))

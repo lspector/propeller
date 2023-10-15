@@ -83,6 +83,9 @@
      :error-function          error-function
      :training-data           train-data
      :testing-data            test-data
+     :case-t-size             (count train-data)
+     :ds-parent-rate          0
+     :ds-parent-gens          1
      :max-generations         300
      :population-size         1000
      :max-initial-plushy-size 250
@@ -92,4 +95,5 @@
      :umad-rate               0.1
      :variation               {:umad 1.0 :crossover 0.0}
      :elitism                 false}
-    (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
+    (apply hash-map (map #(if (string? %) (read-string %) %) args))))
+  (#?(:clj shutdown-agents)))

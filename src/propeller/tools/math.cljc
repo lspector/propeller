@@ -7,6 +7,11 @@
 (defonce ^{:no-doc true :const true} E #?(:clj  Math/E
               :cljs js/Math.PI))
 
+(defn step
+  "returns 1 if number is nonzero, 0 otherwise"
+  [x]
+  (if (zero? x) 0 1))
+
 (defn mean
   "Returns the mean."
   [coll]
@@ -132,3 +137,8 @@
   [x]
   #?(:clj  (Math/tan x)
      :cljs (js/Math.tan x)))
+
+(defn transpose
+  "returns a vector containing the transpose of a coll of colls"
+  [x]
+  (apply map vector x))

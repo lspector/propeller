@@ -134,6 +134,9 @@
      :error-function          error-function
      :training-data           train-data
      :testing-data            test-data
+     :case-t-size             (count train-data)
+     :ds-parent-rate          0
+     :ds-parent-gens          1
      :max-generations         300
      :population-size         1000
      :max-initial-plushy-size 250

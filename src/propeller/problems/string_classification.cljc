@@ -105,6 +105,6 @@ Given a string, return true if it contains A, C, G, and T. Else return false."
        :parent-selection        :lexicase
        :tournament-size         5
        :umad-rate               0.1
-       :variation               {:umad 0.5 :crossover 0.5}
+       :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
       (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

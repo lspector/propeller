@@ -10,6 +10,7 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
+            [propeller.problems.data-creation :as dc]
             [propeller.utils :as utils]
             [propeller.push.instructions :refer [get-stack-instructions]]
             [propeller.push.state :as state]
@@ -17,7 +18,21 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
+; ===========  PROBLEM DESCRIPTION  =========================
+; FIZZ BUZZ from PSB2
+; Given an integer x, return "Fizz" if x is
+; divisible by 3, "Buzz" if x is divisible by 5, "FizzBuzz" if x
+; is divisible by 3 and 5, and a string version of x if none of
+; the above hold.
+;
+; Source: https://arxiv.org/pdf/2106.06086.pdf
+; ============================================================
+
+
 (def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "fizz-buzz" 200 2000))
+(def train-data (:train train-and-test-data))
+(def test-data (:test train-and-test-data))
+
 
 (def instructions
   "Stack-specific instructions, input instructions, close, and constants"
@@ -71,8 +86,11 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
     (merge
       {:instructions            instructions
        :error-function          error-function
-       :training-data           (:train train-and-test-data)
-       :testing-data            (:test train-and-test-data)
+       :training-data           train-data
+       :testing-data            test-data
+       :case-t-size             (count train-data)
+       :ds-parent-rate          0
+       :ds-parent-gens          1
        :max-generations         300
        :population-size         1000
        :max-initial-plushy-size 250
