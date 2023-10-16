@@ -51,14 +51,13 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample? hyperselection?]
+           max-initial-plushy-size solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
     :or   {solution-error-threshold 0.0
            dont-end false
            ds-parent-rate 0
            ds-parent-gens 1
            ids-type :solved ; :solved or :elite or :soft
-           downsample? false
-           hyperselection? false}
+           downsample? false}
     :as   argmap}]
   ;;
   (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
