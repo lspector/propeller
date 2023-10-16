@@ -102,23 +102,23 @@
                  (max height))))))
 
 (defn pmapallv
-  "A utility for concurrent execution of a function on items in a collection.
-In single-thread-mode this acts like mapv. Otherwise it acts like pmap but: 
-1) coll should be finite, 2) the returned sequence will not be lazy, and will
-in fact be a vector, 3) calls to f may occur in any order, to maximize
-multicore processor utilization, and 4) takes only one coll so far."
-  [f coll args]
-  #?(:clj (vec (if (:single-thread-mode args)
-                 (doall (map f coll))
+  "A utility for concurrent execution of a function. If :single-thread-mode is 
+   truthy in the final arg then this acts like mapv of f on the provided colls. 
+   Otherwise it acts like pmap but: 1) the colls should be finite, 2) the 
+   returned sequence will not be lazy, and will in fact be a vector, and 
+   3) calls to f may occur in any order, to maximize multicore processor utilization."
+  [f & colls-args]
+  #?(:clj (vec (if (:single-thread-mode (last colls-args))
+                 (apply mapv f (butlast colls-args))
                  (let [agents (map #(agent % :error-handler
-                                           (fn [agnt except] 
-                                             (repl/pst except 1000) 
+                                           (fn [agnt except]
+                                             (repl/pst except 1000)
                                              (System/exit 0)))
-                                   coll)]
-                   (dorun (map #(send % f) agents))
+                                   (apply map vector (butlast colls-args)))]
+                   (dorun (map (fn [a] (send a #(apply f %))) agents))
                    (apply await agents)
                    (doall (map deref agents)))))
-     :cljs (mapv f coll)))
+     :cljs (apply mapv f (butlast colls-args))))
 
 (def PI
   #?(:clj Math/PI

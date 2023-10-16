@@ -9,12 +9,12 @@
 (t/deftest assign-indices-to-data-test
   (t/testing "assign-indices-to-data"
     (t/testing "should return a map of the same length"
-      (t/is (= (count (ds/assign-indices-to-data (range 10))) 10))
-      (t/is (= (count (ds/assign-indices-to-data (range 0))) 0)))
+      (t/is (= (count (ds/assign-indices-to-data (range 10) {})) 10))
+      (t/is (= (count (ds/assign-indices-to-data (range 0) {})) 0)))
     (t/testing "should return a map where each element has an index key"
-      (t/is (every? #(:index %) (ds/assign-indices-to-data (map #(assoc {} :input %) (range 10))))))
+      (t/is (every? #(:index %) (ds/assign-indices-to-data (map #(assoc {} :input %) (range 10)) {}))))
     (t/testing "should return distinct indices"
-      (t/is (= (map #(:index %) (ds/assign-indices-to-data (range 10))) (range 10))))))
+      (t/is (= (map #(:index %) (ds/assign-indices-to-data (range 10) {})) (range 10))))))
 
 (t/deftest select-downsample-random-test
   (t/testing "select-downsample-random"
@@ -157,7 +157,7 @@
       (t/is (= '(0.25 0.25 0.25 0.25) (hs/hyperselection-track parents2))))
     (t/testing "reindex-pop works correctly"
       (t/is (= '({:blah 3 :index 0} {:blah 3 :index 1}
-                 {:blah 3 :index 2} {:blah 3 :index 3}) (hs/reindex-pop parents1)))
+                 {:blah 3 :index 2} {:blah 3 :index 3}) (hs/reindex-pop parents1 {})))
       (t/is (= '({:plushy 2 :index 0} {:blah 3 :index 1}
-                 {:blah 3 :index 2} {:index 3}) (hs/reindex-pop parents2)))
-      (t/is (= '({:blah 1 :index 0} {:blah 1 :index 1} {:blah 1 :index 2}) (hs/reindex-pop emptyparents))))))
+                 {:blah 3 :index 2} {:index 3}) (hs/reindex-pop parents2 {})))
+      (t/is (= '({:blah 1 :index 0} {:blah 1 :index 1} {:blah 1 :index 2}) (hs/reindex-pop emptyparents {}))))))
