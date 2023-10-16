@@ -51,13 +51,14 @@
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
+           max-initial-plushy-size solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample? hyperselection?]
     :or   {solution-error-threshold 0.0
            dont-end false
            ds-parent-rate 0
            ds-parent-gens 1
            ids-type :solved ; :solved or :elite or :soft
-           downsample? false}
+           downsample? false
+           hyperselection? false}
     :as   argmap}]
   ;;
   (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
@@ -70,7 +71,7 @@
                                         (if (:diploid argmap)
                                           (interleave plushy plushy)
                                           plushy))}) (range population-size) argmap)
-         indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
+         indexed-training-data (if downsample? (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap)) (:training-data argmap))]
     (let [training-data (if downsample?
                           (case (:ds-function argmap)
                             :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
@@ -136,10 +137,13 @@
                      (let [reindexed-pop (hyperselection/reindex-pop evaluated-pop)] ; give every individual an index for hyperselection loggin
                        (hyperselection/log-hyperselection-and-ret
                         (if (:elitism argmap)
-                         (conj (repeatedly (dec population-size) #(variation/new-individual reindexed-pop argmap))
-                                                                          (first reindexed-pop))
-                         (repeatedly population-size ;need to count occurance of each parent, and reset IDs
-                                                                                #(variation/new-individual reindexed-pop argmap)))))
+                          (conj (utils/pmapallv (fn [_] (variation/new-individual reindexed-pop argmap))
+                                                (range (dec population-size))
+                                                argmap)
+                                (first reindexed-pop))         ;elitism maintains the most-fit individual
+                          (utils/pmapallv (fn [_] (variation/new-individual reindexed-pop argmap))
+                                          (range population-size)
+                                          argmap))))
                      (if downsample?
                       (if (zero? (mod generation ds-parent-gens))
                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
