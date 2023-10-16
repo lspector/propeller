@@ -70,7 +70,7 @@
                                         (if (:diploid argmap)
                                           (interleave plushy plushy)
                                           plushy))}) (range population-size) argmap)
-         indexed-training-data (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap))]
+         indexed-training-data (if downsample? (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap) argmap) (:training-data argmap))]
     (let [training-data (if downsample?
                           (case (:ds-function argmap)
                             :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
@@ -133,13 +133,16 @@
                      (+ evaluations (* population-size (count training-data)) ;every member evaluated on the current sample
                         (if (zero? (mod generation ds-parent-gens)) (* (count parent-reps) (- (count indexed-training-data) (count training-data))) 0) ; the parent-reps not evaluted already on down-sample
                         (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
-                     (let [reindexed-pop (hyperselection/reindex-pop evaluated-pop)] ; give every individual an index for hyperselection loggin
+                     (let [reindexed-pop (hyperselection/reindex-pop evaluated-pop argmap)] ; give every individual an index for hyperselection loggin
                        (hyperselection/log-hyperselection-and-ret
                         (if (:elitism argmap)
-                         (conj (repeatedly (dec population-size) #(variation/new-individual reindexed-pop argmap))
-                                                                          (first reindexed-pop))
-                         (repeatedly population-size ;need to count occurance of each parent, and reset IDs
-                                                                                #(variation/new-individual reindexed-pop argmap)))))
+                          (conj (utils/pmapallv (fn [_] (variation/new-individual reindexed-pop argmap))
+                                                (range (dec population-size))
+                                                argmap)
+                                (first reindexed-pop))         ;elitism maintains the most-fit individual
+                          (utils/pmapallv (fn [_] (variation/new-individual reindexed-pop argmap))
+                                          (range population-size)
+                                          argmap))))
                      (if downsample?
                       (if (zero? (mod generation ds-parent-gens))
                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations

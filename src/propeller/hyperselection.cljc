@@ -1,4 +1,5 @@
-(ns propeller.hyperselection)
+(ns propeller.hyperselection 
+  (:require [propeller.utils :as utils]))
 
 (defn sum-list-map-indices
   "sums a list of maps that have the :index property's index multiplicity"
@@ -31,5 +32,5 @@
 
 (defn reindex-pop 
   "assigns each member of the population a unique index before selection to track hyperselection"
-  [pop]
-  (map (fn [indiv index] (assoc indiv :index index)) pop (range (count pop))))
+  [pop argmap]
+  (utils/pmapallv (fn [indiv index] (assoc indiv :index index)) pop (range (count pop)) argmap))

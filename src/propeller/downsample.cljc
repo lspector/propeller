@@ -5,15 +5,15 @@
 
 (defn assign-indices-to-data
   "assigns an index to each training case in order to differentiate them when downsampling"
-  [training-data]
-  (map (fn [data-map index]
+  [training-data argmap]
+  (utils/pmapallv (fn [data-map index]
          (let [data-m (if (map? data-map) data-map (assoc {} :data data-map))] ;if data is not in a map, make it one
            (assoc data-m :index index)))
-       training-data (range (count training-data))))
+       training-data (range (count training-data)) argmap))
 
 (defn initialize-case-distances
-  [{:keys [training-data population-size]}]
-  (map #(assoc % :distances (vec (repeat (count training-data) population-size))) training-data))
+  [{:keys [training-data population-size] :as argmap}]
+  (utils/pmapallv #(assoc % :distances (vec (repeat (count training-data) population-size))) training-data argmap))
 
 (defn select-downsample-random
   "Selects a downsample from the training cases and returns it"
