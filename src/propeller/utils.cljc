@@ -117,7 +117,7 @@
                                    (apply map vector (butlast colls-args)))]
                    (dorun (map (fn [a] (send a #(apply f %))) agents))
                    (apply await agents)
-                   (doall (map deref agents)))))
+                   (doall (mapv deref agents)))))
      :cljs (apply mapv f (butlast colls-args))))
 
 (def PI
