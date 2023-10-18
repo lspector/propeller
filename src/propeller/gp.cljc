@@ -23,29 +23,18 @@
   [evaluations pop generation argmap training-data]
   (let [best (first pop)]
     (clojure.pprint/pprint
-     (merge {:generation            generation
-             :best-plushy           (:plushy best)
-             :best-program          (genome/plushy->push (:plushy best) argmap)
-             :best-total-error      (:total-error best) 
-             :evaluations           evaluations 
-             :ds-indices            (map #(:index %) training-data)
-             :best-errors           (:errors best)
-             :best-behaviors        (:behaviors best)
-             :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
-             :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
-             :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-             :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))}
-            (if (> (or (:ah-umad (:variation argmap)) 0) 0) ;; using autoconstructive hypervariability
-              {:average-hypervariability
-               (let [variabilities (map (fn [i]
-                                          (let [p (:plushy i)]
-                                            (if (empty? p)
-                                              0
-                                              (/ (reduce + (variation/ah-rates p 0 1))
-                                                 (count p)))))
-                                        pop)]
-                 (float (/ (reduce + variabilities) (count variabilities))))}
-              {})))
+     {:generation            generation
+      :best-plushy           (:plushy best)
+      :best-program          (genome/plushy->push (:plushy best) argmap)
+      :best-total-error      (:total-error best)
+      :evaluations           evaluations
+      :ds-indices            (map #(:index %) training-data)
+      :best-errors           (:errors best)
+      :best-behaviors        (:behaviors best)
+      :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+      :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+      :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+      :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
     (println)))
 
 (defn gp

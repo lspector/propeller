@@ -163,8 +163,8 @@
   :boolean_bufa
   ^{:stacks #{:boolean}}
   (fn [state]
-    (make-instruction state 
-                      (fn [b1 b2] b1) 
+    (make-instruction state
+                      (fn [b1 b2] b1)
                       [:boolean :boolean]
                       :boolean)))
 
@@ -172,9 +172,9 @@
   :boolean_nota
   ^{:stacks #{:boolean}}
   (fn [state]
-    (make-instruction state 
-                      (fn [b1 b2] (not b1)) 
-                      [:boolean :boolean] 
+    (make-instruction state
+                      (fn [b1 b2] (not b1))
+                      [:boolean :boolean]
                       :boolean)))
 
 
@@ -184,7 +184,7 @@
   (fn [state]
     (make-instruction state
                       (fn [b1 b2] (not (and b1 b2)))
-                      [:boolean :boolean] 
+                      [:boolean :boolean]
                       :boolean)))
 
 (def-instruction
@@ -224,7 +224,7 @@
         :c2 ;; defined here
         :c1 ;; defined here
         :c0 ;; defined here
-        
+
         ;; BOOLEAN TAGGING?
 
         ;; Recommended by Kalkreuth et al: BUFa, NOTa, AND, OR, XOR, NAND, NOR, XNOR
@@ -303,21 +303,20 @@
      :training-data            (:train train-and-test-data)
      :testing-data             (:test train-and-test-data)
      :max-generations          1000
-     :population-size          100
+     :population-size          1000
      :max-initial-plushy-size  100
-     :step-limit               1000
+     :step-limit               10000
      :parent-selection         :lexicase
      :downsample?              true
      :ds-function              :case-rand
-     :downsample-rate          0.1
+     :downsample-rate          0.5
      ;:parent-selection         :tournament
      ;:parent-selection         :motley-batch-lexicase
      ;:max-batch-size           [1 2 4 8 16 32 64 128 256]
      ;:tournament-size          5
      ;:umad-rate                0.09
-     :ah-umad-protect-rate     0.001 ;; ah-umad
-     :ah-umad-vary-rate        0.1 ;; ah-umad
-     :ah-umad-tournament-size  1 ;; ah-umad
+     :ah-umad-protection       10 ;; ah-umad
+     :ah-umad-rate             0.1 ;; ah-umad
      ;:umad-rate                [1/2
      ;                           1/4 1/4 
      ;                           1/8 1/8 1/8  
