@@ -210,9 +210,35 @@ The function `new-individual` returns a new individual produced by selection and
     (let [initial-mean (/ (reduce + v) (count v))]
       (map #(* m (/ % initial-mean)) v))))
 
+;;; version of ah-rates in which boundaries of hypervariable segments are protected
+;;; retained for experimentation
+;; (defn ah-rates
+;;   "Returns the sequence of rates with which each element of plushy should
+;;   be mutated when using autoconstructive hypervariability."
+;;   [plushy protection rate]
+;;   (loop [i 0
+;;          protected true
+;;          rates []
+;;          remainder plushy]
+;;     (if (empty? remainder)
+;;       (with-mean rate rates)
+;;       (if (and (not protected)
+;;                (= (first remainder) :protect))
+;;         (recur i
+;;                true
+;;                rates
+;;                remainder)
+;;         (recur (inc i)
+;;                (if protected
+;;                  (not= (first remainder) :vary)
+;;                  false)
+;;                (conj rates (if protected (/ 1 protection) 1))
+;;                (rest remainder))))))
+
 (defn ah-rates
   "Returns the sequence of rates with which each element of plushy should
-  be mutated when using autoconstructive hypervariability."
+   be mutated when using autoconstructive hypervariability. Boundaries of
+   hypervariable segments are hypervariable."
   [plushy protection rate]
   (loop [i 0
          protected true
@@ -222,16 +248,21 @@ The function `new-individual` returns a new individual produced by selection and
       (with-mean rate rates)
       (if (and (not protected)
                (= (first remainder) :protect))
-        (recur i
+        (recur (inc i)
                true
-               rates
-               remainder)
+               (conj rates 1)
+               (rest remainder))
         (recur (inc i)
                (if protected
                  (not= (first remainder) :vary)
                  false)
-               (conj rates (if protected (/ 1 protection) 1))
+               (conj rates (if (and protected
+                                    (not= (first remainder) :vary))
+                             (/ 1 protection)
+                             1))
                (rest remainder))))))
+
+;(ah-rates [0 0 :vary 0 :protect 0 0 :protect :vary] 10 0.1)
 
 (defn ah-uniform-addition
   "Returns plushy with new instructions possibly added before or after each
