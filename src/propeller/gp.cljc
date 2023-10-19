@@ -37,6 +37,11 @@
       :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
     (println)))
 
+(defn cleanup
+  []
+  #?(:clj (shutdown-agents))
+  nil)
+
 (defn gp
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
@@ -110,13 +115,13 @@
                   (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))})))
               (if dont-end false true))
           false)
-        nil
+        (cleanup)
         ;;
         (and (not downsample?) (>= generation max-generations))
-        nil
+        (cleanup)
         ;;
         (and downsample? (>= evaluations (* max-generations population-size (count indexed-training-data))))
-        nil
+        (cleanup)
         ;;
         :else (recur (inc generation)
                      (+ evaluations (* population-size (count training-data)) ;every member evaluated on the current sample
@@ -136,5 +141,4 @@
                        (if (zero? (mod generation ds-parent-gens))
                          (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
                          indexed-training-data)
-                       indexed-training-data))))
-    #?(:clj (shutdown-agents))))
+                       indexed-training-data))))))
