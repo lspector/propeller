@@ -67,24 +67,24 @@
                             :case-rand (downsample/select-downsample-random indexed-training-data argmap)
                             (do (prn {:error "Invalid Downsample Function"}) (downsample/select-downsample-random indexed-training-data argmap)))
                           indexed-training-data) ;defaults to full training set
-          parent-reps (if 
+          parent-reps (if
                        (and downsample? ; if we are down-sampling
                             (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
                         (take (* ds-parent-rate (count population)) (shuffle population))
                         '()) ;else just empty list
           ; parent representatives for down-sampling
-          rep-evaluated-pop (if downsample? 
+          rep-evaluated-pop (if downsample?
                               (sort-by :total-error
-                                     (utils/pmapallv
-                                      (partial error-function argmap indexed-training-data)
-                                      parent-reps
-                                      argmap))
+                                       (utils/pmapallv
+                                        (partial error-function argmap indexed-training-data)
+                                        parent-reps
+                                        argmap))
                               '())
           evaluated-pop (sort-by :total-error
-                                    (utils/pmapallv
-                                     (partial error-function argmap training-data)
-                                     population
-                                     argmap)) 
+                                 (utils/pmapallv
+                                  (partial error-function argmap training-data)
+                                  population
+                                  argmap))
           best-individual (first evaluated-pop)
           best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))
           argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
@@ -100,16 +100,16 @@
         ;; If either the best individual on the ds passes all training cases, or best individual on full sample passes all training cases
         ;; We verify success on test cases and end evolution
         (if (or (and best-individual-passes-ds (<= (:total-error (error-function argmap indexed-training-data best-individual)) solution-error-threshold))
-                     (and (not downsample?)
-                          (<= (:total-error best-individual) solution-error-threshold)))
-               (do (prn {:success-generation generation})
-                   (prn {:total-test-error
-                         (:total-error (error-function argmap (:testing-data argmap) best-individual))})
-                   (when (:simplification? argmap)
-                     (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
-                       (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))})))
-                   (if dont-end false true))
-               false)
+                (and (not downsample?)
+                     (<= (:total-error best-individual) solution-error-threshold)))
+          (do (prn {:success-generation generation})
+              (prn {:total-test-error
+                    (:total-error (error-function argmap (:testing-data argmap) best-individual))})
+              (when (:simplification? argmap)
+                (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
+                  (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))})))
+              (if dont-end false true))
+          false)
         nil
         ;;
         (and (not downsample?) (>= generation max-generations))
@@ -133,7 +133,8 @@
                                           (range population-size)
                                           argmap))))
                      (if downsample?
-                      (if (zero? (mod generation ds-parent-gens))
-                        (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
-                        indexed-training-data)
-                       indexed-training-data))))))
+                       (if (zero? (mod generation ds-parent-gens))
+                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
+                         indexed-training-data)
+                       indexed-training-data))))
+    #?(:clj (shutdown-agents))))
