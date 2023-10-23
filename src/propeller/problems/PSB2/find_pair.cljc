@@ -2,7 +2,6 @@
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
-            [propeller.problems.data-creation :as dc]
             [propeller.utils :as utils]
             [propeller.push.instructions :refer [def-instruction get-stack-instructions]]
             [propeller.push.state :as state]
