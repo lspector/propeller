@@ -3,7 +3,8 @@
  {org.clojure/clojure #:mvn{:version "1.10.0"},
   org.clojure/clojurescript #:mvn{:version "1.9.946"},
   org.clojure/test.check #:mvn{:version "1.1.0"},
-  net.clojars.schneau/psb2 #:mvn{:version "1.1.1"}},
+  net.clojars.schneau/psb2 #:mvn{:version "1.1.1"}
+  org.clojure/data.csv #:mvn{:version "1.0.1"}},
  :mvn/repos {}
  :codox {:extra-deps {codox/codox {:mvn/version "0.10.8"}}
          :exec-fn codox.main/generate-docs
