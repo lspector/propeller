@@ -315,8 +315,9 @@
      ;:max-batch-size           [1 2 4 8 16 32 64 128 256]
      ;:tournament-size          5
      ;:umad-rate                0.09
-     :ah-umad-protection       10 ;; ah-umad
-     :ah-umad-rate             0.1 ;; ah-umad
+     :ah-umad-min              0.01
+     :ah-umad-max              0.5
+     :ah-umad-mean             0.05
      ;:umad-rate                [1/2
      ;                           1/4 1/4 
      ;                           1/8 1/8 1/8  
