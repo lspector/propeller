@@ -298,7 +298,7 @@
   [& args]
   (gp/gp
    (merge
-    {:instructions             (concat instructions [:vary :protect]) ;; ah-umad
+    {:instructions             (concat instructions [:gene]) ;; autox
      :error-function           error-function
      :training-data            (:train train-and-test-data)
      :testing-data             (:test train-and-test-data)
@@ -307,17 +307,17 @@
      :max-initial-plushy-size  100
      :step-limit               10000
      :parent-selection         :lexicase
-     :downsample?              true
-     :ds-function              :case-rand
-     :downsample-rate          0.5
+     ;:downsample?              true
+     ;:ds-function              :case-rand
+     ;:downsample-rate          0.5
      ;:parent-selection         :tournament
      ;:parent-selection         :motley-batch-lexicase
      ;:max-batch-size           [1 2 4 8 16 32 64 128 256]
      ;:tournament-size          5
      ;:umad-rate                0.09
-     :ah-umad-min              0.01
-     :ah-umad-max              0.5
-     :ah-umad-mean             0.05
+     ;:ah-umad-min              0.01
+     ;:ah-umad-max              0.5
+     ;:ah-umad-mean             0.05
      ;:umad-rate                [1/2
      ;                           1/4 1/4 
      ;                           1/8 1/8 1/8  
@@ -328,8 +328,9 @@
       ;                          1/256 1/256 1/256 1/256 1/256 1/256 1/256 1/256]
      ;:alternation-rate         [1 1/2 1/4 1/8 1/16 1/32 1/64 1/128 1/256]
      ;:alignment-deviation      [0 1 2 4 8 16 32 64 128]
-     :variation                {:ah-umad 1 ;; ah-umad
-                                :umad 0
+     :variation                {:ah-umad 0
+                                :umad 0.5 ;autox
+                                :autoconstructive-crossover 0.5 ;autox
                                 :alternation 0
                                 :reproduction 0
                                 :tail-aligned-crossover 0}
