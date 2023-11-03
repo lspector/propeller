@@ -279,21 +279,29 @@ The function `new-individual` returns a new individual produced by selection and
                       plushy
                       (ah-rates plushy ah-min ah-max ah-mean)))))
 
+(defn extract-genes
+  [plushy]
+  (apply concat
+         (mapv #(if (some #{:gene} %)
+                  (repeat (dec (count %)) ())
+                  [%])
+               (partition-by #(= % :gene) plushy))))
+
+#_(extract-genes [:add :x :y :gene :z :gene :gene :gene :w :gene])
+
 (defn autoconstructive-crossover
-  "Crosses over two individuals using autoconstructive crossover, one Push instruction at a time.
-   Pads shorter one from the end of the list of instructions."
+  "Crosses over two plushies using autoconstructive crossover, one Push instruction at a time.
+   Assumes the plushies have the same number of genes."
   [plushy-a plushy-b]
-  (let [a-genes (partition-by #(= % :gene) plushy-a)
-        b-genes (partition-by #(= % :gene) plushy-b)
-        shorter (min-key count a-genes b-genes)
-        longer (if (= shorter a-genes)
-                 b-genes
-                 a-genes)
-        length-diff (- (count longer) (count shorter))
-        shorter-padded (concat shorter (repeat length-diff ()))]
-    (flatten (mapv #(if (< (rand) 0.5) %1 %2)
-                   shorter-padded
-                   longer))))
+  (let [a-genes (extract-genes plushy-a)
+        b-genes (extract-genes plushy-b)]
+    (flatten (interpose :gene
+                        (mapv #(if (< (rand) 0.5) %1 %2)
+                              a-genes
+                              b-genes)))))
+
+#_(autoconstructive-crossover [:add :x :y :gene :z :gene :gene :gene :w :gene]
+                              [1 :gene 2 3 :gene 4 :gene 5 :gene :gene])
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of
@@ -324,9 +332,14 @@ The function `new-individual` returns a new individual produced by selection and
           (:plushy (selection/select-parent pop argmap)))
        ;
          :autoconstructive-crossover
-         (autoconstructive-crossover
-          (:plushy (selection/select-parent pop argmap))
-          (:plushy (selection/select-parent pop argmap)))
+         (let [plushy1 (:plushy (selection/select-parent pop argmap))
+               p1-genes  (count (extract-genes plushy1))
+               plushy2 (:plushy (selection/select-parent
+                                 (filter #(= (count (extract-genes (:plushy %)))
+                                             p1-genes)
+                                         pop)
+                                 argmap))]
+           (autoconstructive-crossover plushy1 plushy2))
        ;
          :umad
          (let [rate (utils/onenum (:umad-rate argmap))]
