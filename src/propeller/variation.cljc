@@ -279,15 +279,33 @@ The function `new-individual` returns a new individual produced by selection and
                       plushy
                       (ah-rates plushy ah-min ah-max ah-mean)))))
 
+(defn count-genes
+  "Returns the number of segments between (and before and after) instances of :gene."
+  [plushy]
+  (inc (count (filter #(= % :gene) plushy))))
+
 (defn extract-genes
   [plushy]
-  (apply concat
-         (mapv #(if (some #{:gene} %)
-                  (repeat (dec (count %)) ())
-                  [%])
-               (partition-by #(= % :gene) plushy))))
+  (loop [genes []
+         current-gene []
+         remainder plushy]
+    (cond (empty? remainder)
+          (conj genes current-gene)
+          ;
+          (= (first remainder) :gene)
+          (recur (conj genes current-gene)
+                 []
+                 (rest remainder))
+          ;
+          :else
+          (recur genes
+                 (conj current-gene (first remainder))
+                 (rest remainder)))))
 
 #_(extract-genes [:add :x :y :gene :z :gene :gene :gene :w :gene])
+#_(extract-genes [:gene :z :gene :gene :gene :w :gene])
+#_(extract-genes [:gene])
+#_(extract-genes [])
 
 (defn autoconstructive-crossover
   "Crosses over two plushies using autoconstructive crossover, one Push instruction at a time.
@@ -333,9 +351,9 @@ The function `new-individual` returns a new individual produced by selection and
        ;
          :autoconstructive-crossover
          (let [plushy1 (:plushy (selection/select-parent pop argmap))
-               p1-genes  (count (extract-genes plushy1))
+               p1-genes  (count-genes plushy1)
                plushy2 (:plushy (selection/select-parent
-                                 (filter #(= (count (extract-genes (:plushy %)))
+                                 (filter #(= (count-genes (:plushy %))
                                              p1-genes)
                                          pop)
                                  argmap))]
