@@ -325,7 +325,7 @@
      ;                           1/32 1/32 1/32 1/32 1/32 
      ;                           1/64 1/64 1/64 1/64 1/64 1/64 
      ;                           1/128 1/128 1/128 1/128 1/128 1/128 1/128 
-      ;                          1/256 1/256 1/256 1/256 1/256 1/256 1/256 1/256]
+     ;                           1/256 1/256 1/256 1/256 1/256 1/256 1/256 1/256]
      ;:alternation-rate         [1 1/2 1/4 1/8 1/16 1/32 1/64 1/128 1/256]
      ;:alignment-deviation      [0 1 2 4 8 16 32 64 128]
      :variation                {:ah-umad 0
@@ -334,12 +334,7 @@
                                 :alternation 0
                                 :reproduction 0
                                 :tail-aligned-crossover 0}
-     ;:diploid                  true
-     ;:variation                {:diploid-vumad 0.8
-     ;                           :diploid-uniform-silent-replacement 0.1
-     ;                           :diploid-flip 0.1}
      ;:replacement-rate         0.01
-     ;:diploid-flip-rate        0.01
      :elitism                  false
      :single-thread-mode       false}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

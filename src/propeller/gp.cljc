@@ -60,10 +60,9 @@
   (loop [generation 0
          evaluations 0
          population (utils/pmapallv
-                     (fn [_] {:plushy (let [plushy  (genome/make-random-plushy instructions max-initial-plushy-size)]
-                                        (if (:diploid argmap)
-                                          (interleave plushy plushy)
-                                          plushy))}) (range population-size) argmap)
+                     (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)}) 
+                     (range population-size) 
+                     argmap)
          indexed-training-data (if downsample? (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap) argmap) (:training-data argmap))]
     (let [training-data (if downsample?
                           (case (:ds-function argmap)
