@@ -52,7 +52,8 @@ Since `uniform-addition` and `uniform-deletion` are somewhat stochastic, you can
 The function `new-individual` returns a new individual produced by selection and variation of individuals in the population based on the genetic operators provided in the `:variation` map."
   {:doc/format :markdown}
   (:require [propeller.selection :as selection]
-            [propeller.utils :as utils]))
+            [propeller.utils :as utils]
+            [propeller.tools.metrics :as metrics]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover, one Push instruction at a time.
@@ -239,15 +240,16 @@ The function `new-individual` returns a new individual produced by selection and
                  (rest remainder)))))
 
 (defn autoconstructive-crossover
-  "Crosses over two plushies using autoconstructive crossover, one Push instruction at a time.
-   Assumes the plushies have the same number of genes."
+  "Crosses over two plushies using autoconstructive crossover, one Push instruction at a time."
   [plushy-a plushy-b]
   (let [a-genes (extract-genes plushy-a)
         b-genes (extract-genes plushy-b)]
     (flatten (interpose :gene
-                        (mapv #(if (< (rand) 0.5) %1 %2)
-                              a-genes
-                              b-genes)))))
+                        (mapv (fn [g]
+                                (if (< (rand) 0.5) 
+                                  g
+                                  (apply min-key #(metrics/levenshtein-distance g %) b-genes)))
+                              a-genes)))))
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of
@@ -279,12 +281,7 @@ The function `new-individual` returns a new individual produced by selection and
        ;
          :autoconstructive-crossover
          (let [plushy1 (:plushy (selection/select-parent pop argmap))
-               p1-genes  (count-genes plushy1)
-               plushy2 (:plushy (selection/select-parent
-                                 (filter #(= (count-genes (:plushy %))
-                                             p1-genes)
-                                         pop)
-                                 argmap))]
+               plushy2 (:plushy (selection/select-parent pop argmap))]
            (autoconstructive-crossover plushy1 plushy2))
        ;
          :umad ;; uniform mutation by addition and deleted, see uniform-deletion for the
