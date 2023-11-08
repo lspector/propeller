@@ -125,8 +125,9 @@ Calling `(-main)` will run the default genetic programming problem.
 
 ## Description
 
-Propel is an implementation of the Push programming 
-language and the PushGP genetic programming system in Clojure.
+Propeller is an implementation of the Push programming 
+language and the PushGP genetic programming system in Clojure, based
+on Tom Helmuth's little PushGP implementation [propel](https://github.com/thelmuth/propel).
 
 For more information on Push and PushGP see 
 [http://pushlanguage.org](http://pushlanguage.org).
