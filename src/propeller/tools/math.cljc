@@ -5,7 +5,7 @@
                :cljs js/Math.PI))
 
 (defonce ^{:no-doc true :const true} E #?(:clj  Math/E
-              :cljs js/Math.PI))
+              :cljs js/Math.E))
 
 (defn step
   "returns 1 if number is nonzero, 0 otherwise"
