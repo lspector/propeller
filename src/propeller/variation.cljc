@@ -252,10 +252,8 @@ The function `new-individual` returns a new individual produced by selection and
 (defn new-individual
   "Returns a new individual produced by selection and variation of
   individuals in the population."
-  [pop argmap]
-  (let [umad-parent (selection/select-parent pop argmap)
-        parent-ind (:index umad-parent)] ;this is a hack to log hyperselection, only works for umad
-    {:plushy
+  [pop argmap] 
+  {:plushy
      (let [r (rand)
            op (loop [accum 0.0
                      ops-probs (vec (:variation argmap))]
@@ -347,4 +345,4 @@ The function `new-individual` returns a new individual produced by selection and
          :else
          (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
                    :cljs (js/Error
-                          (str "No match in new-individual for " op))))))}))
+                          (str "No match in new-individual for " op))))))})
