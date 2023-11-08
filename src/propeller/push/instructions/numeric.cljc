@@ -183,6 +183,14 @@ Otherwise, acts as a NOOP"
 ;; FLOAT Instructions only
 ;; =============================================================================
 
+;; Divides the top two items on the float stack
+;; If denominator is 0, returns 1.0
+(def-instruction
+  :float_div
+  ^{:stacks #{:float}}
+  (fn [state]
+    (make-instruction state #(float (if (zero? %2) 1 (/ %1 %2))) [:float :float] :float)))
+
 ;; Pushes the cosine of the top FLOAT
 (def-instruction
   :float_cos
