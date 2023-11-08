@@ -2,8 +2,7 @@
   (:require [clojure.test :as t]
             [propeller.utils :as u]
             [propeller.simplification :as s]
-            [propeller.downsample :as ds]
-            [propeller.hyperselection :as hs]))
+            [propeller.downsample :as ds]))
 
 
 (t/deftest assign-indices-to-data-test
@@ -138,26 +137,3 @@
                     {:case-delta 0})]
       (prn {:selected selected})
       (t/is (= 1 (count selected))))))
-
-
-(t/deftest hyperselection-test
-  (let [parents1 '({:blah 3 :index 1} {:blah 3 :index 1}
-                   {:blah 3 :index 1} {:blah 3 :index 2})
-        parents2 '({:plushy 2 :index 0} {:blah 3 :index 2}
-                   {:blah 3 :index 3} {:index 4})
-        emptyparents '({:blah 1} {:blah 1} {:blah 1})]
-    (t/testing "sum-list-map-indices function works correctly"
-      (t/is (= {1 3, 2 1} (hs/sum-list-map-indices parents1)))
-      (t/is (= {0 1, 2 1, 3 1, 4 1} (hs/sum-list-map-indices parents2))))
-    (t/testing "ordered-freqs function works correctly"
-      (t/is (= '(3 1) (hs/ordered-freqs (hs/sum-list-map-indices parents1))))
-      (t/is (= '(1 1 1 1) (hs/ordered-freqs (hs/sum-list-map-indices parents2)))))
-    (t/testing "hyperselection-track works correctly"
-      (t/is (= '(0.75 0.25) (hs/hyperselection-track parents1)))
-      (t/is (= '(0.25 0.25 0.25 0.25) (hs/hyperselection-track parents2))))
-    (t/testing "reindex-pop works correctly"
-      (t/is (= '({:blah 3 :index 0} {:blah 3 :index 1}
-                 {:blah 3 :index 2} {:blah 3 :index 3}) (hs/reindex-pop parents1 {})))
-      (t/is (= '({:plushy 2 :index 0} {:blah 3 :index 1}
-                 {:blah 3 :index 2} {:index 3}) (hs/reindex-pop parents2 {})))
-      (t/is (= '({:blah 1 :index 0} {:blah 1 :index 1} {:blah 1 :index 2}) (hs/reindex-pop emptyparents {}))))))

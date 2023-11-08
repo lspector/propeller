@@ -151,3 +151,14 @@
   (if (coll? thing-or-collection)
     (rand-nth thing-or-collection)
     thing-or-collection))
+
+(defn pretty-map-println
+  "Takes a map and prints it, with each key/value pair on its own line."
+  [mp]
+  (print "{")
+  (let [mp-seq (seq mp)
+        [first-key first-val] (first mp-seq)]
+    (println (pr-str first-key first-val))
+    (doseq [[k v] (rest mp-seq)]
+      (println (str " " (pr-str k v)))))
+  (println "}"))

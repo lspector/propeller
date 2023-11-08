@@ -1,12 +1,10 @@
 (ns propeller.gp
   "Main genetic programming loop."
   (:require [clojure.string]
-            [clojure.pprint]
             [propeller.genome :as genome]
             [propeller.simplification :as simplification]
             [propeller.variation :as variation]
             [propeller.downsample :as downsample]
-            [propeller.hyperselection :as hyperselection]
             [propeller.push.instructions.bool]
             [propeller.push.instructions.character]
             [propeller.push.instructions.code]
@@ -22,20 +20,21 @@
   "Reports information each generation."
   [evaluations pop generation argmap training-data]
   (let [best (first pop)]
-    (clojure.pprint/pprint
+    (utils/pretty-map-println
      {:generation            generation
       :best-plushy           (:plushy best)
       :best-program          (genome/plushy->push (:plushy best) argmap)
       :best-total-error      (:total-error best)
       :evaluations           evaluations
-      :ds-indices            (map #(:index %) training-data)
+      :ds-indices            (if (:downsample? argmap)
+                              (map #(:index %) training-data)
+                               nil)
       :best-errors           (:errors best)
       :best-behaviors        (:behaviors best)
       :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
       :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
       :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-      :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})
-    (println)))
+      :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})))
 
 (defn cleanup
   []
@@ -125,17 +124,15 @@
         :else (recur (inc generation)
                      (+ evaluations (* population-size (count training-data)) ;every member evaluated on the current sample
                         (if (zero? (mod generation ds-parent-gens)) (* (count parent-reps) (- (count indexed-training-data) (count training-data))) 0) ; the parent-reps not evaluted already on down-sample
-                        (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
-                     (let [reindexed-pop (hyperselection/reindex-pop evaluated-pop argmap)] ; give every individual an index for hyperselection loggin
-                       (hyperselection/log-hyperselection-and-ret
-                        (if (:elitism argmap)
-                          (conj (utils/pmapallv (fn [_] (variation/new-individual reindexed-pop argmap))
+                        (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not  
+                     (if (:elitism argmap)
+                          (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
                                                 (range (dec population-size))
                                                 argmap)
-                                (first reindexed-pop))         ;elitism maintains the most-fit individual
-                          (utils/pmapallv (fn [_] (variation/new-individual reindexed-pop argmap))
+                                (first evaluated-pop))         ;elitism maintains the most-fit individual
+                          (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
                                           (range population-size)
-                                          argmap))))
+                                          argmap))
                      (if downsample?
                        (if (zero? (mod generation ds-parent-gens))
                          (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
