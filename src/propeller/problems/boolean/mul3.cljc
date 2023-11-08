@@ -300,7 +300,7 @@
   [& args]
   (gp/gp
    (merge
-    {:instructions             (concat instructions [:gene]) ;; autox
+    {:instructions             instructions
      :error-function           error-function
      :training-data            (:train train-and-test-data)
      :testing-data             (:test train-and-test-data)
@@ -309,9 +309,9 @@
      :max-initial-plushy-size  100
      :step-limit               10000
      :parent-selection         :lexicase
-     ;:downsample?              true
-     ;:ds-function              :case-rand
-     ;:downsample-rate          0.5
+     :downsample?              true
+     :ds-function              :case-rand
+     :downsample-rate          0.1
      ;:parent-selection         :tournament
      ;:parent-selection         :motley-batch-lexicase
      ;:max-batch-size           [1 2 4 8 16 32 64 128 256]
@@ -331,12 +331,13 @@
      ;:alternation-rate         [1 1/2 1/4 1/8 1/16 1/32 1/64 1/128 1/256]
      ;:alignment-deviation      [0 1 2 4 8 16 32 64 128]
      :variation                {:ah-umad 0
-                                :umad 0.5 ;autox
-                                :autoconstructive-crossover 0.5 ;autox
+                                :umad 0.5
+                                :autoconstructive-crossover 0.5
                                 :alternation 0
                                 :reproduction 0
                                 :tail-aligned-crossover 0}
      ;:replacement-rate         0.01
      :elitism                  false
-     :single-thread-mode       false}
+     :single-thread-mode       false
+     :autoconstructive-crossover-enrichment 10}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
