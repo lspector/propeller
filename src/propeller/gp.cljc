@@ -148,6 +148,15 @@
                 n (:autoconstructive-crossover-enrichment args)]
             (if (and prob (> prob 0))
               (update args :instructions concat (repeat (or n 1) :gene))
+              args)))
+        ;
+        adjust-for-ah-umad
+        (fn [args]
+          (let [prob (:ah-umad (:variation args))
+                n (:ah-umad-enrichment args)]
+            (if (and prob (> prob 0))
+              (update args :instructions concat (flatten (repeat (or n 1) [:vary :protect])))
               args)))]
     (gp-loop (-> argmap
-                 (adjust-for-autoconstructive-crossover)))))
+                 (adjust-for-autoconstructive-crossover)
+                 (adjust-for-ah-umad)))))
