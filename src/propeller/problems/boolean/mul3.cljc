@@ -31,9 +31,6 @@
                  (assoc product-bits (keyword (str "c" bit-index)) this-bit)
                  (- remainder (* (if this-bit  1 0) pow2))))))))
 
-#_(target-function false true false false false true)
-#_(target-function true true true true true)
-
 (def train-and-test-data
   (let [bools [false true]]
     {:train (for [a2 bools
@@ -105,7 +102,6 @@
       (assoc-in (state/pop-stack state :boolean)
                 [:output :c0]
                 (state/peek-stack state :boolean)))))
-
 
 (def-instruction
   :c5
@@ -227,8 +223,6 @@
         :c1 ;; defined here
         :c0 ;; defined here
 
-        ;; BOOLEAN TAGGING?
-
         ;; Recommended by Kalkreuth et al: BUFa, NOTa, AND, OR, XOR, NAND, NOR, XNOR
         ;:boolean_bufa ;; defined here
         ;:boolean_nota ;; defined here
@@ -309,35 +303,16 @@
      :max-initial-plushy-size  100
      :step-limit               10000
      :parent-selection         :lexicase
-     :downsample?              true
+     :downsample?              false
      :ds-function              :case-rand
      :downsample-rate          0.1
-     ;:parent-selection         :tournament
-     ;:parent-selection         :motley-batch-lexicase
-     ;:max-batch-size           [1 2 4 8 16 32 64 128 256]
-     ;:tournament-size          5
      :umad-rate                0.01
-     ;:ah-umad-min              0.01
-     ;:ah-umad-max              0.5
-     ;:ah-umad-mean             0.05
-     ;:umad-rate                [1/2
-     ;                           1/4 1/4 
-     ;                           1/8 1/8 1/8  
-     ;                           1/16 1/16 1/16 1/16 
-     ;                           1/32 1/32 1/32 1/32 1/32 
-     ;                           1/64 1/64 1/64 1/64 1/64 1/64 
-     ;                           1/128 1/128 1/128 1/128 1/128 1/128 1/128 
-     ;                           1/256 1/256 1/256 1/256 1/256 1/256 1/256 1/256]
-     ;:alternation-rate         [1 1/2 1/4 1/8 1/16 1/32 1/64 1/128 1/256]
-     ;:alignment-deviation      [0 1 2 4 8 16 32 64 128]
-     :variation                {:ah-umad 0
-                                :umad 0.5
-                                :autoconstructive-crossover 0.5
-                                :alternation 0
-                                :reproduction 0
-                                :tail-aligned-crossover 0}
-     ;:replacement-rate         0.01
-     :elitism                  false
+     :ah-umad-min              0.001
+     :ah-umad-max              0.5
+     :ah-umad-mean             0.01
+     :variation                {:ah-umad 0.9
+                                :umad 0
+                                :autoconstructive-crossover 0.1}
      :single-thread-mode       false
      :autoconstructive-crossover-enrichment 10}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
