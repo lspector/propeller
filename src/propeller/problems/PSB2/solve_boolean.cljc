@@ -49,11 +49,6 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
                            (:step-limit argmap))
                          :boolean))
                      inputs)
-        parsed-outputs (map (fn [output]
-                              (try (read-string output)
-                                   #?(:clj  (catch Exception e 1000.0)
-                                      :cljs (catch js/Error. e 1000.0))))
-                            outputs)
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
                         10000
@@ -61,9 +56,9 @@ Source: https://arxiv.org/pdf/2106.06086.pdf"
                            0
                            1)))
                     correct-outputs
-                    parsed-outputs)]
+                    outputs)]
     (assoc individual
-      :behaviors parsed-outputs
+      :behaviors outputs
       :errors errors
       :total-error #?(:clj  (apply +' errors)
                       :cljs (apply + errors)))))
