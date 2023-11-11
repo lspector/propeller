@@ -1,19 +1,54 @@
-(ns propeller.tools.math)
+(ns propeller.tools.math
+  "Math functions.")
 
-(defonce PI #?(:clj  Math/PI
+(defonce ^{:no-doc true :const true} PI #?(:clj  Math/PI
                :cljs js/Math.PI))
 
-(defonce E #?(:clj  Math/E
-              :cljs js/Math.PI))
+(defonce ^{:no-doc true :const true} E #?(:clj  Math/E
+              :cljs js/Math.E))
+
+(defn step
+  "returns 1 if number is nonzero, 0 otherwise"
+  [x]
+  (if (zero? x) 0 1))
+
+(defn mean
+  "Returns the mean."
+  [coll]
+  (let [sum (apply + coll)
+        count (count coll)]
+    (if (pos? count)
+      (/ sum (float count))
+      0.0)))
+
+(defn median
+  "Returns the median."
+  [coll]
+  (let [sorted (sort coll)
+        cnt (count sorted)
+        halfway (quot cnt 2.0)]
+    (if (odd? cnt)
+      (nth sorted halfway)
+      (let [bottom (dec halfway)
+            bottom-val (nth sorted bottom)
+            top-val (nth sorted halfway)]
+        (mean [bottom-val top-val])))))
+
+(defn median-absolute-deviation
+  "Returns the median absolute deviation."
+  [coll]
+  (let [median-val (median coll)]
+    (median (map #(Math/abs (- % median-val)) coll))))
 
 (defn abs
   "Returns the absolute value of a number."
   [x]
   (if (neg? x) (- x) x))
 
-(defn approx= [x y epsilon]
+(defn approx=
   "Returns true if the absolute difference between x and y is less than or
   equal to some specified error level, epsilon."
+  [x y epsilon]
   (<= (abs (- y x)) epsilon))
 
 (defn ceil
@@ -102,3 +137,8 @@
   [x]
   #?(:clj  (Math/tan x)
      :cljs (js/Math.tan x)))
+
+(defn transpose
+  "returns a vector containing the transpose of a coll of colls"
+  [x]
+  (apply map vector x))

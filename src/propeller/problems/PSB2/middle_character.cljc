@@ -1,4 +1,12 @@
 (ns propeller.problems.PSB2.middle-character
+  "MIDDLE CHARACTER from PSB2
+
+Given a string, return the middle
+character as a string if it is odd length; return the two middle
+characters as a string if it is even length.
+
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -9,20 +17,12 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  =============================
-; MIDDLE CHARACTER from PSB2
-; Given a string, return the middle
-; character as a string if it is odd length; return the two middle
-; characters as a string if it is even length.
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; ===============================================================
+(def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "middle-character" 200 2000))
 
-(def train-and-test-data (psb2/fetch-examples "data" "middle-character" 200 2000))
-
-(defn random-int [] (- (rand-int 201) 100))
+(defn random-int "Random integer between -100 and 100" [] (- (rand-int 201) 100))
 
 (def instructions
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -35,6 +35,10 @@
       (list "" 0 1 2 random-int))))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ, or 1000000 if no
+  behavior is produced. The behavior is here defined as the final top item on
+  the STRING stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (get i :input1)) data)
@@ -60,7 +64,9 @@
                       :cljs (apply + errors)))))
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge
@@ -77,5 +83,4 @@
        :umad-rate               0.1
        :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
-      (apply hash-map (map #(if (string? %) (read-string %) %) args))))
-  (#?(:clj shutdown-agents)))
+      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

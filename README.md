@@ -2,15 +2,36 @@
 
 Yet another Push-based genetic programming system in Clojure.
 
+Full documentation is at [https://lspector.github.io/propeller/](https://lspector.github.io/propeller/).
+
 ## Usage
 
-If you have installed [leiningen](https://leiningen.org), which is a tool
-for running Clojure programs, then you can run Propeller on a genetic
-programming problem that is defined within this project from the command
-line with the command `lein run -m <namespace>`, replacing `<namespace>` 
+If you are working in a Clojure IDE with an integrated REPL, the first
+thing you may want to do is to open `src/propeller/session.cljc` and 
+evaluate the namespace declaration and the commented-out expressions 
+therein. These demonstrate core components of Propeller including
+complete genetic programming runs. When conducting complete genetic
+programming runs this way (using `gp/gp`), depending on your IDE you 
+may need to explicitly open and load the problem file before evaluating 
+the calls to `require` and `gp/gp`.
+
+To run Propeller from the command line, on a genetic programming problem 
+that is defined within this project, you will probably want to use either
+the Clojure [CLI tools](https://clojure.org/guides/deps_and_cli) or 
+[leiningen](https://leiningen.org). In the examples below, the leiningen
+and CLI commands are identical except that the former begin with
+`lein run -m`, while the latter begin with `clj -M -m`.
+
+To start a run use `clj -M -m <namespace>` or 
+`lein run -m <namespace>`, replacing `<namespace>` 
 with the actual namespace that you will find at the top of the problem file. 
 
 For example, you can run the simple-regression genetic programming problem with:
+
+```
+clj -M -m propeller.problems.simple-regression
+```
+or 
 
 ```
 lein run -m propeller.problems.simple-regression
@@ -20,6 +41,11 @@ Additional command-line arguments may
 be provided to override the default key/value pairs specified in the 
 problem file, for example:
 
+```
+clj -M -m propeller.problems.simple-regression :population-size 100
+```
+
+or
 
 ```
 lein run -m propeller.problems.simple-regression :population-size 100
@@ -28,6 +54,13 @@ lein run -m propeller.problems.simple-regression :population-size 100
 On Unix operating systems, including MacOS, you can use something
 like the following to send output both to the terminal
 and to a text file (called `outfile` in this example):
+
+
+```
+clj -M -m propeller.problems.simple-regression | tee outfile
+```
+
+or
 
 ```
 lein run -m propeller.problems.simple-regression | tee outfile
@@ -41,24 +74,22 @@ value for the `:variation` argument, which is a clojure map
 containing curly brackets that may confuse your shell:
 
 ```
+clj -M -m propeller.problems.simple-regression :variation "{:umad 1.0}"
+```
+
+or
+
+```
 lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
 ```
 
-To run a genetic programming problem from a REPL, start
-your REPL for the project (e.g. with `lein repl` at the
-command line when in the project directory, or through your
-IDE) and then do something like the following (which in
-this case runs the simple-regression problem with 
-`:population-size` 100):
+For many genetic operator hyperparameters, collections may be provided in place of single values. When this is done, a random element of the collection will be chosen (with each being equally likely) each time the operator is used. When specied at the command line, these collections will also have to be quoted, for example with `:umad-rate "[0.01 0.05 0.1]"` to mean that UMAD rates of 0.01, 0.05, and 0.1 can be used.
 
-```
-(require 'propeller.problems.simple-regression)
-(in-ns 'propeller.problems.simple-regression)
-(-main :population-size 100 :variation {:umad 1.0})
-```
-
-If you want to run the problem with the default parameters,
-then you should call `-main` without arguments, as `(-main)`.
+By default, Propeller will conduct many processes concurrently on multiple 
+cores using threads. If you  want to disable this behavior (for example, during 
+debugging) then provide the argument `:single-thread-mode` with the value `true`.
+Threads are not available in Javascript, so no processes are run concurrnetly
+when Propeller is run in Clojurescript.
 
 
 ## CLJS Usage
@@ -94,8 +125,9 @@ Calling `(-main)` will run the default genetic programming problem.
 
 ## Description
 
-Propel is an implementation of the Push programming 
-language and the PushGP genetic programming system in Clojure.
+Propeller is an implementation of the Push programming 
+language and the PushGP genetic programming system in Clojure, based
+on Tom Helmuth's little PushGP implementation [propel](https://github.com/thelmuth/propel).
 
 For more information on Push and PushGP see 
 [http://pushlanguage.org](http://pushlanguage.org).

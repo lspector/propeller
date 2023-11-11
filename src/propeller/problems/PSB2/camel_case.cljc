@@ -1,4 +1,13 @@
 (ns propeller.problems.PSB2.camel-case
+  "CAMEL CASE from PSB2
+
+Take a string in kebab-case and convert all of the words to camelCase.
+Each group of words to convert is delimited by \"-\", and each grouping
+is separated by a space. For example: \"camel-case example-test-string\"
+→ \"camelCase exampleTestString\"
+
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -9,25 +18,18 @@
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
-; ===========  PROBLEM DESCRIPTION  =====================================
-; CAMEL CASE from PSB2
-; Take a string in kebab-case and convert all of the words to camelCase.
-; Each group of words to convert is delimited by "-", and each grouping
-; is separated by a space. For example: "camel-case example-test-string"
-; → "camelCase exampleTestString"
-;
-; Source: https://arxiv.org/pdf/2106.06086.pdf
-; =======================================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "camel-case" 200 2000))
+(def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "camel-case" 200 2000))
 
 ; Visible character ERC
 (defn random-char
+  "Return visible character ERC"
   []
   (rand-nth (map char (range 97 122))))
 
 ; Word generator for string ERC
 (defn word-generator
+  "Word generator for string ERC"
   []
   (let [chars-between #(map char (range (int %1) (inc (int %2))))
         chars (chars-between \a \z)
@@ -35,6 +37,7 @@
     (apply str (repeatedly word-len #(rand-nth chars)))))
 
 (defn cleanup-length
+  "Remove spaces and dashes from end of string"
   [string len]
   (let [result (take len string)]
     (if (or (= (last result) \space)
@@ -44,6 +47,7 @@
 
 ; String ERC
 (defn random-input
+  "Returns random string ERCs"
   [len]
   (loop [result-string (word-generator)]
     (if (>= (count result-string) len)
@@ -53,6 +57,7 @@
                   (word-generator))))))
 
 (def instructions
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -66,6 +71,10 @@
 
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ, or 1000000 if no
+  behavior is produced. The behavior is here defined as the final top item on
+  the STRING stack."
   [argmap data individual]
   (let [program (genome/plushy->push (:plushy individual) argmap)
         inputs (map (fn [i] (get i :input1)) data)
@@ -91,7 +100,9 @@
                       :cljs (apply + errors)))))
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge
@@ -108,5 +119,4 @@
        :umad-rate               0.1
        :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
-      (apply hash-map (map #(if (string? %) (read-string %) %) args))))
-  (#?(:clj shutdown-agents)))
+      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

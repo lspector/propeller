@@ -1,4 +1,7 @@
 (ns propeller.push.instructions.bool
+  "BOOLEAN Instructions, created with `propeller.push.instructions/def-instruction`.
+  List of instructions can be found at [Additional Instructions](Additional_Instructions.md)."
+  {:doc/format :markdown}
   (:require [propeller.push.instructions :refer [def-instruction
                                                  make-instruction]]))
 

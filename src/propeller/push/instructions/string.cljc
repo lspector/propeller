@@ -1,4 +1,6 @@
 (ns propeller.push.instructions.string
+  "STRING Instructions, created with `propeller.push.instructions/def-instruction`.
+  List of instructions can be found at [Additional Instructions](Additional_Instructions.md)."
   (:require [clojure.string :as string]
             [propeller.push.state :as state]
             [propeller.push.instructions :refer [def-instruction

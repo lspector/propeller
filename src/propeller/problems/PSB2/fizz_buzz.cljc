@@ -1,4 +1,12 @@
 (ns propeller.problems.PSB2.fizz-buzz
+  "FIZZ BUZZ from PSB2
+Given an integer x, return \"Fizz\" if x is
+divisible by 3, \"Buzz\" if x is divisible by 5, \"FizzBuzz\" if x
+is divisible by 3 and 5, and a string version of x if none of
+the above hold.
+
+Source: https://arxiv.org/pdf/2106.06086.pdf"
+  {:doc/format :markdown}
   (:require [psb2.core :as psb2]
             [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
@@ -19,9 +27,14 @@
 ; Source: https://arxiv.org/pdf/2106.06086.pdf
 ; ============================================================
 
-(def train-and-test-data (psb2/fetch-examples "data" "fizz-buzz" 200 2000))
+
+(def train-and-test-data "Data taken from https://zenodo.org/record/5084812" (psb2/fetch-examples "data" "fizz-buzz" 200 2000))
+(def train-data (:train train-and-test-data))
+(def test-data (:test train-and-test-data))
+
 
 (def instructions
+  "Stack-specific instructions, input instructions, close, and constants"
   (utils/not-lazy
     (concat
       ;;; stack-specific instructions
@@ -34,6 +47,10 @@
       (list "Fizz" "Buzz" "FizzBuzz" 0 3 5))))
 
 (defn error-function
+  "Finds the behaviors and errors of an individual: Error is 0 if the value and
+  the program's selected behavior match, or 1 if they differ, or 1000000 if no
+  behavior is produced. The behavior is here defined as the final top item on
+  the STRING stack."
   [argmap data individual]
    (let [program (genome/plushy->push (:plushy individual) argmap)
          inputs (map (fn [i] (get i :input1)) data)
@@ -60,14 +77,19 @@
 
 
 (defn -main
-  "Runs propel-gp, giving it a map of arguments."
+  "Runs the top-level genetic programming function, giving it a map of 
+  arguments with defaults that can be overridden from the command line
+  or through a passed map."
   [& args]
   (gp/gp
     (merge
       {:instructions            instructions
        :error-function          error-function
-       :training-data           (:train train-and-test-data)
-       :testing-data            (:test train-and-test-data)
+       :training-data           train-data
+       :testing-data            test-data
+       :case-t-size             (count train-data)
+       :ds-parent-rate          0
+       :ds-parent-gens          1
        :max-generations         300
        :population-size         1000
        :max-initial-plushy-size 250
@@ -77,5 +99,4 @@
        :umad-rate               0.1
        :variation               {:umad 1.0 :crossover 0.0}
        :elitism                 false}
-      (apply hash-map (map #(if (string? %) (read-string %) %) args))))
-  (#?(:clj shutdown-agents)))
+      (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

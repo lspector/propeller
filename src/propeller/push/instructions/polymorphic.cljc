@@ -1,4 +1,5 @@
 (ns propeller.push.instructions.polymorphic
+  "Polymorphic Instructions (for all stacks, with the exception of non-data ones like input and output)"
   (:require [propeller.utils :as utils]
             [propeller.push.state :as state]
             [propeller.push.limits :as limit]
@@ -15,6 +16,8 @@
 ;; Duplicates the top item of the stack. Does not pop its argument (since that
 ;; would negate the effect of the duplication)
 (def _dup
+  "Duplicates the top item of the stack. Does not pop its argument
+  (since that would negate the effect of the duplication)"
   ^{:stacks #{}
     :name "_dup"}
   (fn [stack state]
@@ -30,6 +33,12 @@
 ;; of n are treated as 0. The final number of items on the stack is limited to
 ;; globals/max-stack-items.
 (def _dup_times
+  "Duplicates n copies of the top item (i.e leaves n copies there). Does not pop
+  its argument (since that would negate the effect of the duplication). The
+  number n is determined by the top INTEGER. For n = 0, equivalent to POP.
+  For n = 1, equivalent to NOOP. For n = 2, equivalent to DUP. Negative values
+  of n are treated as 0. The final number of items on the stack is limited to
+  globals/max-stack-items."
   ^{:stacks #{:integer}
     :name "_dup_times"}
   (fn [stack state]
@@ -53,6 +62,10 @@
 ;; fewer than n items are on the stack, the entire stack will be duplicated.
 ;; The final number of items on the stack is limited to globals/max-stack-items.
 (def _dup_items
+  "Duplicates the top n items on the stack, one time each. The number n is
+   determined by the top INTEGER. If n <= 0, no items will be duplicated. If
+   fewer than n items are on the stack, the entire stack will be duplicated.
+   The final number of items on the stack is limited to globals/max-stack-items."
   ^{:stacks #{:integer}
     :name "_dup_items"}
   (fn [stack state]
@@ -66,6 +79,7 @@
 
 ;; Pushes TRUE onto the BOOLEAN stack if the stack is empty. Otherwise FALSE
 (def _empty
+  "Pushes TRUE onto the BOOLEAN stack if the stack is empty. Otherwise FALSE"
   ^{:stacks #{:boolean}
     :name "_empty"}
   (fn [stack state]
@@ -74,6 +88,7 @@
 ;; Pushes TRUE onto the BOOLEAN stack if the top two items are equal.
 ;; Otherwise FALSE
 (def _eq
+  "Pushes TRUE onto the BOOLEAN stack if the top two items are equal. Otherwise FALSE"
   ^{:stacks #{:boolean}
     :name "_eq"}
   (fn [stack state]
@@ -81,6 +96,7 @@
 
 ;; Empties the given stack
 (def _flush
+  "Empties the given stack"
   ^{:stacks #{}
     :name "_flush"}
   (fn [stack state]
@@ -88,6 +104,7 @@
 
 ;; Pops the given stack
 (def _pop
+  "Pops the given stack"
   ^{:stacks #{}
     :name "_pop"}
   (fn [stack state]
@@ -96,6 +113,8 @@
 ;; Rotates the top three items on the stack (i.e. pulls the third item out and
 ;; pushes it on top). Equivalent to (yank state stack-type 2)
 (def _rot
+  "Rotates the top three items on the stack (i.e. pulls the third item out and
+  pushes it on top). Equivalent to (yank state stack-type 2)"
   ^{:stacks #{}
     :name "_rot"}
   (fn [stack state]
@@ -109,6 +128,8 @@
 ;; Inserts the top item deeper into the stack, using the top INTEGER to
 ;; determine how deep
 (def _shove
+  "Inserts the top item deeper into the stack, using the top INTEGER to
+  determine how deep"
   ^{:stacks #{:integer}
     :name "_shove"}
   (fn [stack state]
@@ -129,6 +150,7 @@
 
 ;; Pushes the given stack's depth onto the INTEGER stack
 (def _stack_depth
+  "Pushes the given stack's depth onto the INTEGER stack"
   ^{:stacks #{:integer}
     :name "_stack_depth"}
   (fn [stack state]
@@ -137,6 +159,7 @@
 
 ;; Swaps the top two items on the stack
 (def _swap
+  "Swaps the top two items on the stack"
   ^{:stacks #{}
     :name "_swap"}
   (fn [stack state]
@@ -149,6 +172,8 @@
 ;; Pushes an indexed item from deep in the stack, removing it. The top INTEGER
 ;; is used to determine how deep to yank from
 (def _yank
+  "Pushes an indexed item from deep in the stack, removing it. The top INTEGER
+  is used to determine how deep to yank from"
   ^{:stacks #{:integer}
     :name "_yank"}
   (fn [stack state]
@@ -170,6 +195,8 @@
 ;; Pushes a copy of an indexed item from deep in the stack, without removing it.
 ;; The top INTEGER is used to determine how deep to yankdup from
 (def _yank_dup
+  "Pushes a copy of an indexed item from deep in the stack, without removing it.
+  The top INTEGER is used to determine how deep to yankdup from"
   ^{:stacks #{:integer}
     :name "_yank_dup"}
   (fn [stack state]
@@ -188,6 +215,8 @@
 ;; Pushes a copy of an indexed item from deep in the stack, without removing it.
 ;; The top INTEGER is used to determine the index from the BOTTOM of the stack.
 (def _deep_dup
+  "Pushes a copy of an indexed item from deep in the stack, without removing it.
+  The top INTEGER is used to determine the index from the BOTTOM of the stack."
   ^{:stacks #{:integer}
     :name "_deep_dup"}
   (fn [stack state]

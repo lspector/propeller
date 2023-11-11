@@ -1,4 +1,4 @@
-(ns propeller.main
+(ns ^:no-doc propeller.main
   (:require [propeller.core :as propeller]))
 
 (defn main! []

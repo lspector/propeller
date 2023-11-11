@@ -1,10 +1,47 @@
 (ns propeller.tools.metrics
+  "Functions to measure things."
   (:require [propeller.tools.math :as math]))
+
+(defn argmins
+  "returns the indice(s) of the minimum value of a list. Could be more efficient, probably"
+  [coll]
+  (if (empty? coll) '()
+      (let [m (apply min coll)]
+        (keep-indexed #(when (= m %2) %1) coll))))
+
+(defn argmax-last
+  "returns the index of the maximum value in a list, tiebreaking last"
+  [coll]
+  (->> coll
+       (map-indexed vector)
+       (apply max-key second)
+       first))
+
+(defn argmax
+  "returns the index of the maximum value in a list, randomly tiebreaking"
+  [coll]
+  (if (zero? (count coll))
+    :null
+    (->> coll
+         (map-indexed vector)
+         (filter #(= (apply max coll) (second %)))
+         rand-nth
+         first)))
 
 (defn mean
   "Returns the mean of a collection."
   [coll]
   (if (empty? coll) 0 (math/div (apply + coll) (count coll))))
+
+(defn mean-of-colls
+  "returns the mean of multiple colls"
+  [coll]
+  (map mean (math/transpose coll)))
+
+(defn min-of-colls
+  "returns the smallest value of multiple colls"
+  [coll]
+  (map #(apply min %) (math/transpose coll)))
 
 (defn median
   "Returns the median of a collection."
@@ -28,12 +65,12 @@
   "computes the next row using the prev-row current-element and the other seq"
   [prev-row current-element other-seq pred]
   (reduce
-    (fn [row [diagonal above other-element]]
-      (let [update-val (if (pred other-element current-element)
+   (fn [row [diagonal above other-element]]
+     (let [update-val (if (pred other-element current-element)
                          ;; if the elements are deemed equivalent according to the predicate
                          ;; pred, then no change has taken place to the string, so we are
                          ;; going to set it the same value as diagonal (which is the previous edit-distance)
-                         diagonal
+                        diagonal
                          ;; in the case where the elements are not considered equivalent, then we are going
                          ;; to figure out if its a substitution (then there is a change of 1 from the previous
                          ;; edit distance) thus the value is diagonal + 1 or if its a deletion, then the value
@@ -41,18 +78,18 @@
                          ;; of last of row + 1 (since we will be using vectors, peek is more efficient)
                          ;; or it could be a case of insertion, then the value is above+1, and we chose
                          ;; the minimum of the three
-                         (inc (min diagonal above (peek row))))]
+                        (inc (min diagonal above (peek row))))]
 
-        (conj row update-val)))
+       (conj row update-val)))
     ;; we need to initialize the reduce function with the value of a row, since we are
     ;; constructing this row from the previous one, the row is a vector of 1 element which
     ;; consists of 1 + the first element in the previous row (edit distance between the prefix so far
     ;; and an empty string)
-    [(inc (first prev-row))]
+   [(inc (first prev-row))]
     ;; for the reduction to go over, we need to provide it with three values, the diagonal
     ;; which is the same as prev-row because it starts from 0, the above, which is the next element
     ;; from the list and finally the element from the other sequence itself.
-    (map vector prev-row (next prev-row) other-seq)))
+   (map vector prev-row (next prev-row) other-seq)))
 
 (defn levenshtein-distance
   "Levenshtein Distance - http://en.wikipedia.org/wiki/Levenshtein_distance
@@ -65,17 +102,17 @@
     (empty? (str a)) (count (str b)) ;; sometimes stack pushes numbers, force
     (empty? (str b)) (count (str a)) ;; a and b to be strings
     :else (peek
-            (reduce
+           (reduce
               ;; we use a simple reduction to convert the previous row into the
               ;; next-row using the compute-next-row which takes a current
               ;; element, the previous-row computed so far, and the predicate
               ;; to compare for equality
-              (fn [prev-row current-element]
-                (compute-next-row prev-row current-element (str b) p))
+            (fn [prev-row current-element]
+              (compute-next-row prev-row current-element (str b) p))
               ;; we need to initialize the prev-row with the edit distance
               ;; between the various prefixes of b and the empty string
-              (range (inc (count (str b))))
-              (str a)))))
+            (range (inc (count (str b))))
+            (str a)))))
 
 (defn sequence-similarity
   "Returns a number between 0 and 1, indicating how similar the sequences are
