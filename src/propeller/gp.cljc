@@ -39,6 +39,7 @@
 (defn cleanup
   []
   #?(:clj (shutdown-agents))
+  (prn {:run-completed true})
   nil)
 
 (defn gp-loop
