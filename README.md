@@ -26,15 +26,15 @@ To start a run use `clj -M -m <namespace>` or
 `lein run -m <namespace>`, replacing `<namespace>` 
 with the actual namespace that you will find at the top of the problem file. 
 
-For example, you can run the simple-regression genetic programming problem with:
+For example, you can run the integer-regression genetic programming problem with:
 
 ```
-clj -M -m propeller.problems.simple-regression
+clj -M -m propeller.problems.integer-regression
 ```
 or 
 
 ```
-lein run -m propeller.problems.simple-regression
+lein run -m propeller.problems.integer-regression
 ```
 
 Additional command-line arguments may
@@ -42,13 +42,13 @@ be provided to override the default key/value pairs specified in the
 problem file, for example:
 
 ```
-clj -M -m propeller.problems.simple-regression :population-size 100
+clj -M -m propeller.problems.integer-regression :population-size 100
 ```
 
 or
 
 ```
-lein run -m propeller.problems.simple-regression :population-size 100
+lein run -m propeller.problems.integer-regression :population-size 100
 ```
 
 On Unix operating systems, including MacOS, you can use something
@@ -57,13 +57,13 @@ and to a text file (called `outfile` in this example):
 
 
 ```
-clj -M -m propeller.problems.simple-regression | tee outfile
+clj -M -m propeller.problems.integer-regression | tee outfile
 ```
 
 or
 
 ```
-lein run -m propeller.problems.simple-regression | tee outfile
+lein run -m propeller.problems.integer-regression | tee outfile
 ```
 
 If you want to provide command line arguments that include
@@ -74,13 +74,13 @@ value for the `:variation` argument, which is a clojure map
 containing curly brackets that may confuse your shell:
 
 ```
-clj -M -m propeller.problems.simple-regression :variation "{:umad 1.0}"
+clj -M -m propeller.problems.integer-regression :variation "{:umad 1.0}"
 ```
 
 or
 
 ```
-lein run -m propeller.problems.simple-regression :variation "{:umad 1.0}"
+lein run -m propeller.problems.integer-regression :variation "{:umad 1.0}"
 ```
 
 For many genetic operator hyperparameters, collections may be provided in place of single values. When this is done, a random element of the collection will be chosen (with each being equally likely) each time the operator is used. When specied at the command line, these collections will also have to be quoted, for example with `:umad-rate "[0.01 0.05 0.1]"` to mean that UMAD rates of 0.01, 0.05, and 0.1 can be used.
