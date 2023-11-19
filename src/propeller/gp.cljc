@@ -54,7 +54,7 @@
            downsample? false}
     :as   argmap}]
   ;;
-  (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
+  (prn {:starting-args (update (update argmap :error-function str) :instructions utils/not-lazy)})
   (println)
   ;;
   (loop [generation 0
