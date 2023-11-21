@@ -251,17 +251,27 @@ The function `new-individual` returns a new individual produced by selection and
           (:plushy (selection/select-parent pop argmap))
           (:plushy (selection/select-parent pop argmap)))
        ;
-         :bmx
+         :bmx ;; best match crossover
          (let [plushy1 (:plushy (selection/select-parent pop argmap))
-               plushy2 (:plushy (selection/select-parent pop argmap))]
-           (bmx plushy1 plushy2 (or (:bmx-rate argmap) 0.5)))
+               plushy2 (:plushy (selection/select-parent pop argmap))
+               rate (utils/onenum (or (:bmx-rate argmap) 0.5))]
+           (bmx plushy1 plushy2 rate))
        ;
-         :umad ;; uniform mutation by addition and deleted, see uniform-deletion for the
+         :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
          (let [rate (utils/onenum (:umad-rate argmap))]
            (-> (:plushy (selection/select-parent pop argmap))
                (uniform-addition (:instructions argmap) rate)
                (uniform-deletion rate)))
+       ;
+         :bmx-umad ;; applies umad to the results of bmx
+         (let [umad-rate (utils/onenum (:umad-rate argmap))]
+           (->  (let [plushy1 (:plushy (selection/select-parent pop argmap))
+                      plushy2 (:plushy (selection/select-parent pop argmap))
+                      bmx-rate (utils/onenum (or (:bmx-rate argmap) 0.5))]
+                  (bmx plushy1 plushy2 bmx-rate))
+                (uniform-addition (:instructions argmap) umad-rate)
+                (uniform-deletion umad-rate)))
        ;
          :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
                 ;; number of additions made
