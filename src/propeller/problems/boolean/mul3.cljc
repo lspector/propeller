@@ -312,7 +312,7 @@
      :ah-umad-mean             0.01
      :variation                {:ah-umad 0.9
                                 :umad 0
-                                :autoconstructive-crossover 0.1}
+                                :bmx 0.1}
      :single-thread-mode       false
-     :autoconstructive-crossover-enrichment 10}
+     :bmx-enrichment 10}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

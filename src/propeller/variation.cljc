@@ -239,7 +239,7 @@ The function `new-individual` returns a new individual produced by selection and
                  (conj current-gene (first remainder))
                  (rest remainder)))))
 
-(defn autoconstructive-crossover
+(defn bmx
   "Crosses over two plushies using autoconstructive crossover, one Push instruction at a time."
   [plushy-a plushy-b]
   (let [a-genes (extract-genes plushy-a)
@@ -277,10 +277,10 @@ The function `new-individual` returns a new individual produced by selection and
           (:plushy (selection/select-parent pop argmap))
           (:plushy (selection/select-parent pop argmap)))
        ;
-         :autoconstructive-crossover
+         :bmx
          (let [plushy1 (:plushy (selection/select-parent pop argmap))
                plushy2 (:plushy (selection/select-parent pop argmap))]
-           (autoconstructive-crossover plushy1 plushy2))
+           (bmx plushy1 plushy2))
        ;
          :umad ;; uniform mutation by addition and deleted, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
