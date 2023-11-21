@@ -162,3 +162,29 @@
     (doseq [[k v] (rest mp-seq)]
       (println (str " " (pr-str k v)))))
   (println "}"))
+
+(defn count-genes
+  "A utility for best match crossover (bmx). Returns the number of segments 
+   between (and before and after) instances of :gene."
+  [plushy]
+  (inc (count (filter #(= % :gene) plushy))))
+
+(defn extract-genes
+  "A utility for best match crossover (bmx). Returns the segments of the plushy
+   before/between/after instances of :gene."
+  [plushy]
+  (loop [genes []
+         current-gene []
+         remainder plushy]
+    (cond (empty? remainder)
+          (conj genes current-gene)
+          ;
+          (= (first remainder) :gene)
+          (recur (conj genes current-gene)
+                 []
+                 (rest remainder))
+          ;
+          :else
+          (recur genes
+                 (conj current-gene (first remainder))
+                 (rest remainder)))))

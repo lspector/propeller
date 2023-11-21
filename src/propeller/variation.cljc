@@ -213,37 +213,11 @@ The function `new-individual` returns a new individual produced by selection and
                       plushy
                       (ah-rates plushy ah-min ah-max ah-mean)))))
 
-(defn count-genes
-  "A utility for best match crossover (bmx). Returns the number of segments 
-   between (and before and after) instances of :gene."
-  [plushy]
-  (inc (count (filter #(= % :gene) plushy))))
-
-(defn extract-genes
-  "A utility for best match crossover (bmx). Returns the segments of the plushy
-   before/between/after instances of :gene."
-  [plushy]
-  (loop [genes []
-         current-gene []
-         remainder plushy]
-    (cond (empty? remainder)
-          (conj genes current-gene)
-          ;
-          (= (first remainder) :gene)
-          (recur (conj genes current-gene)
-                 []
-                 (rest remainder))
-          ;
-          :else
-          (recur genes
-                 (conj current-gene (first remainder))
-                 (rest remainder)))))
-
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
   [plushy-a plushy-b rate]
-  (let [a-genes (extract-genes plushy-a)
-        b-genes (extract-genes plushy-b)]
+  (let [a-genes (utils/extract-genes plushy-a)
+        b-genes (utils/extract-genes plushy-b)]
     (flatten (interpose :gene
                         (mapv (fn [g]
                                 (if (< (rand) rate)

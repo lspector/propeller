@@ -21,20 +21,26 @@
   [evaluations pop generation argmap training-data]
   (let [best (first pop)]
     (utils/pretty-map-println
-     {:generation            generation
-      :best-plushy           (:plushy best)
-      :best-program          (genome/plushy->push (:plushy best) argmap)
-      :best-total-error      (:total-error best)
-      :evaluations           evaluations
-      :ds-indices            (if (:downsample? argmap)
-                              (map #(:index %) training-data)
-                               nil)
-      :best-errors           (:errors best)
-      :best-behaviors        (:behaviors best)
-      :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
-      :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
-      :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-      :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})))
+     (merge
+      {:generation            generation
+       :best-plushy           (:plushy best)
+       :best-program          (genome/plushy->push (:plushy best) argmap)
+       :best-total-error      (:total-error best)
+       :evaluations           evaluations
+       :ds-indices            (if (:downsample? argmap)
+                                (map #(:index %) training-data)
+                                nil)
+       :best-errors           (:errors best)
+       :best-behaviors        (:behaviors best)
+       :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+       :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+       :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+       :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))}
+      (if (> (or (:bmx (:variation argmap)) 0) 0) ; using bmx
+        {:best-gene-count     (utils/count-genes (:plushy best))
+         :average-gene-count  (float (/ (reduce + (map utils/count-genes (map :plushy pop)))
+                                        (count pop)))}
+        {})))))
 
 (defn cleanup
   []
