@@ -214,13 +214,13 @@ The function `new-individual` returns a new individual produced by selection and
                       (ah-rates plushy ah-min ah-max ah-mean)))))
 
 (defn count-genes
-  "A utility for autoconstructive crossover. Returns the number of segments 
+  "A utility for best match crossover (bmx). Returns the number of segments 
    between (and before and after) instances of :gene."
   [plushy]
   (inc (count (filter #(= % :gene) plushy))))
 
 (defn extract-genes
-  "A utility for autoconstructive crossover. Returns the segments of the plushy
+  "A utility for best match crossover (bmx). Returns the segments of the plushy
    before/between/after instances of :gene."
   [plushy]
   (loop [genes []
@@ -240,15 +240,15 @@ The function `new-individual` returns a new individual produced by selection and
                  (rest remainder)))))
 
 (defn bmx
-  "Crosses over two plushies using autoconstructive crossover, one Push instruction at a time."
-  [plushy-a plushy-b]
+  "Crosses over two plushies using best match crossover (bmx)."
+  [plushy-a plushy-b rate]
   (let [a-genes (extract-genes plushy-a)
         b-genes (extract-genes plushy-b)]
     (flatten (interpose :gene
                         (mapv (fn [g]
-                                (if (< (rand) 0.5) 
-                                  g
-                                  (apply min-key #(metrics/levenshtein-distance g %) b-genes)))
+                                (if (< (rand) rate)
+                                  (apply min-key #(metrics/levenshtein-distance g %) b-genes)
+                                  g))
                               a-genes)))))
 
 (defn new-individual
@@ -280,7 +280,7 @@ The function `new-individual` returns a new individual produced by selection and
          :bmx
          (let [plushy1 (:plushy (selection/select-parent pop argmap))
                plushy2 (:plushy (selection/select-parent pop argmap))]
-           (bmx plushy1 plushy2))
+           (bmx plushy1 plushy2 (or (:bmx-rate argmap) 0.5)))
        ;
          :umad ;; uniform mutation by addition and deleted, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
