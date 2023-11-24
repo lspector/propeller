@@ -122,12 +122,16 @@
                      (<= (:total-error best-individual)
                          solution-error-threshold)))
           (do (prn {:success-generation generation})
+              (prn {:successful-plushy (:plushy best-individual)})
+              (prn {:successful-program (genome/plushy->push (:plushy best-individual) argmap)})
               (prn {:total-test-error
                     (:total-error (error-function argmap (:testing-data argmap) best-individual))})
               (when (:simplification? argmap)
                 (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
                   (prn {:total-test-error-simplified
-                        (:total-error (error-function argmap (:testing-data argmap) {:plushy simplified-plushy}))})))
+                        (:total-error (error-function argmap (:testing-data argmap) {:plushy simplified-plushy}))})
+                  (prn {:simplified-plushy simplified-plushy})
+                  (prn {:simplified-program (genome/plushy->push simplified-plushy argmap)})))
               (if dont-end false true))
           false)
         (cleanup)
