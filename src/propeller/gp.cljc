@@ -179,9 +179,11 @@
   [argmap]
   (let [adjust-for-bmx
         (fn [args]
-          (let [prob (:bmx (:variation args))
+          (let [prob-bmx (:bmx (:variation args))
+                prob-bmx-umad (:bmx-umad (:variation args))
                 n (:bmx-enrichment args)]
-            (if (and prob (> prob 0))
+            (if (or (and prob-bmx (> prob-bmx 0))
+                    (and prob-bmx-umad (> prob-bmx-umad 0)))
               (update args :instructions concat (repeat (or n 1) :gene))
               args)))
         ;
