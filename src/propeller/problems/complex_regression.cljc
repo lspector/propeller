@@ -3,6 +3,7 @@
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
             [propeller.tools.math :as math]
+            [propeller.downsample :as downsample]
             [propeller.gp :as gp]
             #?(:cljs [cljs.reader :refer [read-string]])))
 
@@ -24,12 +25,10 @@
         :float_subtract
         :float_mult
         :float_quot
-        :float_eq
         :exec_dup
-        :exec_if
         'close
-        0
-        1))
+        0.0
+        1.0))
 
 (defn error-function
   "Finds the behaviors and errors of an individual. The error is the absolute
@@ -61,7 +60,7 @@
                             :cljs (apply + errors))))))
 
 (defn -main
-  "Runs the top-level genetic programming function, giving it a map of 
+  "Runs the top-level genetic programming function, giving it a map of
   arguments with defaults that can be overridden from the command line
   or through a passed map."
   [& args]
@@ -71,13 +70,15 @@
      :error-function           error-function
      :training-data            (:train train-and-test-data)
      :testing-data             (:test train-and-test-data)
-     :max-generations          5000
-     :population-size          500
+     :max-generations          1000
+     :population-size          2000
      :max-initial-plushy-size  100
      :step-limit               200
-     :parent-selection         :ds-lexicase
-     :ds-function              :case-maxmin
-     :downsample-rate          0.1
+     :parent-selection         :lexicase
+     ; or set `:downsample?` to `false` and leave `:downsample` out altogehther.
+     :downsample?              true
+     :downsample               downsample/select-downsample-maxmin
+     :downsample-rate          0.5
      :case-t-size              20
      :tournament-size          5
      :umad-rate                0.1
