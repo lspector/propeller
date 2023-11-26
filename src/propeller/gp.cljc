@@ -45,12 +45,16 @@
 (defn gp-loop
   "Main GP loop."
   [{:keys [population-size max-generations error-function instructions
-           max-initial-plushy-size solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
+           max-initial-plushy-size solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type
+           downsample downsample?]
     :or   {solution-error-threshold 0.0
            dont-end false
            ds-parent-rate 0
            ds-parent-gens 1
            ids-type :solved ; :solved or :elite or :soft
+           ; Default the `downsample` function to a function that returns the `training-data` unchanged,
+           ; i.e., to do no downsampling and use the entire training data set.
+           downsample (fn [training-data _] training-data)
            downsample? false}
     :as   argmap}]
   ;;
@@ -60,17 +64,11 @@
   (loop [generation 0
          evaluations 0
          population (utils/pmapallv
-                     (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)}) 
-                     (range population-size) 
+                     (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
+                     (range population-size)
                      argmap)
          indexed-training-data (if downsample? (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap) argmap) (:training-data argmap))]
-    (let [training-data (if downsample?
-                          (case (:ds-function argmap)
-                            :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
-                            :case-maxmin-auto (downsample/select-downsample-maxmin-adaptive indexed-training-data argmap)
-                            :case-rand (downsample/select-downsample-random indexed-training-data argmap)
-                            (do (prn {:error "Invalid Downsample Function"}) (downsample/select-downsample-random indexed-training-data argmap)))
-                          indexed-training-data) ;defaults to full training set
+    (let [training-data (downsample indexed-training-data argmap)
           parent-reps (if
                        (and downsample? ; if we are down-sampling
                             (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
@@ -125,7 +123,7 @@
         :else (recur (inc generation)
                      (+ evaluations (* population-size (count training-data)) ;every member evaluated on the current sample
                         (if (zero? (mod generation ds-parent-gens)) (* (count parent-reps) (- (count indexed-training-data) (count training-data))) 0) ; the parent-reps not evaluted already on down-sample
-                        (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not  
+                        (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
                      (if (:elitism argmap)
                           (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
                                                 (range (dec population-size))
