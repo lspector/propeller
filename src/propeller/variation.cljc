@@ -213,42 +213,16 @@ The function `new-individual` returns a new individual produced by selection and
                       plushy
                       (ah-rates plushy ah-min ah-max ah-mean)))))
 
-(defn count-genes
-  "A utility for autoconstructive crossover. Returns the number of segments 
-   between (and before and after) instances of :gene."
-  [plushy]
-  (inc (count (filter #(= % :gene) plushy))))
-
-(defn extract-genes
-  "A utility for autoconstructive crossover. Returns the segments of the plushy
-   before/between/after instances of :gene."
-  [plushy]
-  (loop [genes []
-         current-gene []
-         remainder plushy]
-    (cond (empty? remainder)
-          (conj genes current-gene)
-          ;
-          (= (first remainder) :gene)
-          (recur (conj genes current-gene)
-                 []
-                 (rest remainder))
-          ;
-          :else
-          (recur genes
-                 (conj current-gene (first remainder))
-                 (rest remainder)))))
-
-(defn autoconstructive-crossover
-  "Crosses over two plushies using autoconstructive crossover, one Push instruction at a time."
-  [plushy-a plushy-b]
-  (let [a-genes (extract-genes plushy-a)
-        b-genes (extract-genes plushy-b)]
+(defn bmx
+  "Crosses over two plushies using best match crossover (bmx)."
+  [plushy-a plushy-b rate]
+  (let [a-genes (utils/extract-genes plushy-a)
+        b-genes (utils/extract-genes plushy-b)]
     (flatten (interpose :gene
                         (mapv (fn [g]
-                                (if (< (rand) 0.5) 
-                                  g
-                                  (apply min-key #(metrics/levenshtein-distance g %) b-genes)))
+                                (if (< (rand) rate)
+                                  (apply min-key #(metrics/levenshtein-distance g %) b-genes)
+                                  g))
                               a-genes)))))
 
 (defn new-individual
@@ -277,17 +251,27 @@ The function `new-individual` returns a new individual produced by selection and
           (:plushy (selection/select-parent pop argmap))
           (:plushy (selection/select-parent pop argmap)))
        ;
-         :autoconstructive-crossover
+         :bmx ;; best match crossover
          (let [plushy1 (:plushy (selection/select-parent pop argmap))
-               plushy2 (:plushy (selection/select-parent pop argmap))]
-           (autoconstructive-crossover plushy1 plushy2))
+               plushy2 (:plushy (selection/select-parent pop argmap))
+               rate (utils/onenum (or (:bmx-rate argmap) 0.5))]
+           (bmx plushy1 plushy2 rate))
        ;
-         :umad ;; uniform mutation by addition and deleted, see uniform-deletion for the
+         :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
          (let [rate (utils/onenum (:umad-rate argmap))]
            (-> (:plushy (selection/select-parent pop argmap))
                (uniform-addition (:instructions argmap) rate)
                (uniform-deletion rate)))
+       ;
+         :bmx-umad ;; applies umad to the results of bmx
+         (let [umad-rate (utils/onenum (:umad-rate argmap))]
+           (->  (let [plushy1 (:plushy (selection/select-parent pop argmap))
+                      plushy2 (:plushy (selection/select-parent pop argmap))
+                      bmx-rate (utils/onenum (or (:bmx-rate argmap) 0.5))]
+                  (bmx plushy1 plushy2 bmx-rate))
+                (uniform-addition (:instructions argmap) umad-rate)
+                (uniform-deletion umad-rate)))
        ;
          :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
                 ;; number of additions made

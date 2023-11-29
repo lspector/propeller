@@ -21,20 +21,27 @@
   [evaluations pop generation argmap training-data]
   (let [best (first pop)]
     (utils/pretty-map-println
-     {:generation            generation
-      :best-plushy           (:plushy best)
-      :best-program          (genome/plushy->push (:plushy best) argmap)
-      :best-total-error      (:total-error best)
-      :evaluations           evaluations
-      :ds-indices            (if (:downsample? argmap)
-                              (map #(:index %) training-data)
-                               nil)
-      :best-errors           (:errors best)
-      :best-behaviors        (:behaviors best)
-      :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
-      :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
-      :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
-      :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))})))
+     (merge
+      {:generation            generation
+       :best-plushy           (:plushy best)
+       :best-program          (genome/plushy->push (:plushy best) argmap)
+       :best-total-error      (:total-error best)
+       :evaluations           evaluations
+       :ds-indices            (if (:downsample? argmap)
+                                (map #(:index %) training-data)
+                                nil)
+       :best-errors           (:errors best)
+       :best-behaviors        (:behaviors best)
+       :genotypic-diversity   (float (/ (count (distinct (map :plushy pop))) (count pop)))
+       :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
+       :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
+       :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))}
+      (if (or (> (or (:bmx (:variation argmap)) 0) 0)       ; using bmx
+              (> (or (:bmx-umad (:variation argmap)) 0) 0)) ; using bmx-umad
+        {:best-gene-count     (utils/count-genes (:plushy best))
+         :average-gene-count  (float (/ (reduce + (map utils/count-genes (map :plushy pop)))
+                                        (count pop)))}
+        {})))))
 
 (defn cleanup
   []
@@ -57,8 +64,11 @@
            downsample (fn [training-data _] training-data)
            downsample? false}
     :as   argmap}]
-  ;;
-  (prn {:starting-args (update (update argmap :error-function str) :instructions str)})
+  ;; print starting args
+  (prn {:starting-args (update (update argmap :error-function str)
+                               :instructions
+                               (fn [instrs]
+                                 (utils/not-lazy (map #(if (fn? %) (str %) %) instrs))))})
   (println)
   ;;
   (loop [generation 0
@@ -97,57 +107,80 @@
       (if (:custom-report argmap)
         ((:custom-report argmap) evaluations evaluated-pop generation argmap)
         (report evaluations evaluated-pop generation argmap training-data))
-      ;;did the indvidual pass all cases in ds?
+      ;; Did the indvidual pass all cases in ds?
       (when best-individual-passes-ds
         (prn {:semi-success-generation generation}))
       (cond
-        ;; If either the best individual on the ds passes all training cases, or best individual on full sample passes all training cases
-        ;; We verify success on test cases and end evolution
-        (if (or (and best-individual-passes-ds (<= (:total-error (error-function argmap indexed-training-data best-individual)) solution-error-threshold))
+        ;; If either the best individual on the ds passes all training cases, or best individual on full 
+        ;; sample passes all training cases, we verify success on test cases and exit, succeeding
+        (if (or (and best-individual-passes-ds
+                     (<= (:total-error (error-function argmap indexed-training-data best-individual))
+                         solution-error-threshold))
                 (and (not downsample?)
-                     (<= (:total-error best-individual) solution-error-threshold)))
+                     (<= (:total-error best-individual)
+                         solution-error-threshold)))
           (do (prn {:success-generation generation})
+              (prn {:successful-plushy (:plushy best-individual)})
+              (prn {:successful-program (genome/plushy->push (:plushy best-individual) argmap)})
               (prn {:total-test-error
                     (:total-error (error-function argmap (:testing-data argmap) best-individual))})
               (when (:simplification? argmap)
                 (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
-                  (prn {:total-test-error-simplified (:total-error (error-function argmap (:testing-data argmap) (hash-map :plushy simplified-plushy)))})))
+                  (prn {:total-test-error-simplified
+                        (:total-error (error-function argmap (:testing-data argmap) {:plushy simplified-plushy}))})
+                  (prn {:simplified-plushy simplified-plushy})
+                  (prn {:simplified-program (genome/plushy->push simplified-plushy argmap)})))
               (if dont-end false true))
           false)
         (cleanup)
-        ;;
-        (and (not downsample?) (>= generation max-generations))
+        ;; If we've evolved for as many generations as the parameters allow, exit without succeeding
+        (or (and (not downsample?)
+                 (>= generation max-generations))
+            (and downsample?
+                 (>= evaluations (* max-generations population-size (count indexed-training-data)))))
         (cleanup)
-        ;;
-        (and downsample? (>= evaluations (* max-generations population-size (count indexed-training-data))))
-        (cleanup)
-        ;;
+        ;; Otherwise, evolve for another generation
         :else (recur (inc generation)
-                     (+ evaluations (* population-size (count training-data)) ;every member evaluated on the current sample
-                        (if (zero? (mod generation ds-parent-gens)) (* (count parent-reps) (- (count indexed-training-data) (count training-data))) 0) ; the parent-reps not evaluted already on down-sample
-                        (if best-individual-passes-ds (- (count indexed-training-data) (count training-data)) 0)) ; if we checked for generalization or not
-                     (if (:elitism argmap)
-                          (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
-                                                (range (dec population-size))
-                                                argmap)
-                                (first evaluated-pop))         ;elitism maintains the most-fit individual
-                          (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
-                                          (range population-size)
-                                          argmap))
+                     (+ evaluations
+                        (* population-size (count training-data)) ;every member evaluated on the current sample
+                        (if (zero? (mod generation ds-parent-gens))
+                          (* (count parent-reps)
+                             (- (count indexed-training-data)
+                                (count training-data)))
+                          0) ; the parent-reps not evaluted already on down-sample
+                        (if best-individual-passes-ds
+                          (- (count indexed-training-data) (count training-data))
+                          0)) ; if we checked for generalization or not  
+                     (if (:elitism argmap) ; elitism maintains the most-fit individual
+                       (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
+                                             (range (dec population-size))
+                                             argmap)
+                             (first evaluated-pop))
+                       (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
+                                       (range population-size)
+                                       argmap))
                      (if downsample?
                        (if (zero? (mod generation ds-parent-gens))
-                         (downsample/update-case-distances rep-evaluated-pop indexed-training-data indexed-training-data ids-type (/ solution-error-threshold (count indexed-training-data))) ; update distances every ds-parent-gens generations
+                         ; update distances every ds-parent-gens generations
+                         (downsample/update-case-distances rep-evaluated-pop
+                                                           indexed-training-data
+                                                           indexed-training-data
+                                                           ids-type
+                                                           (/ solution-error-threshold
+                                                              (count indexed-training-data)))
                          indexed-training-data)
                        indexed-training-data))))))
 
 (defn gp
   "Top-level gp function. Calls gp-loop with possibly-adjusted arguments."
   [argmap]
-  (let [adjust-for-autoconstructive-crossover
+  (let [adjust-for-bmx
         (fn [args]
-          (let [prob (:autoconstructive-crossover (:variation args))
-                n (:autoconstructive-crossover-enrichment args)]
-            (if (and prob (> prob 0))
+          (let [prob-bmx (:bmx (:variation args))
+                prob-bmx-umad (:bmx-umad (:variation args))
+                n (:bmx-enrichment args)]
+            (if (or (and prob-bmx (> prob-bmx 0))
+                    (and prob-bmx-umad (> prob-bmx-umad 0)))
               (update args :instructions concat (repeat (or n 1) :gene))
               args)))
         ;
@@ -159,5 +192,5 @@
               (update args :instructions concat (flatten (repeat (or n 1) [:vary :protect])))
               args)))]
     (gp-loop (-> argmap
-                 (adjust-for-autoconstructive-crossover)
+                 (adjust-for-bmx)
                  (adjust-for-ah-umad)))))
