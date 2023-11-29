@@ -69,12 +69,14 @@
                      argmap)
          indexed-training-data (if downsample? (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap) argmap) (:training-data argmap))]
     (let [training-data (downsample indexed-training-data argmap)
+          ; Informed downsampling. Evaluate a subset of the parents on _all_ training cases every K generations.
           parent-reps (if
                        (and downsample? ; if we are down-sampling
                             (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
                         (take (* ds-parent-rate (count population)) (shuffle population))
                         '()) ;else just empty list
           ; parent representatives for down-sampling
+          ; Evaluated `parent-reps` on _all_ training cases.
           rep-evaluated-pop (if downsample?
                               (sort-by :total-error
                                        (utils/pmapallv
