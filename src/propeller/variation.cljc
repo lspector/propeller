@@ -134,85 +134,6 @@ The function `new-individual` returns a new individual produced by selection and
                        (/ 1 (+ 1 (/ 1 umad-rate)))))
             plushy)))
 
-(defn ah-normalize
-  "A utility for autoconstructive hypervariability mutation. 
-   Takes a vector of :protect and :vary and returns a numeric vector
-   that conforms to the specified min, max, and mean."
-  [v ah-min ah-max ah-mean]
-  (let [c (count v)
-        protect-count (count (filter #(= % :protected) v))
-        vary-count (- c protect-count)
-        extremes (mapv #(if (= % :protect) ah-min ah-max) v)
-        mean-of-extremes (/ (reduce + extremes) (count extremes))]
-    (cond
-      ;; all :vary or all :protect, return all ah-mean
-      (or (zero? protect-count) (zero? vary-count))
-      (repeat (count v) ah-mean)
-      ;; mean is too high, lower high values from max
-      (> mean-of-extremes ah-mean)
-      (let [lowered (/ (- (* ah-mean c)
-                          (* ah-min protect-count))
-                       vary-count)]
-        (mapv #(if (= % ah-max) lowered %) extremes))
-      ;; mean is too low, raise low values from min
-      (> mean-of-extremes ah-mean)
-      (let [raised (/ (- (* ah-mean c)
-                         (* ah-max vary-count))
-                      protect-count)]
-        (mapv #(if (= % ah-min) raised %) extremes))
-      ;; mean is just right, return extremes
-      :else
-      extremes)))
-
-(defn ah-rates
-  "A utility for autoconstructive hypervariability mutation. 
-   Returns the sequence of rates with which each element of plushy should
-   be mutated when using autoconstructive hypervariability."
-  [plushy ah-min ah-max ah-mean]
-  (loop [i 0
-         protected true
-         rates []
-         remainder plushy]
-    (if (empty? remainder)
-      (ah-normalize rates ah-min ah-max ah-mean)
-      (if (and (not protected)
-               (= (first remainder) :protect))
-        (recur (inc i)
-               true
-               (conj rates 1)
-               (rest remainder))
-        (recur (inc i)
-               (if protected
-                 (not= (first remainder) :vary)
-                 false)
-               (conj rates (if protected :protect :vary))
-               (rest remainder))))))
-
-(defn ah-uniform-addition
-  "Returns plushy with new instructions possibly added before or after each
-  existing instruction. Rates are autoconstructively hypervariable."
-  [plushy instructions ah-min ah-max ah-mean]
-  (apply concat
-         (mapv #(if (< (rand) %2)
-                  (shuffle [%1 (utils/random-instruction instructions)])
-                  [%1])
-               plushy
-               (ah-rates plushy ah-min ah-max ah-mean))))
-
-(defn ah-uniform-deletion
-  "Randomly deletes instructions from plushy at some rate.
-   Rates are autoconstructively hypervariable."
-  [plushy ah-min ah-max ah-mean]
-  (mapv first
-        (remove (fn [[_ rate]]
-                  (< (rand)
-                     (if (zero? rate)
-                       0
-                       (/ 1 (+ 1 (/ 1 rate))))))
-                (mapv vector
-                      plushy
-                      (ah-rates plushy ah-min ah-max ah-mean)))))
-
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
   [plushy-a plushy-b rate]
@@ -290,15 +211,6 @@ The function `new-individual` returns a new individual produced by selection and
            (-> (:plushy (selection/select-parent pop argmap))
                (uniform-addition (:instructions argmap) rate)
                (uniform-deletion rate)))
-       ;
-         :ah-umad ;; autoconstructive hypervariability UMAD
-         (let [ah-min (utils/onenum (:ah-umad-min argmap))
-               ah-max (utils/onenum (:ah-umad-max argmap))
-               ah-mean (utils/onenum (:ah-umad-mean argmap))
-               parent-genome (:plushy (selection/select-parent pop argmap))]
-           (-> parent-genome
-               (ah-uniform-addition (:instructions argmap) ah-min ah-max ah-mean)
-               (ah-uniform-deletion ah-min ah-max ah-mean)))
        ;
          :uniform-addition
          (-> (:plushy (selection/select-parent pop argmap))

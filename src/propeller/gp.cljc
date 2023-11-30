@@ -185,15 +185,6 @@
             (if (or (and prob-bmx (> prob-bmx 0))
                     (and prob-bmx-umad (> prob-bmx-umad 0)))
               (update args :instructions concat (repeat (or n 1) :gene))
-              args)))
-        ;
-        adjust-for-ah-umad
-        (fn [args]
-          (let [prob (:ah-umad (:variation args))
-                n (:ah-umad-enrichment args)]
-            (if (and prob (> prob 0))
-              (update args :instructions concat (flatten (repeat (or n 1) [:vary :protect])))
               args)))]
     (gp-loop (-> argmap
-                 (adjust-for-bmx)
-                 (adjust-for-ah-umad)))))
+                 (adjust-for-bmx)))))
