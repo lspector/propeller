@@ -77,7 +77,7 @@
                             (math/abs (- (second correct-output) output-2)))))
                     correct-outputs outputs-1 outputs-2)]
     (assoc individual
-           :behavior outputs
+           :behaviors outputs
            :errors errors
            :total-error #?(:clj  (apply +' errors)
                            :cljs (apply + errors)))))
