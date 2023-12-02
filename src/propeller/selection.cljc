@@ -19,16 +19,18 @@
   eliminating any individuals with errors for the current case that are worse than the best error in the selection pool,
   until a single individual remains."
   [pop argmap]
-  (loop [survivors (map rand-nth (vals (group-by :errors pop)))
-         cases (shuffle (range (count (:errors (first pop)))))]
-    (if (or (empty? cases)
-            (empty? (rest survivors)))
-      (rand-nth survivors)
-      (let [min-err-for-case (apply min (map #(nth % (first cases))
-                                             (map :errors survivors)))]
-        (recur (filter #(= (nth (:errors %) (first cases)) min-err-for-case)
-                       survivors)
-               (rest cases))))))
+  (let [initial-cases (or (:initial-cases argmap)
+                          (shuffle (range (count (:errors (first pop))))))]
+    (loop [survivors (map rand-nth (vals (group-by :errors pop)))
+           cases initial-cases]
+      (if (or (empty? cases)
+              (empty? (rest survivors)))
+        (assoc (rand-nth survivors) :selection-cases initial-cases)
+        (let [min-err-for-case (apply min (map #(nth % (first cases))
+                                               (map :errors survivors)))]
+          (recur (filter #(= (nth (:errors %) (first cases)) min-err-for-case)
+                         survivors)
+                 (rest cases)))))))
 
 (defn fitness-proportionate-selection 
   "Selects an individual from the population using a fitness proportionate selection."
