@@ -139,7 +139,7 @@ The function `new-individual` returns a new individual produced by selection and
   [plushy-a plushy-b rate]
   (let [a-genes (utils/extract-genes plushy-a)
         b-genes (utils/extract-genes plushy-b)]
-    (flatten (interpose :gene
+    (flatten (interpose :gap
                         (mapv (fn [g]
                                 (if (< (rand) rate)
                                   (apply min-key #(metrics/levenshtein-distance g %) b-genes)

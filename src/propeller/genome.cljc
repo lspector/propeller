@@ -48,8 +48,8 @@ They hold the genetic material for an `individual`. In the initial population, w
    (plushy->push plushy {}))
   ;; call plushy->push-internal with possibly-preprocessed plushy
   ([plushy argmap]
-   (plushy->push-internal (if (or (> (or (:bmx (:variation argmap)) 0) 0) ;; must strip :gene
-                                  (> (or (:bmx-umad (:variation argmap)) 0) 0)) ;; must strip :gene
-                            (filter (complement #{:gene}) plushy)
+   (plushy->push-internal (if (or (> (or (:bmx (:variation argmap)) 0) 0) ;; must strip :gap
+                                  (> (or (:bmx-umad (:variation argmap)) 0) 0)) ;; must strip :gap
+                            (filter (complement #{:gap}) plushy)
                             plushy)
                           argmap)))

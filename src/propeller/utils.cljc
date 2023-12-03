@@ -165,13 +165,13 @@
 
 (defn count-genes
   "A utility for best match crossover (bmx). Returns the number of segments 
-   between (and before and after) instances of :gene."
+   between (and before and after) instances of :gap."
   [plushy]
-  (inc (count (filter #(= % :gene) plushy))))
+  (inc (count (filter #(= % :gap) plushy))))
 
 (defn extract-genes
   "A utility for best match crossover (bmx). Returns the segments of the plushy
-   before/between/after instances of :gene."
+   before/between/after instances of :gap."
   [plushy]
   (loop [genes []
          current-gene []
@@ -179,7 +179,7 @@
     (cond (empty? remainder)
           (conj genes current-gene)
           ;
-          (= (first remainder) :gene)
+          (= (first remainder) :gap)
           (recur (conj genes current-gene)
                  []
                  (rest remainder))

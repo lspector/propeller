@@ -184,7 +184,7 @@
                 n (:bmx-enrichment args)]
             (if (or (and prob-bmx (> prob-bmx 0))
                     (and prob-bmx-umad (> prob-bmx-umad 0)))
-              (update args :instructions concat (repeat (or n 1) :gene))
+              (update args :instructions concat (repeat (or n 1) :gap))
               args)))]
     (gp-loop (-> argmap
                  (adjust-for-bmx)))))
