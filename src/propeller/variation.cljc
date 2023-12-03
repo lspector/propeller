@@ -173,8 +173,16 @@ The function `new-individual` returns a new individual produced by selection and
           (:plushy (selection/select-parent pop argmap)))
        ;
          :bmx ;; best match crossover
-         (let [plushy1 (:plushy (selection/select-parent pop argmap))
-               plushy2 (:plushy (selection/select-parent pop argmap))
+         (let [parent1 (selection/select-parent pop argmap)
+               parent2 (if (:bmx-complementary argmap)
+                         (selection/select-parent
+                          pop
+                          (assoc argmap
+                                 :initial-cases
+                                 (reverse (:selection-cases parent1))))
+                         (selection/select-parent pop argmap))
+               plushy1 (:plushy parent1)
+               plushy2 (:plushy parent2)
                rate (utils/onenum (or (:bmx-rate argmap) 0.5))]
            (bmx plushy1 plushy2 rate))
        ;
@@ -187,8 +195,16 @@ The function `new-individual` returns a new individual produced by selection and
        ;
          :bmx-umad ;; applies umad to the results of bmx
          (let [umad-rate (utils/onenum (:umad-rate argmap))]
-           (->  (let [plushy1 (:plushy (selection/select-parent pop argmap))
-                      plushy2 (:plushy (selection/select-parent pop argmap))
+           (->  (let [parent1 (selection/select-parent pop argmap)
+                      parent2 (if (:bmx-complementary argmap)
+                                (selection/select-parent 
+                                 pop 
+                                 (assoc argmap 
+                                        :initial-cases
+                                        (reverse (:selection-cases parent1))))
+                                (selection/select-parent pop argmap))
+                      plushy1 (:plushy parent1)
+                      plushy2 (:plushy parent2)
                       bmx-rate (utils/onenum (or (:bmx-rate argmap) 0.5))]
                   (bmx plushy1 plushy2 bmx-rate))
                 (uniform-addition (:instructions argmap) umad-rate)
