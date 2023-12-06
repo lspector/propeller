@@ -49,8 +49,8 @@
   (prn {:run-completed true})
   nil)
 
-(defn gp-loop
-  "Main GP loop."
+(defn gp
+  "Main GP function"
   [{:keys [population-size max-generations error-function instructions max-initial-plushy-size
            solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
     :or   {solution-error-threshold 0.0
@@ -174,17 +174,3 @@
                          indexed-training-data)
                        indexed-training-data))))))
 
-(defn gp
-  "Top-level gp function. Calls gp-loop with possibly-adjusted arguments."
-  [argmap]
-  (let [adjust-for-bmx
-        (fn [args]
-          (let [prob-bmx (:bmx (:variation args))
-                prob-bmx-umad (:bmx-umad (:variation args))
-                n (:bmx-enrichment args)]
-            (if (or (and prob-bmx (> prob-bmx 0))
-                    (and prob-bmx-umad (> prob-bmx-umad 0)))
-              (update args :instructions concat (repeat (or n 1) :gap))
-              args)))]
-    (gp-loop (-> argmap
-                 (adjust-for-bmx)))))
