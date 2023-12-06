@@ -6,11 +6,17 @@ They hold the genetic material for an `individual`. In the initial population, w
             [propeller.utils :as utils]))
 
 (defn make-random-plushy
-  "Creates and returns a new plushy made of random instructions and of a maximum size of max-initial-plushy-size."
-  [instructions max-initial-plushy-size]
-  (repeatedly
-   (rand-int max-initial-plushy-size)
-   #(utils/random-instruction instructions)))
+  "Creates and returns a new plushy made of random instructions."
+  [{:keys [instructions max-initial-plushy-size bmx? bmx-gap-probability]}]
+  (if bmx?
+    (repeatedly
+     (rand-int max-initial-plushy-size)
+     #(if (< (rand) bmx-gap-probability)
+        :gap
+        (utils/random-instruction instructions)))
+    (repeatedly
+     (rand-int max-initial-plushy-size)
+     #(utils/random-instruction instructions))))
 
 (defn plushy->push-internal
   [plushy argmap]

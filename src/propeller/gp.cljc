@@ -50,8 +50,8 @@
 
 (defn gp
   "Main GP function"
-  [{:keys [population-size max-generations error-function instructions max-initial-plushy-size
-           solution-error-threshold ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
+  [{:keys [population-size max-generations error-function solution-error-threshold 
+           ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
     :or   {solution-error-threshold 0.0
            dont-end false
            ds-parent-rate 0
@@ -69,7 +69,7 @@
   (loop [generation 0
          evaluations 0
          population (utils/pmapallv
-                     (fn [_] {:plushy (genome/make-random-plushy instructions max-initial-plushy-size)})
+                     (fn [_] {:plushy (genome/make-random-plushy argmap)})
                      (range population-size)
                      argmap)
          indexed-training-data (if downsample?

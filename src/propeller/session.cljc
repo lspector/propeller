@@ -55,7 +55,9 @@
 ;; and returning the Push program expressed by the genome:
 
 #_(genome/plushy->push
-    (genome/make-random-plushy (instructions/get-stack-instructions #{:float :integer :exec :boolean}) 20))
+    (genome/make-random-plushy 
+     {:instructions (instructions/get-stack-instructions #{:float :integer :exec :boolean}) 
+      :bmx-gap-probability 20}))
 
 ;; One way of running a genetic programming problem defined in the project
 ;; is to require the problem's namespace and then call `gp/gp` using the
