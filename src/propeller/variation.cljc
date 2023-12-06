@@ -174,7 +174,7 @@ The function `new-individual` returns a new individual produced by selection and
        ;
          :bmx ;; best match crossover
          (let [parent1 (selection/select-parent pop argmap)
-               parent2 (if (:bmx-complementary argmap)
+               parent2 (if (:bmx-complementary? argmap)
                          (selection/select-parent
                           pop
                           (assoc argmap
@@ -196,7 +196,7 @@ The function `new-individual` returns a new individual produced by selection and
          :bmx-umad ;; applies umad to the results of bmx
          (let [umad-rate (utils/onenum (:umad-rate argmap))]
            (->  (let [parent1 (selection/select-parent pop argmap)
-                      parent2 (if (:bmx-complementary argmap)
+                      parent2 (if (:bmx-complementary? argmap)
                                 (selection/select-parent 
                                  pop 
                                  (assoc argmap 
