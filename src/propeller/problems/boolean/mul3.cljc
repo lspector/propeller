@@ -311,6 +311,6 @@
                                 :bmx 0
                                 :bmx-umad 1}
      :single-thread-mode       false
-     :bmx-rate                 0.1
+     :bmx-exchange-rate        0.1
      :bmx-enrichment           10}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))
