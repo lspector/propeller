@@ -36,8 +36,7 @@
        :behavioral-diversity  (float (/ (count (distinct (map :behaviors pop))) (count pop)))
        :average-genome-length (float (/ (reduce + (map count (map :plushy pop))) (count pop)))
        :average-total-error   (float (/ (reduce + (map :total-error pop)) (count pop)))}
-      (if (or (> (or (:bmx (:variation argmap)) 0) 0)       ; using bmx
-              (> (or (:bmx-umad (:variation argmap)) 0) 0)) ; using bmx-umad
+      (if (:bmx? argmap)
         {:best-gene-count     (utils/count-genes (:plushy best))
          :average-gene-count  (float (/ (reduce + (map utils/count-genes (map :plushy pop)))
                                         (count pop)))}
@@ -173,4 +172,3 @@
                                                               (count indexed-training-data)))
                          indexed-training-data)
                        indexed-training-data))))))
-
