@@ -138,22 +138,32 @@ The function `new-individual` returns a new individual produced by selection and
                      (< (rand) adjusted-rate)))
               plushy))))
 
+(defn uniform-gap-addition
+  "Returns plushy with new instances of :gap possibly added within each gene,
+   each of which is a subsequence of the plushy."
+  [plushy gap-change-prob]
+  (if (zero? gap-change-prob)
+    plushy
+    (flatten (interpose :gap
+                        (apply concat
+                               (mapv (fn [gene]
+                                       (if (< (rand) gap-change-prob)
+                                         (let [n (rand-int (inc (count gene)))]
+                                           [(take n gene) (drop n gene)])
+                                         [gene]))
+                                     (utils/extract-genes plushy)))))))
+
 (defn uniform-gap-deletion
-  "Randomly deletes instances of :gap from plushy at some rate, which has to be adjusted not
-   only because additions may already have happened, but also because while :gap can be added
-   anywhere, it can only be deleted where it already is."
-  [plushy gap-change-rate]
-  (let [gap-count (count (filter #(= % :gap) plushy))]
-    (if (or (zero? gap-change-rate)
-            (empty? plushy)
-            (zero? gap-count))
-      plushy
-      (let [adjusted-rate (/ 1 (/ (+ 1 (/ 1 gap-change-rate))
-                                  (/ (count plushy) gap-count)))]
-        (remove (fn [item]
-                  (and (= item :gap)
-                       (< (rand) adjusted-rate)))
-                plushy)))))
+  "Randomly deletes instances of :gap from plushy at a rate that is adjusted
+   relative to the rate used for gap addition."
+  [plushy gap-change-prob]
+  (if (zero? gap-change-prob)
+    plushy
+    (let [adjusted-rate (/ 1 (+ 1 (/ 1 gap-change-prob)))]
+      (remove (fn [item]
+                (and (= item :gap)
+                     (< (rand) adjusted-rate)))
+              plushy))))
 
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
@@ -215,21 +225,23 @@ The function `new-individual` returns a new individual produced by selection and
                (uniform-deletion rate)))
        ;
          :bmx-umad ;; applies umad to the results of bmx
-         (let [umad-rate (utils/onenum (:umad-rate argmap))]
+         (let [umad-rate (utils/onenum (:umad-rate argmap))
+               gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
            (->  (let [parent1 (selection/select-parent pop argmap)
                       parent2 (if (:bmx-complementary? argmap)
-                                (selection/select-parent 
-                                 pop 
-                                 (assoc argmap 
-                                        :initial-cases
-                                        (reverse (:selection-cases parent1))))
+                                (selection/select-parent  pop
+                                                          (assoc argmap
+                                                                 :initial-cases
+                                                                 (reverse (:selection-cases parent1))))
                                 (selection/select-parent pop argmap))
                       plushy1 (:plushy parent1)
                       plushy2 (:plushy parent2)
                       bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
                   (bmx plushy1 plushy2 bmx-exchange-rate))
-                (uniform-addition [:gap] (:bmx-gap-change-probability argmap))
-                (uniform-gap-deletion (:bmx-gap-change-probability argmap))))
+                (uniform-gap-addition gap-change-prob)
+                (uniform-gap-deletion gap-change-prob)
+                (uniform-addition (:instructions argmap) umad-rate)
+                (uniform-deletion umad-rate)))
        ;
          :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
                 ;; number of additions made
