@@ -111,7 +111,8 @@ The function `new-individual` returns a new individual produced by selection and
   existing instruction."
   [plushy instructions umad-rate]
   (apply concat
-         (map #(if (< (rand) umad-rate)
+         (map #(if (and (not= % :gap)
+                        (< (rand) umad-rate))
                  (shuffle [% (utils/random-instruction instructions)])
                  [%])
               plushy)))
