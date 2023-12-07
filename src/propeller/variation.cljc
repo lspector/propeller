@@ -130,8 +130,10 @@ The function `new-individual` returns a new individual produced by selection and
   [plushy umad-rate]
   (if (zero? umad-rate)
     plushy
-    (remove (fn [_] (< (rand)
-                       (/ 1 (+ 1 (/ 1 umad-rate)))))
+    (remove (fn [item]
+              (and (not= item :gap)
+                   (< (rand)
+                      (/ 1 (+ 1 (/ 1 umad-rate))))))
             plushy)))
 
 (defn bmx
