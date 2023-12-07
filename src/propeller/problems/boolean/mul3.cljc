@@ -294,22 +294,26 @@
   [& args]
   (gp/gp
    (merge
-    {:instructions             instructions
-     :error-function           error-function
-     :training-data            (:train train-and-test-data)
-     :testing-data             (:test train-and-test-data)
-     :max-generations          1000
-     :population-size          1000
-     :max-initial-plushy-size  100
-     :step-limit               10000
-     :parent-selection         :lexicase
-     :downsample?              false
-     :ds-function              :case-rand
-     :downsample-rate          0.1
-     :umad-rate                0.01
-     :variation                {:umad 0
-                                :bmx 0
-                                :bmx-umad 1}
-     :single-thread-mode       false
-     :bmx-exchange-rate        0.1}
+    {:instructions               instructions
+     :error-function             error-function
+     :training-data              (:train train-and-test-data)
+     :testing-data               (:test train-and-test-data)
+     :max-generations            1000
+     :population-size            1000
+     :max-initial-plushy-size    100
+     :step-limit                 10000
+     :parent-selection           :lexicase
+     :downsample?                false
+     :ds-function                :case-rand
+     :downsample-rate            0.1
+     :umad-rate                  0.01
+     :variation                  {:umad 0
+                                  :bmx 0
+                                  :bmx-umad 1}
+     :single-thread-mode         false
+     :bmx?                       true
+     :bmx-exchange-rate          0.5
+     :bmx-gap-probability        0.1
+     :bmx-gap-change-probability 0.01
+     :bmx-complementary?         true}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

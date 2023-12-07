@@ -130,11 +130,28 @@ The function `new-individual` returns a new individual produced by selection and
   [plushy umad-rate]
   (if (zero? umad-rate)
     plushy
-    (remove (fn [item]
-              (and (not= item :gap)
-                   (< (rand)
-                      (/ 1 (+ 1 (/ 1 umad-rate))))))
-            plushy)))
+    (let [adjusted-rate (/ 1 (+ 1 (/ 1 umad-rate)))]
+      (remove (fn [item]
+                (and (not= item :gap)
+                     (< (rand) adjusted-rate)))
+              plushy))))
+
+(defn uniform-gap-deletion
+  "Randomly deletes instances of :gap from plushy at some rate, which has to be adjusted not
+   only because additions may already have happened, but also because while :gap can be added
+   anywhere, it can only be deleted where it already is."
+  [plushy gap-change-rate]
+  (let [gap-count (count (filter #(= % :gap) plushy))]
+    (if (or (zero? gap-change-rate)
+            (empty? plushy)
+            (zero? gap-count))
+      plushy
+      (let [adjusted-rate (/ 1 (/ (+ 1 (/ 1 gap-change-rate))
+                                  (/ (count plushy) gap-count)))]
+        (remove (fn [item]
+                  (and (= item :gap)
+                       (< (rand) adjusted-rate)))
+                plushy)))))
 
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
@@ -185,8 +202,8 @@ The function `new-individual` returns a new individual produced by selection and
                          (selection/select-parent pop argmap))
                plushy1 (:plushy parent1)
                plushy2 (:plushy parent2)
-               rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
-           (bmx plushy1 plushy2 rate))
+               bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
+           (bmx plushy1 plushy2 bmx-exchange-rate))
        ;
          :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
@@ -209,8 +226,8 @@ The function `new-individual` returns a new individual produced by selection and
                       plushy2 (:plushy parent2)
                       bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
                   (bmx plushy1 plushy2 bmx-exchange-rate))
-                (uniform-addition (:instructions argmap) umad-rate)
-                (uniform-deletion umad-rate)))
+                (uniform-addition [:gap] (:bmx-gap-change-probability argmap))
+                (uniform-gap-deletion (:bmx-gap-change-probability argmap))))
        ;
          :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
                 ;; number of additions made
