@@ -126,7 +126,8 @@ The function `new-individual` returns a new individual produced by selection and
        plushy))
 
 (defn uniform-deletion
-  "Randomly deletes instructions from plushy at some rate."
+  "Randomly deletes instructions from plushy at a rate that is adjusted
+   relative to the rate used for addition."
   [plushy umad-rate]
   (if (zero? umad-rate)
     plushy
