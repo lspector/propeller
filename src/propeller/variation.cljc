@@ -214,8 +214,11 @@ The function `new-individual` returns a new individual produced by selection and
                          (selection/select-parent pop argmap))
                plushy1 (:plushy parent1)
                plushy2 (:plushy parent2)
-               bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
-           (bmx plushy1 plushy2 bmx-exchange-rate))
+               bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
+               gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
+           (->  (bmx plushy1 plushy2 bmx-exchange-rate)
+                (uniform-gap-addition gap-change-prob)
+                (uniform-gap-deletion gap-change-prob)))
        ;
          :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
