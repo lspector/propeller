@@ -173,7 +173,7 @@ The function `new-individual` returns a new individual produced by selection and
     (flatten (interpose :gap
                         (mapv (fn [g]
                                 (if (< (rand) rate)
-                                  (apply min-key #(metrics/levenshtein-distance g %) b-genes)
+                                  (apply min-key #(metrics/unigram-bigram-distance g %) b-genes)
                                   g))
                               a-genes)))))
 

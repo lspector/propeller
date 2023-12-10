@@ -124,3 +124,24 @@
     (let [distance (levenshtein-distance seq1 seq2)
           max-distance (max (count seq1) (count seq2))]
       (math/div (- max-distance distance) max-distance))))
+
+(defn multiset-distance
+  "Returns the total of the differences between the counts of all items across 
+   the provided multisets."
+  [ms1 ms2]
+  (loop [total 0
+         remaining (clojure.set/union (set ms1) (set ms2))]
+    (if (empty? remaining)
+      total
+      (recur (+ total
+                (math/abs (- (count (filter (partial = (first remaining)) ms1))
+                             (count (filter (partial = (first remaining)) ms2)))))
+             (rest remaining)))))
+
+(defn unigram-bigram-distance
+  "Returns the distance between two sequences, calculated as the sum of the multiset
+   distance between the items (unigrams) in the sequences and half of the multiset 
+   distance between the adjacent pairs (bigrams) in the sequences."
+  [seq1 seq2]
+  (+ (multiset-distance seq1 seq2)
+     (* 0.5 (multiset-distance (partition 2 1 seq1) (partition 2 1 seq2)))))
