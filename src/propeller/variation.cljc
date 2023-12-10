@@ -170,12 +170,23 @@ The function `new-individual` returns a new individual produced by selection and
   [plushy-a plushy-b rate]
   (let [a-genes (utils/extract-genes plushy-a)
         b-genes (utils/extract-genes plushy-b)]
-    (flatten (interpose :gap
-                        (mapv (fn [g]
-                                (if (< (rand) rate)
-                                  (apply min-key #(metrics/unigram-bigram-distance g %) b-genes)
-                                  g))
-                              a-genes)))))
+    (flatten
+     (interpose
+      :gap
+      (mapv (fn [a-gene]
+              (if (< (rand) rate)
+                (let [match-info (map (fn [b-gene]
+                                        {:distance (metrics/unigram-bigram-distance a-gene b-gene)
+                                         :gene b-gene})
+                                      b-genes)
+                      candidates (filter (fn [info]
+                                           (<= (:distance info) 4))
+                                         match-info)]
+                  (if (empty? candidates)
+                    a-gene
+                    (:gene (apply min-key :distance candidates))))
+                a-gene))
+            a-genes)))))
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of
