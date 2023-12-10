@@ -180,114 +180,114 @@ The function `new-individual` returns a new individual produced by selection and
 (defn new-individual
   "Returns a new individual produced by selection and variation of
   individuals in the population."
-  [pop argmap] 
+  [pop argmap]
   {:plushy
-     (let [r (rand)
-           op (loop [accum 0.0
-                     ops-probs (vec (:variation argmap))]
-                (if (empty? ops-probs)
-                  :reproduction
-                  (let [[op1 prob1] (first ops-probs)]
-                    (if (>= (+ accum prob1) r)
-                      op1
-                      (recur (+ accum prob1)
-                             (rest ops-probs))))))]
-       (case op
-         :crossover
-         (crossover
-          (:plushy (selection/select-parent pop argmap))
-          (:plushy (selection/select-parent pop argmap)))
+   (let [r (rand)
+         op (loop [accum 0.0
+                   ops-probs (vec (:variation argmap))]
+              (if (empty? ops-probs)
+                :reproduction
+                (let [[op1 prob1] (first ops-probs)]
+                  (if (>= (+ accum prob1) r)
+                    op1
+                    (recur (+ accum prob1)
+                           (rest ops-probs))))))]
+     (case op
+       :crossover
+       (crossover
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
-         :tail-aligned-crossover
-         (tail-aligned-crossover
-          (:plushy (selection/select-parent pop argmap))
-          (:plushy (selection/select-parent pop argmap)))
+       :tail-aligned-crossover
+       (tail-aligned-crossover
+        (:plushy (selection/select-parent pop argmap))
+        (:plushy (selection/select-parent pop argmap)))
        ;
-         :bmx ;; best match crossover
-         (let [parent1 (selection/select-parent pop argmap)
-               parent2 (if (:bmx-complementary? argmap)
-                         (selection/select-parent
-                          pop
-                          (assoc argmap
-                                 :initial-cases
-                                 (reverse (:selection-cases parent1))))
-                         (selection/select-parent pop argmap))
-               plushy1 (:plushy parent1)
-               plushy2 (:plushy parent2)
-               bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
-               gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
-           (->  (bmx plushy1 plushy2 bmx-exchange-rate)
-                (uniform-gap-addition gap-change-prob)
-                (uniform-gap-deletion gap-change-prob)))
+       :bmx ;; best match crossover
+       (let [parent1 (selection/select-parent pop argmap)
+             parent2 (if (:bmx-complementary? argmap)
+                       (selection/select-parent
+                        pop
+                        (assoc argmap
+                               :initial-cases
+                               (reverse (:selection-cases parent1))))
+                       (selection/select-parent pop argmap))
+             plushy1 (:plushy parent1)
+             plushy2 (:plushy parent2)
+             bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
+             gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
+         (->  (bmx plushy1 plushy2 bmx-exchange-rate)
+              (uniform-gap-addition gap-change-prob)
+              (uniform-gap-deletion gap-change-prob)))
        ;
-         :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
+       :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
-         (let [rate (utils/onenum (:umad-rate argmap))]
-           (-> (:plushy (selection/select-parent pop argmap))
-               (uniform-addition (:instructions argmap) rate)
-               (uniform-deletion rate)))
+       (let [rate (utils/onenum (:umad-rate argmap))]
+         (-> (:plushy (selection/select-parent pop argmap))
+             (uniform-addition (:instructions argmap) rate)
+             (uniform-deletion rate)))
        ;
-         :bmx-umad ;; applies umad to the results of bmx
-         (let [umad-rate (utils/onenum (:umad-rate argmap))
-               gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
-           (->  (let [parent1 (selection/select-parent pop argmap)
-                      parent2 (if (:bmx-complementary? argmap)
-                                (selection/select-parent  pop
-                                                          (assoc argmap
-                                                                 :initial-cases
-                                                                 (reverse (:selection-cases parent1))))
-                                (selection/select-parent pop argmap))
-                      plushy1 (:plushy parent1)
-                      plushy2 (:plushy parent2)
-                      bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
-                  (bmx plushy1 plushy2 bmx-exchange-rate))
-                (uniform-gap-addition gap-change-prob)
-                (uniform-gap-deletion gap-change-prob)
-                (uniform-addition (:instructions argmap) umad-rate)
-                (uniform-deletion umad-rate)))
+       :bmx-umad ;; applies umad to the results of bmx
+       (let [umad-rate (utils/onenum (:umad-rate argmap))
+             gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
+         (->  (let [parent1 (selection/select-parent pop argmap)
+                    parent2 (if (:bmx-complementary? argmap)
+                              (selection/select-parent  pop
+                                                        (assoc argmap
+                                                               :initial-cases
+                                                               (reverse (:selection-cases parent1))))
+                              (selection/select-parent pop argmap))
+                    plushy1 (:plushy parent1)
+                    plushy2 (:plushy parent2)
+                    bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
+                (bmx plushy1 plushy2 bmx-exchange-rate))
+              (uniform-gap-addition gap-change-prob)
+              (uniform-gap-deletion gap-change-prob)
+              (uniform-addition (:instructions argmap) umad-rate)
+              (uniform-deletion umad-rate)))
        ;
-         :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
+       :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
                 ;; number of additions made
-         (let [parent-genome (:plushy (selection/select-parent pop argmap))
-               after-addition (uniform-addition parent-genome
-                                                (:instructions argmap)
-                                                (utils/onenum (:umad-rate argmap)))
-               effective-addition-rate (/ (- (count after-addition)
-                                             (count parent-genome))
-                                          (count parent-genome))]
-           (uniform-deletion after-addition effective-addition-rate))
+       (let [parent-genome (:plushy (selection/select-parent pop argmap))
+             after-addition (uniform-addition parent-genome
+                                              (:instructions argmap)
+                                              (utils/onenum (:umad-rate argmap)))
+             effective-addition-rate (/ (- (count after-addition)
+                                           (count parent-genome))
+                                        (count parent-genome))]
+         (uniform-deletion after-addition effective-addition-rate))
        ;
-         :vumad ;; variable umad: :umad-rate is interpreted as the max, and the 
+       :vumad ;; variable umad: :umad-rate is interpreted as the max, and the 
                 ;; actual rate is chosen uniformly from the range [0, max)
-         (let [rate (rand (utils/onenum (:umad-rate argmap)))]
-           (-> (:plushy (selection/select-parent pop argmap))
-               (uniform-addition (:instructions argmap) rate)
-               (uniform-deletion rate)))
-       ;
-         :uniform-addition
+       (let [rate (rand (utils/onenum (:umad-rate argmap)))]
          (-> (:plushy (selection/select-parent pop argmap))
-             (uniform-addition (:instructions argmap)
-                               (utils/onenum (:umad-rate argmap))))
+             (uniform-addition (:instructions argmap) rate)
+             (uniform-deletion rate)))
        ;
-         :uniform-replacement
-         (-> (:plushy (selection/select-parent pop argmap))
-             (uniform-replacement (:instructions argmap)
-                                  (utils/onenum (:replacement-rate argmap))))
+       :uniform-addition
+       (-> (:plushy (selection/select-parent pop argmap))
+           (uniform-addition (:instructions argmap)
+                             (utils/onenum (:umad-rate argmap))))
        ;
-         :uniform-deletion
-         (-> (:plushy (selection/select-parent pop argmap))
-             (uniform-deletion (utils/onenum (:umad-rate argmap))))
+       :uniform-replacement
+       (-> (:plushy (selection/select-parent pop argmap))
+           (uniform-replacement (:instructions argmap)
+                                (utils/onenum (:replacement-rate argmap))))
        ;
-         :alternation
-         (alternation (:plushy (selection/select-parent pop argmap))
-                      (:plushy (selection/select-parent pop argmap))
-                      (utils/onenum (or (:alternation-rate argmap) 0))
-                      (utils/onenum (or (:alignment-deviation argmap) 0)))
+       :uniform-deletion
+       (-> (:plushy (selection/select-parent pop argmap))
+           (uniform-deletion (utils/onenum (:umad-rate argmap))))
        ;
-         :reproduction
-         (:plushy (selection/select-parent pop argmap))
+       :alternation
+       (alternation (:plushy (selection/select-parent pop argmap))
+                    (:plushy (selection/select-parent pop argmap))
+                    (utils/onenum (or (:alternation-rate argmap) 0))
+                    (utils/onenum (or (:alignment-deviation argmap) 0)))
        ;
-         :else
-         (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
-                   :cljs (js/Error
-                          (str "No match in new-individual for " op))))))})
+       :reproduction
+       (:plushy (selection/select-parent pop argmap))
+       ;
+       :else
+       (throw #?(:clj  (Exception. (str "No match in new-individual for " op))
+                 :cljs (js/Error
+                        (str "No match in new-individual for " op))))))})
