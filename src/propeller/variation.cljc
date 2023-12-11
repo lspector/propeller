@@ -180,11 +180,12 @@ The function `new-individual` returns a new individual produced by selection and
         b-genes (utils/extract-genes plushy-b)]
     (flatten
      (interpose :gap
-                (mapv (fn [g]
-                        (if (< (rand) rate)
-                          (apply min-key #(bmx-distance g %) b-genes)
-                          g))
-                      a-genes)))))
+                (remove empty?
+                        (mapv (fn [g]
+                                (if (< (rand) rate)
+                                  (apply min-key #(bmx-distance g %) b-genes)
+                                  g))
+                              a-genes))))))
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of
