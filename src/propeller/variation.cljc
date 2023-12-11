@@ -173,42 +173,27 @@ The function `new-individual` returns a new individual produced by selection and
   (+ (* 0.5 (metrics/multiset-distance p1 p2))
      (math/abs (- (count p1) (count p2)))))
 
-;; (defn bmx
-;;   "Crosses over two plushies using best match crossover (bmx)."
-;;   [plushy-a plushy-b rate]
-;;   (let [a-genes (utils/extract-genes plushy-a)
-;;         b-genes (utils/extract-genes plushy-b)]
-;;     (flatten
-;;      (interpose :gap
-;;                 (remove empty?
-;;                         (mapv (fn [g]
-;;                                 (if (< (rand) rate)
-;;                                   (apply min-key #(bmx-distance g %) b-genes)
-;;                                   g))
-;;                               a-genes))))))
-
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
-  [plushy-a plushy-b rate]
+  [plushy-a plushy-b rate max-distance]
   (let [a-genes (utils/extract-genes plushy-a)
         b-genes (utils/extract-genes plushy-b)]
     (flatten
      (interpose :gap
-                (remove empty?
-                        (mapv (fn [a-gene]
-                                (if (< (rand) rate)
-                                  (let [match-info (map (fn [b-gene]
-                                                          {:distance (bmx-distance a-gene b-gene)
-                                                           :gene b-gene})
-                                                        b-genes)
-                                        candidates (filter (fn [info]
-                                                             (<= (:distance info) 3))
-                                                           match-info)]
-                                    (if (empty? candidates)
-                                      a-gene
-                                      (:gene (apply min-key :distance candidates))))
-                                  a-gene))
-                              a-genes))))))
+                (mapv (fn [a-gene]
+                        (if (< (rand) rate)
+                          (let [match-info (map (fn [b-gene]
+                                                  {:distance (bmx-distance a-gene b-gene)
+                                                   :gene b-gene})
+                                                b-genes)
+                                candidates (filter (fn [info]
+                                                     (<= (:distance info) max-distance))
+                                                   match-info)]
+                            (if (empty? candidates)
+                              a-gene
+                              (:gene (apply min-key :distance candidates))))
+                          a-gene))
+                      a-genes)))))
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of
@@ -248,8 +233,9 @@ The function `new-individual` returns a new individual produced by selection and
              plushy1 (:plushy parent1)
              plushy2 (:plushy parent2)
              bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
-             gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
-         (->  (bmx plushy1 plushy2 bmx-exchange-rate)
+             gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))
+             max-distance (utils/onenum (:bmx-maximum-distance argmap))]
+         (->  (bmx plushy1 plushy2 bmx-exchange-rate max-distance)
               (uniform-gap-addition gap-change-prob)
               (uniform-gap-deletion gap-change-prob)))
        ;
@@ -272,8 +258,9 @@ The function `new-individual` returns a new individual produced by selection and
                               (selection/select-parent pop argmap))
                     plushy1 (:plushy parent1)
                     plushy2 (:plushy parent2)
-                    bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))]
-                (bmx plushy1 plushy2 bmx-exchange-rate))
+                    bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
+                    max-distance (utils/onenum (:bmx-maximum-distance argmap))]
+                (bmx plushy1 plushy2 bmx-exchange-rate max-distance))
               (uniform-gap-addition gap-change-prob)
               (uniform-gap-deletion gap-change-prob)
               (uniform-addition (:instructions argmap) umad-rate)
