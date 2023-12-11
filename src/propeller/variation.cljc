@@ -53,7 +53,8 @@ The function `new-individual` returns a new individual produced by selection and
   {:doc/format :markdown}
   (:require [propeller.selection :as selection]
             [propeller.utils :as utils]
-            [propeller.tools.metrics :as metrics]))
+            [propeller.tools.metrics :as metrics]
+            [propeller.tools.math :as math]))
 
 (defn crossover
   "Crosses over two individuals using uniform crossover, one Push instruction at a time.
@@ -165,28 +166,25 @@ The function `new-individual` returns a new individual produced by selection and
                      (< (rand) adjusted-rate)))
               plushy))))
 
+(defn bmx-distance
+  "A utility function for bmx. Returns the distance between two plushies
+   computed as half of their multiset-distance plus their length difference."
+  [p1 p2]
+  (+ (* 0.5 (metrics/multiset-distance p1 p2))
+     (math/abs (- (count p1) (count p2)))))
+
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
   [plushy-a plushy-b rate]
   (let [a-genes (utils/extract-genes plushy-a)
         b-genes (utils/extract-genes plushy-b)]
     (flatten
-     (interpose
-      :gap
-      (mapv (fn [a-gene]
-              (if (< (rand) rate)
-                (let [match-info (map (fn [b-gene]
-                                        {:distance (metrics/unigram-bigram-distance a-gene b-gene)
-                                         :gene b-gene})
-                                      b-genes)
-                      candidates (filter (fn [info]
-                                           (<= (:distance info) 4))
-                                         match-info)]
-                  (if (empty? candidates)
-                    a-gene
-                    (:gene (apply min-key :distance candidates))))
-                a-gene))
-            a-genes)))))
+     (interpose :gap
+                (mapv (fn [g]
+                        (if (< (rand) rate)
+                          (apply min-key #(bmx-distance g %) b-genes)
+                          g))
+                      a-genes)))))
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of

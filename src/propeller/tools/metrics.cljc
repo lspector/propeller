@@ -137,11 +137,3 @@
                 (math/abs (- (count (filter (partial = (first remaining)) ms1))
                              (count (filter (partial = (first remaining)) ms2)))))
              (rest remaining)))))
-
-(defn unigram-bigram-distance
-  "Returns the distance between two sequences, calculated as the sum of the multiset
-   distance between the items (unigrams) in the sequences and half of the multiset 
-   distance between the adjacent pairs (bigrams) in the sequences."
-  [seq1 seq2]
-  (+ (multiset-distance seq1 seq2)
-     (* 0.5 (multiset-distance (partition 2 1 seq1) (partition 2 1 seq2)))))
