@@ -173,6 +173,20 @@ The function `new-individual` returns a new individual produced by selection and
   (+ (* 0.5 (metrics/multiset-distance p1 p2))
      (math/abs (- (count p1) (count p2)))))
 
+;; (defn bmx
+;;   "Crosses over two plushies using best match crossover (bmx)."
+;;   [plushy-a plushy-b rate]
+;;   (let [a-genes (utils/extract-genes plushy-a)
+;;         b-genes (utils/extract-genes plushy-b)]
+;;     (flatten
+;;      (interpose :gap
+;;                 (remove empty?
+;;                         (mapv (fn [g]
+;;                                 (if (< (rand) rate)
+;;                                   (apply min-key #(bmx-distance g %) b-genes)
+;;                                   g))
+;;                               a-genes))))))
+
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
   [plushy-a plushy-b rate]
@@ -181,10 +195,19 @@ The function `new-individual` returns a new individual produced by selection and
     (flatten
      (interpose :gap
                 (remove empty?
-                        (mapv (fn [g]
+                        (mapv (fn [a-gene]
                                 (if (< (rand) rate)
-                                  (apply min-key #(bmx-distance g %) b-genes)
-                                  g))
+                                  (let [match-info (map (fn [b-gene]
+                                                          {:distance (bmx-distance a-gene b-gene)
+                                                           :gene b-gene})
+                                                        b-genes)
+                                        candidates (filter (fn [info]
+                                                             (<= (:distance info) 3))
+                                                           match-info)]
+                                    (if (empty? candidates)
+                                      a-gene
+                                      (:gene (apply min-key :distance candidates))))
+                                  a-gene))
                               a-genes))))))
 
 (defn new-individual
