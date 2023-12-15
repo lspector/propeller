@@ -178,22 +178,31 @@ The function `new-individual` returns a new individual produced by selection and
   [plushy-a plushy-b rate max-distance argmap]
   (let [a-genes (utils/extract-genes plushy-a)
         b-genes (utils/extract-genes plushy-b)]
-    (flatten
-     (interpose :gap
-                (mapv (fn [a-gene]
-                        (if (< (rand) rate)
-                          (let [match-info (map (fn [b-gene]
-                                                  {:distance (bmx-distance a-gene b-gene)
-                                                   :gene b-gene})
-                                                b-genes)
-                                candidates (filter (fn [info]
-                                                     (<= (:distance info) max-distance))
-                                                   match-info)]
-                            (if (empty? candidates)
-                              a-gene
-                              (:gene (apply min-key :distance candidates))))
-                          a-gene))
-                      a-genes)))))
+    (if (:ssx-not-bmx argmap)
+      (flatten (interpose :gap 
+                          (mapv (fn [a-gene b-gene]
+                                  (if (and b-gene
+                                           (< (rand) rate))
+                                    b-gene
+                                    a-gene))
+                                a-genes
+                                (concat b-genes (repeat false)))))
+      (flatten
+       (interpose :gap
+                  (mapv (fn [a-gene]
+                          (if (< (rand) rate)
+                            (let [match-info (map (fn [b-gene]
+                                                    {:distance (bmx-distance a-gene b-gene)
+                                                     :gene b-gene})
+                                                  b-genes)
+                                  candidates (filter (fn [info]
+                                                       (<= (:distance info) max-distance))
+                                                     match-info)]
+                              (if (empty? candidates)
+                                a-gene
+                                (:gene (apply min-key :distance candidates))))
+                            a-gene))
+                        a-genes))))))
 
 (defn new-individual
   "Returns a new individual produced by selection and variation of
