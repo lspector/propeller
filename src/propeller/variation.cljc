@@ -175,7 +175,7 @@ The function `new-individual` returns a new individual produced by selection and
 
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
-  [plushy-a plushy-b rate max-distance]
+  [plushy-a plushy-b rate max-distance argmap]
   (let [a-genes (utils/extract-genes plushy-a)
         b-genes (utils/extract-genes plushy-b)]
     (flatten
@@ -235,7 +235,7 @@ The function `new-individual` returns a new individual produced by selection and
              bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
              gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))
              max-distance (utils/onenum (:bmx-maximum-distance argmap))]
-         (->  (bmx plushy1 plushy2 bmx-exchange-rate max-distance)
+         (->  (bmx plushy1 plushy2 bmx-exchange-rate max-distance argmap)
               (uniform-gap-addition gap-change-prob)
               (uniform-gap-deletion gap-change-prob)))
        ;
@@ -260,7 +260,7 @@ The function `new-individual` returns a new individual produced by selection and
                     plushy2 (:plushy parent2)
                     bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
                     max-distance (utils/onenum (:bmx-maximum-distance argmap))]
-                (bmx plushy1 plushy2 bmx-exchange-rate max-distance))
+                (bmx plushy1 plushy2 bmx-exchange-rate max-distance argmap))
               (uniform-gap-addition gap-change-prob)
               (uniform-gap-deletion gap-change-prob)
               (uniform-addition (:instructions argmap) umad-rate)
