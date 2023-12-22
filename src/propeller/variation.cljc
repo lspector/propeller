@@ -232,13 +232,17 @@ The function `new-individual` returns a new individual produced by selection and
        ;
        :bmx ;; best match crossover
        (let [parent1 (selection/select-parent pop argmap)
-             parent2 (if (:bmx-complementary? argmap)
-                       (selection/select-parent
-                        pop
-                        (assoc argmap
-                               :initial-cases
-                               (reverse (:selection-cases parent1))))
-                       (selection/select-parent pop argmap))
+             parent2 (let [pool (if (:bmx-same-gene-count argmap)
+                                  (let [n (utils/count-genes (:plushy parent1))]
+                                    (filter #(= n (utils/count-genes (:plushy %))) pop))
+                                  pop)]
+                       (if (:bmx-complementary? argmap)
+                         (selection/select-parent
+                          pool
+                          (assoc argmap
+                                 :initial-cases
+                                 (reverse (:selection-cases parent1))))
+                         (selection/select-parent pool argmap)))
              plushy1 (:plushy parent1)
              plushy2 (:plushy parent2)
              bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
@@ -259,12 +263,16 @@ The function `new-individual` returns a new individual produced by selection and
        (let [umad-rate (utils/onenum (:umad-rate argmap))
              gap-change-prob (utils/onenum (:bmx-gap-change-probability argmap))]
          (->  (let [parent1 (selection/select-parent pop argmap)
-                    parent2 (if (:bmx-complementary? argmap)
-                              (selection/select-parent  pop
-                                                        (assoc argmap
-                                                               :initial-cases
-                                                               (reverse (:selection-cases parent1))))
-                              (selection/select-parent pop argmap))
+                    parent2 (let [pool (if (:bmx-same-gene-count argmap)
+                                         (let [n (utils/count-genes (:plushy parent1))]
+                                           (filter #(= n (utils/count-genes (:plushy %))) pop))
+                                         pop)]
+                              (if (:bmx-complementary? argmap)
+                                (selection/select-parent  pool
+                                                          (assoc argmap
+                                                                 :initial-cases
+                                                                 (reverse (:selection-cases parent1))))
+                                (selection/select-parent pool argmap)))
                     plushy1 (:plushy parent1)
                     plushy2 (:plushy parent2)
                     bmx-exchange-rate (utils/onenum (or (:bmx-exchange-rate argmap) 0.5))
