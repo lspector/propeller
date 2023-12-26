@@ -12,7 +12,7 @@ They hold the genetic material for an `individual`. In the initial population, w
                            #(utils/random-instruction instructions))]
     (if bmx?
       (-> plushy
-          (utils/fill-empty-genes instructions)
+          (utils/remove-empty-genes)
           (utils/enforce-gene-length-limit bmx-gene-length-limit))
       plushy)))
 

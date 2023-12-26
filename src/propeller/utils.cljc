@@ -198,17 +198,13 @@
   (+ (* 0.5 (metrics/multiset-distance p1 p2))
      (math/abs (- (count p1) (count p2)))))
 
-(defn fill-empty-genes
+(defn remove-empty-genes
   "A utility function for bmx-related genetic operators. Returns the provided
    plushy with any empty genes (regions before/between/after instances of :gap)
-   filled with a new random instruction."
-  [plushy instructions]
-  (flatten (interpose :gap
-                      (mapv (fn [gene]
-                              (if (empty? gene)
-                                (random-instruction instructions)
-                                gene))
-                            (extract-genes plushy)))))
+   removed."
+  [plushy]
+  (vec (flatten (interpose :gap (filter #(not (empty? %))
+                                        (extract-genes plushy))))))
 
 (defn break-up
   "A utility function for bmx-related genetic operators. Returns the provided
