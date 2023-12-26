@@ -7,16 +7,14 @@ They hold the genetic material for an `individual`. In the initial population, w
 
 (defn make-random-plushy
   "Creates and returns a new plushy made of random instructions."
-  [{:keys [instructions max-initial-plushy-size bmx? bmx-gap-probability]}]
-  (if bmx?
-    (repeatedly
-     (rand-int max-initial-plushy-size)
-     #(if (< (rand) bmx-gap-probability)
-        :gap
-        (utils/random-instruction instructions)))
-    (repeatedly
-     (rand-int max-initial-plushy-size)
-     #(utils/random-instruction instructions))))
+  [{:keys [instructions max-initial-plushy-size bmx? bmx-gene-length-limit]}]
+  (let [plushy (repeatedly (rand-int max-initial-plushy-size)
+                           #(utils/random-instruction instructions))]
+    (if bmx?
+      (-> plushy
+          (utils/fill-empty-genes instructions)
+          (utils/enforce-gene-length-limit bmx-gene-length-limit))
+      plushy)))
 
 (defn plushy->push-internal
   [plushy argmap]

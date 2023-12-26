@@ -313,7 +313,7 @@
      :single-thread-mode         false
      :bmx?                       true
      :bmx-exchange-rate          0.5
-     :bmx-gap-probability        0.1
+     :bmx-gene-length-limit      10
      :bmx-gap-change-probability 0.01
      :bmx-complementary?         true}
     (apply hash-map (map #(if (string? %) (read-string %) %) args)))))

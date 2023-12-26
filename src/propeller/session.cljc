@@ -57,7 +57,9 @@
 #_(genome/plushy->push
     (genome/make-random-plushy 
      {:instructions (instructions/get-stack-instructions #{:float :integer :exec :boolean}) 
-      :bmx-gap-probability 20}))
+      :max-initial-plushy-size 100 
+      :bmx? true
+      :bmx-gene-length-limit 10}))
 
 ;; One way of running a genetic programming problem defined in the project
 ;; is to require the problem's namespace and then call `gp/gp` using the

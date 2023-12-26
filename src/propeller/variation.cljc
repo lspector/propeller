@@ -244,7 +244,8 @@ The function `new-individual` returns a new individual produced by selection and
          (->  (bmx plushy1 plushy2 bmx-exchange-rate max-distance argmap)
               (uniform-gap-addition gap-change-prob)
               (uniform-gap-deletion gap-change-prob)
-              (utils/fill-empty-genes (:instructions argmap))))
+              (utils/fill-empty-genes (:instructions argmap))
+              (utils/enforce-gene-length-limit (:bmx-gene-length-limit argmap))))
        ;
        :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
@@ -276,7 +277,8 @@ The function `new-individual` returns a new individual produced by selection and
               (uniform-gap-deletion gap-change-prob)
               (uniform-addition (:instructions argmap) umad-rate)
               (uniform-deletion umad-rate)
-              (utils/fill-empty-genes (:instructions argmap))))
+              (utils/fill-empty-genes (:instructions argmap))
+              (utils/enforce-gene-length-limit (:bmx-gene-length-limit argmap))))
        ;
        :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
                 ;; number of additions made

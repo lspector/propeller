@@ -209,3 +209,25 @@
                                 (random-instruction instructions)
                                 gene))
                             (extract-genes plushy)))))
+
+(defn break-up
+  "A utility function for bmx-related genetic operators. Returns the provided
+  :gap-free plushy with gaps randomly inserted to ensure that no gene is longer
+  than the provided limit."
+  [gene limit]
+  (if (> (count gene) limit)
+    (let [i (inc (rand-int (dec (count gene))))]
+      (concat (break-up (take i gene) limit)
+              [:gap]
+              (break-up (drop i gene) limit)))
+    gene))
+
+(defn enforce-gene-length-limit
+  "A utility function for bmx-related genetic operators. Returns the provided
+   plushy with any over-length genes broken into non-empty pieces, recursively
+   until all genes obey the limit."
+  [plushy limit]
+  (flatten (interpose :gap
+                      (mapv (fn [gene]
+                              (break-up gene limit))
+                            (extract-genes plushy)))))
