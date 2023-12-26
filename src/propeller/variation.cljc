@@ -166,25 +166,6 @@ The function `new-individual` returns a new individual produced by selection and
                      (< (rand) adjusted-rate)))
               plushy))))
 
-(defn bmx-distance
-  "A utility function for bmx. Returns the distance between two plushies
-   computed as half of their multiset-distance plus their length difference."
-  [p1 p2]
-  (+ (* 0.5 (metrics/multiset-distance p1 p2))
-     (math/abs (- (count p1) (count p2)))))
-
-(defn fill-empty-genes
-  "A utility function for bmx-related genetic operators. Returns the provided
-   plushy with any empty genes (regions before/between/after instances of :gap)
-   filled with a new random instruction."
-  [plushy instructions]
-  (flatten (interpose :gap
-                      (mapv (fn [gene]
-                              (if (empty? gene)
-                               (utils/random-instruction instructions)
-                               gene))
-                            (utils/extract-genes plushy)))))
-
 (defn bmx
   "Crosses over two plushies using best match crossover (bmx)."
   [plushy-a plushy-b rate max-distance argmap]
@@ -204,7 +185,7 @@ The function `new-individual` returns a new individual produced by selection and
                   (mapv (fn [a-gene]
                           (if (< (rand) rate)
                             (let [match-info (map (fn [b-gene]
-                                                    {:distance (bmx-distance a-gene b-gene)
+                                                    {:distance (utils/bmx-distance a-gene b-gene)
                                                      :gene b-gene})
                                                   b-genes)
                                   candidates (filter (fn [info]
@@ -263,7 +244,7 @@ The function `new-individual` returns a new individual produced by selection and
          (->  (bmx plushy1 plushy2 bmx-exchange-rate max-distance argmap)
               (uniform-gap-addition gap-change-prob)
               (uniform-gap-deletion gap-change-prob)
-              (fill-empty-genes (:instructions argmap))))
+              (utils/fill-empty-genes (:instructions argmap))))
        ;
        :umad ;; uniform mutation by addition and deletion, see uniform-deletion for the
                ;; adjustment that makes this size neutral on average
@@ -295,7 +276,7 @@ The function `new-individual` returns a new individual produced by selection and
               (uniform-gap-deletion gap-change-prob)
               (uniform-addition (:instructions argmap) umad-rate)
               (uniform-deletion umad-rate)
-              (fill-empty-genes (:instructions argmap))))
+              (utils/fill-empty-genes (:instructions argmap))))
        ;
        :rumad ;; responsive UMAD, uses a deletion rate computed from the actual
                 ;; number of additions made

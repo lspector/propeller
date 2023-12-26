@@ -1,7 +1,9 @@
 (ns propeller.utils
   "Useful functions."
   (:require [clojure.zip :as zip]
-            [clojure.repl :as repl]))
+            [clojure.repl :as repl]
+            [propeller.tools.metrics :as metrics]
+            [propeller.tools.math :as math]))
 
 (defn filter-by-index
   "filters a collection by a list of indices"
@@ -188,3 +190,22 @@
           (recur genes
                  (conj current-gene (first remainder))
                  (rest remainder)))))
+
+(defn bmx-distance
+  "A utility function for bmx. Returns the distance between two plushies
+   computed as half of their multiset-distance plus their length difference."
+  [p1 p2]
+  (+ (* 0.5 (metrics/multiset-distance p1 p2))
+     (math/abs (- (count p1) (count p2)))))
+
+(defn fill-empty-genes
+  "A utility function for bmx-related genetic operators. Returns the provided
+   plushy with any empty genes (regions before/between/after instances of :gap)
+   filled with a new random instruction."
+  [plushy instructions]
+  (flatten (interpose :gap
+                      (mapv (fn [gene]
+                              (if (empty? gene)
+                                (random-instruction instructions)
+                                gene))
+                            (extract-genes plushy)))))
