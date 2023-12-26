@@ -1,6 +1,7 @@
 (ns propeller.tools.metrics
   "Functions to measure things."
-  (:require [propeller.tools.math :as math]))
+  (:require [clojure.set]
+            [propeller.tools.math :as math]))
 
 (defn argmins
   "returns the indice(s) of the minimum value of a list. Could be more efficient, probably"
