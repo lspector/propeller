@@ -49,7 +49,7 @@
 (defn random-instruction
   "Returns a random instruction from a supplied pool of instructions, evaluating
   ERC-producing functions to a constant literal."
-  [instructions]
+  [instructions argmap]
   (let [instruction (rand-nth instructions)]
     (if (fn? instruction)
       (instruction)

@@ -110,20 +110,20 @@ The function `new-individual` returns a new individual produced by selection and
 (defn uniform-addition
   "Returns plushy with new instructions possibly added before or after each
   existing instruction."
-  [plushy instructions umad-rate]
+  [plushy instructions umad-rate argmap]
   (apply concat
          (map #(if (and (not= % :gap)
                         (< (rand) umad-rate))
-                 (shuffle [% (utils/random-instruction instructions)])
+                 (shuffle [% (utils/random-instruction instructions argmap)])
                  [%])
               plushy)))
 
 (defn uniform-replacement
   "Returns plushy with new instructions possibly replacing existing
    instructions."
-  [plushy instructions replacement-rate]
+  [plushy instructions replacement-rate argmap]
   (map #(if (< (rand) replacement-rate)
-          (utils/random-instruction instructions)
+          (utils/random-instruction instructions argmap)
           %)
        plushy))
 
@@ -251,7 +251,7 @@ The function `new-individual` returns a new individual produced by selection and
                ;; adjustment that makes this size neutral on average
        (let [rate (utils/onenum (:umad-rate argmap))]
          (-> (:plushy (selection/select-parent pop argmap))
-             (uniform-addition (:instructions argmap) rate)
+             (uniform-addition (:instructions argmap) rate argmap)
              (uniform-deletion rate)))
        ;
        :bmx-umad ;; applies umad to the results of bmx
@@ -275,7 +275,7 @@ The function `new-individual` returns a new individual produced by selection and
                 (bmx plushy1 plushy2 bmx-exchange-rate max-distance argmap))
               (uniform-gap-addition gap-change-prob)
               (uniform-gap-deletion gap-change-prob)
-              (uniform-addition (:instructions argmap) umad-rate)
+              (uniform-addition (:instructions argmap) umad-rate argmap)
               (uniform-deletion umad-rate)
               (utils/remove-empty-genes)
               (utils/enforce-gene-length-limit (:bmx-gene-length-limit argmap))))
@@ -285,7 +285,8 @@ The function `new-individual` returns a new individual produced by selection and
        (let [parent-genome (:plushy (selection/select-parent pop argmap))
              after-addition (uniform-addition parent-genome
                                               (:instructions argmap)
-                                              (utils/onenum (:umad-rate argmap)))
+                                              (utils/onenum (:umad-rate argmap))
+                                              argmap)
              effective-addition-rate (/ (- (count after-addition)
                                            (count parent-genome))
                                         (count parent-genome))]
@@ -295,18 +296,20 @@ The function `new-individual` returns a new individual produced by selection and
                 ;; actual rate is chosen uniformly from the range [0, max)
        (let [rate (rand (utils/onenum (:umad-rate argmap)))]
          (-> (:plushy (selection/select-parent pop argmap))
-             (uniform-addition (:instructions argmap) rate)
+             (uniform-addition (:instructions argmap) rate argmap)
              (uniform-deletion rate)))
        ;
        :uniform-addition
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-addition (:instructions argmap)
-                             (utils/onenum (:umad-rate argmap))))
+                             (utils/onenum (:umad-rate argmap))
+                             argmap))
        ;
        :uniform-replacement
        (-> (:plushy (selection/select-parent pop argmap))
            (uniform-replacement (:instructions argmap)
-                                (utils/onenum (:replacement-rate argmap))))
+                                (utils/onenum (:replacement-rate argmap))
+                                argmap))
        ;
        :uniform-deletion
        (-> (:plushy (selection/select-parent pop argmap))
