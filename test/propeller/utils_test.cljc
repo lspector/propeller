@@ -24,7 +24,7 @@
 (t/deftest random-instruction-test
   (t/is
    (letfn [(instruct [] 1)]
-     (let [test (u/random-instruction [instruct 2])]
+     (let [test (u/random-instruction [instruct 2] {})]
        (if (= 1 test)
          true
          (= 2 test))))))
