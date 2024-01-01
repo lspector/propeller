@@ -2,7 +2,7 @@
   "The genetic material in Propeller. A `plushy` is a list of Push instructions that represent a Push program.
 They hold the genetic material for an `individual`. In the initial population, we create random plushys."
   {:doc/format :markdown}
-  (:require [propeller.push.instructions :as instructions]
+  (:require [propeller.push.instructions.parentheses :as parentheses]
             [propeller.utils :as utils]))
 
 (defn make-random-plushy
@@ -21,7 +21,7 @@ They hold the genetic material for an `individual`. In the initial population, w
   [plushy argmap]
   (let [opener? #(and (vector? %) (= (first %) 'open))]    ;; [open <n>] marks opens
     (loop [push ()                                         ;; iteratively build the Push program from the plushy
-           plushy (mapcat #(let [n (get instructions/opens %)]
+           plushy (mapcat #(let [n (get parentheses/opens %)]
                              (if (and n
                                       (> n 0))
                                [% ['open n]]
