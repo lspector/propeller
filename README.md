@@ -2,7 +2,7 @@
 
 Yet another Push-based genetic programming system in Clojure.
 
-Propeller is a component of several active research projects and subject to change as a part of these activities.
+Propeller is a component of several active research projects and it is subject to change as a part of these activities.
 
 See the git commit comments for guidance with respect to recent changes.
 
