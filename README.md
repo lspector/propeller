@@ -2,7 +2,7 @@
 
 Yet another Push-based genetic programming system in Clojure.
 
-Full documentation is at [https://lspector.github.io/propeller/](https://lspector.github.io/propeller/).
+Documentation is at [https://lspector.github.io/propeller/](https://lspector.github.io/propeller/).
 
 ## Usage
 
