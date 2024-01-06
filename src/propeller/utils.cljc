@@ -51,21 +51,16 @@
   "Returns a random instruction from a supplied pool of instructions, evaluating
   ERC-producing functions to a constant literal."
   [instructions argmap]
-  (if (:auto-close argmap)
-    (let [instructions (remove #(= % 'close) instructions)
-          p (/ (apply + (filter identity
-                                (map #(get parentheses/opens %) instructions)))
-               (count instructions))]
-      (if (< (rand) p)
-        'close
-        (let [instruction (rand-nth instructions)]
-          (if (fn? instruction)
-            (instruction)
-            instruction))))
-    (let [instruction (rand-nth instructions)]
-      (if (fn? instruction)
-        (instruction)
-        instruction))))
+  (let [instructions (remove #(= % 'close) instructions)
+        p (/ (apply + (filter identity
+                              (map #(get parentheses/opens %) instructions)))
+             (count instructions))]
+    (if (< (rand) p)
+      'close
+      (let [instruction (rand-nth instructions)]
+        (if (fn? instruction)
+          (instruction)
+          instruction)))))
 
 (defn count-points
   "Returns the number of points in tree, where each atom and each pair of parentheses
