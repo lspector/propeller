@@ -52,27 +52,41 @@
   "Returns argmap with any unspecified values filled with defaults."
   [argmap]
   (let [defaults
-        {:bmx-exchange-rate           0.5 ; for bmx, the rate at which genes will be exchanged
+        {:alignment-deviation         2 ; for alternation, the standard deviation of deviation of index when alternating
+         :alternation-rate            0.1 ; for alternation, the probability of switching parents at each location
+         :bmx-exchange-rate           0.5 ; for bmx, the rate at which genes will be exchanged
          :bmx-gene-length-limit       10  ; for bmx, the maximum length of a gene
          :bmx-gap-change-probability  0.001 ; for bmx, the mutation rate for gaps
          :bmx-complementary?          false ; for bmx, whether mates selected using reverse case sequence of first parent
+         :bmx-maximum-distance        1000000 ; for bmx, don't exchange if distance is greater than this
+         :bmx-same-gene-count         false ; for bmx, only allow exchanges between individuals with same number of genes
+         :custom-report               false ; if provided, should be a function that takes an argmap
          :dont-end                    false ; if true, keep running until limit regardless of success
          :downsample?                 true ; wether to use downsampling
          :ds-function                 :case-maxmin ; :case-rand, case-maxmin, case-maxmin-auto
          :downsample-rate             0.05 ; proportion of data used in downsample
          :ds-parent-rate              0.01 ; proportion of parents used to evaluate case distances
          :ds-parent-gens              10 ; generations between computation of parent distances
+         :elitism                     false ; whether always to add the lowest-error individual to the next generation
          :error-function              (fn [& args] (println "ERROR FUNCTION NOT PROVIDED")) ; must provide
          :ids-type                    :solved ; type of informed downsampling, :solved or :elite or :soft
          :instructions                ["INSTRUCTIONS NOT PROVIDED"] ; must be provided
+         :max-batch-size              10 ; for motley-batch-lexicase-selection, the max size of a batch of cases
          :max-initial-plushy-size     100 ; the maximum size of genomes in initial population
          :max-generations             1000 ; generation limi when downsampling is not used, adjusted by downsampling
          :parent-selection            :lexicase ; see options in variation.cljc
          :population-size             1000 ; the size of the GP ppopulation
+         :replacement-rate            0.1 ; for uniform-replacement, the rate at with items will be replaced
+         :simplification?             false ; whether to auto-simplify solutions
+         :simplification-k            4 ; when auto-simplifying, max number of items deleted in single step
+         :simplification-steps        1000 ; when auto-simplifying, number of simplification steps to perform
+         :simplification-verbose?     false ; when auto-simplifying, whether to print a lot of information
          :single-thread-mode          false ; if true, don't use multithreading
          :solution-error-threshold    0 ; maximum total error for solutions
+         :ssx-not-bmx                 false ; for bmx, swap with segment with same sequence index, not by best match
          :step-limit                  1000 ; limit of Push interpreter steps in a Push program evaluation 
          :testing-data                [] ; must be provided unless there is no testing data
+         :tournament-size             5 ; for torunament selection, the number of individuals in each tournament
          :training-data               [] ; must be provided
          :umad-rate                   0.1 ; addition rate (from which deletion rate will be derived) for UMAD
          :variation                   {:umad 1} ; genetic operators and probabilities for their use, which should sum to 1
@@ -181,7 +195,7 @@
                           (if best-individual-passes-ds
                             (- (count indexed-training-data) (count training-data))
                             0)) ; if we checked for generalization or not  
-                       (if (:elitism argmap) ; elitism maintains the most-fit individual
+                       (if (:elitism argmap) ; elitism maintains the individual with lowest total error
                          (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
                                                (range (dec population-size))
                                                argmap)
