@@ -48,127 +48,153 @@
   (prn {:run-completed true})
   nil)
 
+(defn fill-defaults
+  "Returns argmap with any unspecified values filled with defaults."
+  [argmap]
+  (let [defaults
+        {:bmx-exchange-rate           0.5
+         :bmx-gene-length-limit       10
+         :bmx-gap-change-probability  0.001
+         :bmx-complementary?          false
+         :dont-end                    false
+         :downsample?                 true
+         :ds-function                 :case-maxmin
+         :downsample-rate             0.05
+         :ds-parent-rate              0.01
+         :ds-parent-gens              10
+         :error-function              (fn [& args] (println "ERROR FUNCTION NOT PROVIDED"))
+         :ids-type                    :solved ; :solved or :elite or :soft
+         :max-initial-plushy-size     100
+         :max-generations             1000
+         :parent-selection            :lexicase
+         :population-size             1000
+         :single-thread-mode          false
+         :solution-error-threshold    0
+         :step-limit                  1000
+         :testing-data                []
+         :training-data               []
+         :umad-rate                   0.1
+         :variation                   {:umad 1}}
+        defaulted (merge defaults argmap)]
+    (merge defaulted ; use the map below to include derived values in argmap
+           {:bmx? (some #{:bmx :bmx-umad} (keys (:variation defaulted)))})))
+
 (defn gp
   "Main GP function"
-  [{:keys [population-size max-generations error-function solution-error-threshold 
-           ds-parent-rate ds-parent-gens dont-end ids-type downsample?]
-    :or   {solution-error-threshold 0.0
-           dont-end false
-           ds-parent-rate 0
-           ds-parent-gens 1
-           ids-type :solved ; :solved or :elite or :soft
-           downsample? false}
-    :as   argmap}]
+  [non-default-argmap]
+  (let [argmap (fill-defaults non-default-argmap)
+        {:keys [population-size max-generations error-function solution-error-threshold dont-end
+                downsample? ds-parent-rate ds-parent-gens ids-type]} argmap]
   ;; print starting args
-  (prn {:starting-args (update (update argmap :error-function str)
-                               :instructions
-                               (fn [instrs]
-                                 (utils/not-lazy (map #(if (fn? %) (str %) %) instrs))))})
-  (println)
+    (prn {:starting-args (update (update argmap :error-function str)
+                                 :instructions
+                                 (fn [instrs]
+                                   (utils/not-lazy (map #(if (fn? %) (str %) %) instrs))))})
+    (println)
   ;;
-  (loop [generation 0
-         evaluations 0
-         population (utils/pmapallv
-                     (fn [_] {:plushy (genome/make-random-plushy argmap)})
-                     (range population-size)
-                     argmap)
-         indexed-training-data (if downsample?
-                                 (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap) argmap)
-                                 (:training-data argmap))]
-    (let [training-data (if downsample?
-                          (case (:ds-function argmap)
-                            :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
-                            :case-maxmin-auto (downsample/select-downsample-maxmin-adaptive indexed-training-data argmap)
-                            :case-rand (downsample/select-downsample-random indexed-training-data argmap)
-                            (do (prn {:error "Invalid Downsample Function"})
-                                (downsample/select-downsample-random indexed-training-data argmap)))
-                          indexed-training-data) ;defaults to full training set
-          parent-reps (if
-                       (and downsample? ; if we are down-sampling
-                            (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
-                        (take (* ds-parent-rate (count population)) (shuffle population))
-                        '()) ;else just empty list
+    (loop [generation 0
+           evaluations 0
+           population (utils/pmapallv
+                       (fn [_] {:plushy (genome/make-random-plushy argmap)})
+                       (range population-size)
+                       argmap)
+           indexed-training-data (if downsample?
+                                   (downsample/assign-indices-to-data (downsample/initialize-case-distances argmap) argmap)
+                                   (:training-data argmap))]
+      (let [training-data (if downsample?
+                            (case (:ds-function argmap)
+                              :case-maxmin (downsample/select-downsample-maxmin indexed-training-data argmap)
+                              :case-maxmin-auto (downsample/select-downsample-maxmin-adaptive indexed-training-data argmap)
+                              :case-rand (downsample/select-downsample-random indexed-training-data argmap)
+                              (do (prn {:error "Invalid Downsample Function"})
+                                  (downsample/select-downsample-random indexed-training-data argmap)))
+                            indexed-training-data) ;defaults to full training set
+            parent-reps (if
+                         (and downsample? ; if we are down-sampling
+                              (zero? (mod generation ds-parent-gens))) ;every ds-parent-gens generations
+                          (take (* ds-parent-rate (count population)) (shuffle population))
+                          '()) ;else just empty list
           ; parent representatives for down-sampling
-          rep-evaluated-pop (if downsample?
-                              (sort-by :total-error
-                                       (utils/pmapallv
-                                        (partial error-function argmap indexed-training-data)
-                                        parent-reps
-                                        argmap))
-                              '())
-          evaluated-pop (sort-by :total-error
-                                 (utils/pmapallv
-                                  (partial error-function argmap training-data)
-                                  population
-                                  argmap))
-          best-individual (first evaluated-pop)
-          best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))
-          argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
-                   (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
-                   argmap)]   ; epsilons
-      (if (:custom-report argmap)
-        ((:custom-report argmap) evaluations evaluated-pop generation argmap)
-        (report evaluations evaluated-pop generation argmap training-data))
+            rep-evaluated-pop (if downsample?
+                                (sort-by :total-error
+                                         (utils/pmapallv
+                                          (partial error-function argmap indexed-training-data)
+                                          parent-reps
+                                          argmap))
+                                '())
+            evaluated-pop (sort-by :total-error
+                                   (utils/pmapallv
+                                    (partial error-function argmap training-data)
+                                    population
+                                    argmap))
+            best-individual (first evaluated-pop)
+            best-individual-passes-ds (and downsample? (<= (:total-error best-individual) solution-error-threshold))
+            argmap (if (= (:parent-selection argmap) :epsilon-lexicase)
+                     (assoc argmap :epsilons (selection/epsilon-list evaluated-pop))
+                     argmap)]   ; epsilons
+        (if (:custom-report argmap)
+          ((:custom-report argmap) evaluations evaluated-pop generation argmap)
+          (report evaluations evaluated-pop generation argmap training-data))
       ;; Did the indvidual pass all cases in ds?
-      (when best-individual-passes-ds
-        (prn {:semi-success-generation generation}))
-      (cond
+        (when best-individual-passes-ds
+          (prn {:semi-success-generation generation}))
+        (cond
         ;; If either the best individual on the ds passes all training cases, or best individual on full 
         ;; sample passes all training cases, we verify success on test cases and exit, succeeding
-        (if (or (and best-individual-passes-ds
-                     (<= (:total-error (error-function argmap indexed-training-data best-individual))
-                         solution-error-threshold))
-                (and (not downsample?)
-                     (<= (:total-error best-individual)
-                         solution-error-threshold)))
-          (do (prn {:success-generation generation})
-              (prn {:successful-plushy (:plushy best-individual)})
-              (prn {:successful-program (genome/plushy->push (:plushy best-individual) argmap)})
-              (prn {:total-test-error
-                    (:total-error (error-function argmap (:testing-data argmap) best-individual))})
-              (when (:simplification? argmap)
-                (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
-                  (prn {:total-test-error-simplified
-                        (:total-error (error-function argmap (:testing-data argmap) {:plushy simplified-plushy}))})
-                  (prn {:simplified-plushy simplified-plushy})
-                  (prn {:simplified-program (genome/plushy->push simplified-plushy argmap)})))
-              (if dont-end false true))
-          false)
-        (cleanup)
+          (if (or (and best-individual-passes-ds
+                       (<= (:total-error (error-function argmap indexed-training-data best-individual))
+                           solution-error-threshold))
+                  (and (not downsample?)
+                       (<= (:total-error best-individual)
+                           solution-error-threshold)))
+            (do (prn {:success-generation generation})
+                (prn {:successful-plushy (:plushy best-individual)})
+                (prn {:successful-program (genome/plushy->push (:plushy best-individual) argmap)})
+                (prn {:total-test-error
+                      (:total-error (error-function argmap (:testing-data argmap) best-individual))})
+                (when (:simplification? argmap)
+                  (let [simplified-plushy (simplification/auto-simplify-plushy (:plushy best-individual) error-function argmap)]
+                    (prn {:total-test-error-simplified
+                          (:total-error (error-function argmap (:testing-data argmap) {:plushy simplified-plushy}))})
+                    (prn {:simplified-plushy simplified-plushy})
+                    (prn {:simplified-program (genome/plushy->push simplified-plushy argmap)})))
+                (if dont-end false true))
+            false)
+          (cleanup)
         ;; If we've evolved for as many generations as the parameters allow, exit without succeeding
-        (or (and (not downsample?)
-                 (>= generation max-generations))
-            (and downsample?
-                 (>= evaluations (* max-generations population-size (count indexed-training-data)))))
-        (cleanup)
+          (or (and (not downsample?)
+                   (>= generation max-generations))
+              (and downsample?
+                   (>= evaluations (* max-generations population-size (count indexed-training-data)))))
+          (cleanup)
         ;; Otherwise, evolve for another generation
-        :else (recur (inc generation)
-                     (+ evaluations
-                        (* population-size (count training-data)) ;every member evaluated on the current sample
-                        (if (zero? (mod generation ds-parent-gens))
-                          (* (count parent-reps)
-                             (- (count indexed-training-data)
-                                (count training-data)))
-                          0) ; the parent-reps not evaluted already on down-sample
-                        (if best-individual-passes-ds
-                          (- (count indexed-training-data) (count training-data))
-                          0)) ; if we checked for generalization or not  
-                     (if (:elitism argmap) ; elitism maintains the most-fit individual
-                       (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
-                                             (range (dec population-size))
-                                             argmap)
-                             (first evaluated-pop))
-                       (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
-                                       (range population-size)
-                                       argmap))
-                     (if downsample?
-                       (if (zero? (mod generation ds-parent-gens))
+          :else (recur (inc generation)
+                       (+ evaluations
+                          (* population-size (count training-data)) ;every member evaluated on the current sample
+                          (if (zero? (mod generation ds-parent-gens))
+                            (* (count parent-reps)
+                               (- (count indexed-training-data)
+                                  (count training-data)))
+                            0) ; the parent-reps not evaluted already on down-sample
+                          (if best-individual-passes-ds
+                            (- (count indexed-training-data) (count training-data))
+                            0)) ; if we checked for generalization or not  
+                       (if (:elitism argmap) ; elitism maintains the most-fit individual
+                         (conj (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
+                                               (range (dec population-size))
+                                               argmap)
+                               (first evaluated-pop))
+                         (utils/pmapallv (fn [_] (variation/new-individual evaluated-pop argmap))
+                                         (range population-size)
+                                         argmap))
+                       (if downsample?
+                         (if (zero? (mod generation ds-parent-gens))
                          ; update distances every ds-parent-gens generations
-                         (downsample/update-case-distances rep-evaluated-pop
-                                                           indexed-training-data
-                                                           indexed-training-data
-                                                           ids-type
-                                                           (/ solution-error-threshold
-                                                              (count indexed-training-data)))
-                         indexed-training-data)
-                       indexed-training-data))))))
+                           (downsample/update-case-distances rep-evaluated-pop
+                                                             indexed-training-data
+                                                             indexed-training-data
+                                                             ids-type
+                                                             (/ solution-error-threshold
+                                                                (count indexed-training-data)))
+                           indexed-training-data)
+                         indexed-training-data)))))))
