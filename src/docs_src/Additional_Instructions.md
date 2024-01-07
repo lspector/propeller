@@ -10,6 +10,7 @@ Table of contents
 * [.DS_Store](#ds_store)
 * [numeric.cljc](#numericcljc)
 * [string.cljc](#stringcljc)
+* [parentheses.cljc](#parenthesescljc)
 * [character.cljc](#charactercljc)
 * [bool.cljc](#boolcljc)
 * [code.cljc](#codecljc)
@@ -24,6 +25,8 @@ Prints new line
 
 # numeric.cljc
 
+## :float_div
+Divides the top two items on the float stack If denominator is 0, returns 1.0 
 ## :float_cos
 Pushes the cosine of the top FLOAT 
 ## :float_sin
@@ -96,6 +99,8 @@ Splits the top STRING on whitespace, and pushes back the resulting components in
 Pushes the substring of the top STRING, with beginning and end indices determined by the second topmost and topmost INTEGERs respectively. If an index is out of bounds, the beginning/end of the string is used instead 
 ## :string_take
 Pushes the substring of the top STRING consisting of its first n letters, where n is determined by the top INTEGER 
+# parentheses.cljc
+
 # character.cljc
 
 ## :char_is_letter
