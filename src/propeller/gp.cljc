@@ -52,29 +52,31 @@
   "Returns argmap with any unspecified values filled with defaults."
   [argmap]
   (let [defaults
-        {:bmx-exchange-rate           0.5
-         :bmx-gene-length-limit       10
-         :bmx-gap-change-probability  0.001
-         :bmx-complementary?          false
-         :dont-end                    false
-         :downsample?                 true
-         :ds-function                 :case-maxmin
-         :downsample-rate             0.05
-         :ds-parent-rate              0.01
-         :ds-parent-gens              10
-         :error-function              (fn [& args] (println "ERROR FUNCTION NOT PROVIDED"))
-         :ids-type                    :solved ; :solved or :elite or :soft
-         :max-initial-plushy-size     100
-         :max-generations             1000
-         :parent-selection            :lexicase
-         :population-size             1000
-         :single-thread-mode          false
-         :solution-error-threshold    0
-         :step-limit                  1000
-         :testing-data                []
-         :training-data               []
-         :umad-rate                   0.1
-         :variation                   {:umad 1}}
+        {:bmx-exchange-rate           0.5 ; for bmx, the rate at which genes will be exchanged
+         :bmx-gene-length-limit       10  ; for bmx, the maximum length of a gene
+         :bmx-gap-change-probability  0.001 ; for bmx, the mutation rate for gaps
+         :bmx-complementary?          false ; for bmx, whether mates selected using reverse case sequence of first parent
+         :dont-end                    false ; if true, keep running until limit regardless of success
+         :downsample?                 true ; wether to use downsampling
+         :ds-function                 :case-maxmin ; :case-rand, case-maxmin, case-maxmin-auto
+         :downsample-rate             0.05 ; proportion of data used in downsample
+         :ds-parent-rate              0.01 ; proportion of parents used to evaluate case distances
+         :ds-parent-gens              10 ; generations between computation of parent distances
+         :error-function              (fn [& args] (println "ERROR FUNCTION NOT PROVIDED")) ; must provide
+         :ids-type                    :solved ; type of informed downsampling, :solved or :elite or :soft
+         :instructions                ["INSTRUCTIONS NOT PROVIDED"] ; must be provided
+         :max-initial-plushy-size     100 ; the maximum size of genomes in initial population
+         :max-generations             1000 ; generation limi when downsampling is not used, adjusted by downsampling
+         :parent-selection            :lexicase ; see options in variation.cljc
+         :population-size             1000 ; the size of the GP ppopulation
+         :single-thread-mode          false ; if true, don't use multithreading
+         :solution-error-threshold    0 ; maximum total error for solutions
+         :step-limit                  1000 ; limit of Push interpreter steps in a Push program evaluation 
+         :testing-data                [] ; must be provided unless there is no testing data
+         :training-data               [] ; must be provided
+         :umad-rate                   0.1 ; addition rate (from which deletion rate will be derived) for UMAD
+         :variation                   {:umad 1} ; genetic operators and probabilities for their use, which should sum to 1
+         }
         defaulted (merge defaults argmap)]
     (merge defaulted ; use the map below to include derived values in argmap
            {:bmx? (some #{:bmx :bmx-umad} (keys (:variation defaulted)))})))
