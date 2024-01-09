@@ -214,11 +214,29 @@
 
 (defn break-up
   "A utility function for bmx-related genetic operators. Returns the provided
-  :gap-free plushy with gaps randomly inserted to ensure that no gene is longer
-  than the provided limit."
+   :gap-free plushy with gaps randomly inserted to ensure that no gene is longer
+   than the provided limit. Will break just before an instruction that opens code
+   blocks or just after a close, unless there are no opportunities to do so"
   [gene limit]
   (if (> (count gene) limit)
-    (let [i (inc (rand-int (dec (count gene))))]
+    (let [openers (map first
+                       (filter #(and (second %)
+                                     (not (zero? (second %))))
+                               parentheses/opens))
+          i (if (or (some (set openers) (rest gene))
+                    (some #{'close} (butlast gene)))
+              (rand-nth (filter identity
+                                (concat (map-indexed (fn [ix item]
+                                                       (if (some #{item} openers)
+                                                         (inc ix)
+                                                         nil))
+                                                     (rest gene))
+                                        (map-indexed (fn [ix item]
+                                                       (if (= item 'close)
+                                                         (inc ix)
+                                                         nil))
+                                                     (butlast gene)))))
+              (inc (rand-int (dec (count gene)))))]
       (concat (break-up (take i gene) limit)
               [:gap]
               (break-up (drop i gene) limit)))
