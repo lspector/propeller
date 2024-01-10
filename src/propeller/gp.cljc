@@ -40,7 +40,8 @@
         {:best-gene-count     (utils/count-genes (:plushy best))
          :average-gene-count  (float (/ (reduce + (map utils/count-genes (map :plushy pop)))
                                         (count pop)))}
-        {})))))
+        {})))
+    (flush)))
 
 (defn cleanup
   []
