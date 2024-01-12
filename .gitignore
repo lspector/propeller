@@ -23,6 +23,7 @@ notes
 /temp
 *~
 q
+scratch.clj
 
 # Clojure Script
 .shadow-cljs/
