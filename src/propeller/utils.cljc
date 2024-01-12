@@ -51,7 +51,7 @@
   "Returns a random instruction from a supplied pool of instructions, evaluating
   ERC-producing functions to a constant literal."
   [instructions argmap]
-  (case (or (:closes argmap) :specified)
+  (case (or (:closes argmap) :specified) 
     :specified (let [instruction (rand-nth instructions)]
                  (if (fn? instruction)
                    (instruction)
