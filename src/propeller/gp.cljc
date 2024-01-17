@@ -61,7 +61,7 @@
          :bmx-complementary?          false ; for bmx, whether mates selected using reverse case sequence of first parent
          :bmx-maximum-distance        1000000 ; for bmx, don't exchange if distance is greater than this
          :bmx-same-gene-count         false ; for bmx, only allow exchanges between individuals with same number of genes
-         :closes                      :specified ; :pecified, :balanced, :none
+         :closes                      :specified ; :specified, :balanced, :none
          :custom-report               false ; if provided, should be a function that takes an argmap
          :dont-end                    false ; if true, keep running until limit regardless of success
          :downsample?                 true ; wether to use downsampling

@@ -1,4 +1,4 @@
-(ns propeller.problems.integer-regression
+(ns propeller.problems.regression.integer-regression
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]

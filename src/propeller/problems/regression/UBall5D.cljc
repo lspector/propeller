@@ -1,4 +1,4 @@
-(ns propeller.problems.UBall5D
+(ns propeller.problems.regression.UBall5D
   (:require [propeller.genome :as genome]
             [propeller.push.interpreter :as interpreter]
             [propeller.push.state :as state]
