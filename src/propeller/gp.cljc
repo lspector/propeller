@@ -64,7 +64,7 @@
          :closes                      :specified ; :specified, :balanced, :none
          :custom-report               false ; if provided, should be a function that takes an argmap
          :dont-end                    false ; if true, keep running until limit regardless of success
-         :downsample?                 true ; wether to use downsampling
+         :downsample?                 false ; whether to use downsampling
          :ds-function                 :case-maxmin ; :case-rand, case-maxmin, case-maxmin-auto
          :downsample-rate             0.05 ; proportion of data used in downsample
          :ds-parent-rate              0.01 ; proportion of parents used to evaluate case distances
