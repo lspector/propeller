@@ -1,4 +1,4 @@
-;; This file implements a the symbolic regression problem described:
+;; This file implements the symbolic regression problem described in:
 ;;
 ;;   Saini, A.K., Spector, L. (2020). Using Modularity Metrics as 
 ;;   Design Features to Guide Evolution in Genetic Programming. 
