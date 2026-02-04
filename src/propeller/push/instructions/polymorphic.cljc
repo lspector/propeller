@@ -142,7 +142,7 @@
             popped-state (state/pop-stack state :integer)
             top-item (state/peek-stack popped-state stack)
             popped-state (state/pop-stack popped-state stack)
-            index (max 0 (min index-raw (dec (count (get popped-state stack)))))]
+            index (max 0 (min index-raw (count (get popped-state stack))))]
         (update popped-state stack #(utils/not-lazy (concat (take index %)
                                                             (list top-item)
                                                             (drop index %)))))
